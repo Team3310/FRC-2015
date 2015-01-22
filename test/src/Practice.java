@@ -55,7 +55,15 @@ public class Practice {
 		double twoAngle4 = (180 - fiveAngle2 - fourAngle3);
 		double threeAngle4 = (oneAngle4 + twoAngle4 + 90);
 		System.out.print("Angle 4: ");
-		System.out.print(threeAngle4);
+		if(x < 0)
+		{
+			System.out.print((x < 0) ? threeAngle4 - 90 : x);		
+		}
+		else
+		{
+			System.out.print(threeAngle4);
+		}
+		//System.out.print(threeAngle4);
 		
 		
 		// Closing scanners
