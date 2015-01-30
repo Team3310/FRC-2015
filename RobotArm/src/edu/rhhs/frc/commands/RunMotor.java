@@ -1,18 +1,17 @@
+package edu.rhhs.frc.commands;
 
-package org.usfirst.frc.team3310.robot.commands;
-
+import edu.rhhs.frc.RobotMain;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Command;
-
-import org.usfirst.frc.team3310.robot.Robot;
 
 /**
  *
  */
-public class ExampleCommand extends Command {
-
-    public ExampleCommand() {
+public class RunMotor extends Command {
+	
+    public RunMotor() {
         // Use requires() here to declare subsystem dependencies
-        requires(Robot.exampleSubsystem);
+        requires(RobotMain.bg);
     }
 
     // Called just before this Command runs the first time

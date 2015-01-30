@@ -23,8 +23,8 @@
   
   <property file="${user.home}/wpilib/wpilib.properties"/>
   <property file="build.properties"/>
-  <property file="${user.home}/wpilib/java/${version}/ant/build.properties"/>
+  <property file="${user.home}/wpilib/java/jdk1.8.0_31/ant/build.properties"/>
   
-  <import file="${wpilib.ant.dir}/build.xml"/>
+  <import file="C:/Documents and Settings/Heath/wpilib/java/current/ant/build.xml"/>
 
 </project> 
