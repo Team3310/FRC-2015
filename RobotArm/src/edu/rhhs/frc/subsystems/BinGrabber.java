@@ -14,17 +14,17 @@ public class BinGrabber extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
-    	setMotorSpeed(1.0);
+    	//setMotorSpeed(1.0);
     }
     
     /**
      * Where 'x' is the speed, ranging from -1 to +1
      */
-    public void setMotorSpeed(double x) {
+    /*public void setMotorSpeed(double x) {
     	getAllocatedMotor(1).set(.5);
     }
 	private SpeedController getAllocatedMotor(int i) {
 		return new Victor(i);
-	}
+	}*/
 }
 

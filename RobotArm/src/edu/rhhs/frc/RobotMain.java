@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class RobotMain extends IterativeRobot {
-	Command autonomousCommand;
+	//Command autonomousCommand;
 	public static BinGrabber bg;
 
 	/**
@@ -27,7 +27,8 @@ public class RobotMain extends IterativeRobot {
 	public void robotInit() {
 		//To retrieve OI, call OI.getInstance();
 		// instantiate the command used for the autonomous period
-		autonomousCommand = new RunMotor();
+		//autonomousCommand = new RunMotor();
+		CommandBase.init();
 		bg = new BinGrabber();
 		updateUniverse();
 		System.out.println("Corndog-making mechanism fully initialized!");
@@ -41,7 +42,7 @@ public class RobotMain extends IterativeRobot {
 	public void autonomousInit() {
 		// schedule the autonomous command (example)
 		updateUniverse();
-		if (autonomousCommand != null) autonomousCommand.start();
+		//if (autonomousCommand != null) autonomousCommand.start();
 	}
 
 	/**
@@ -58,7 +59,7 @@ public class RobotMain extends IterativeRobot {
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 		updateUniverse();
-		if (autonomousCommand != null) autonomousCommand.cancel();
+		//if (autonomousCommand != null) autonomousCommand.cancel();
 	}
 
 	/**
