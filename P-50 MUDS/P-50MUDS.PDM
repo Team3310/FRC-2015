@@ -1,0 +1,98 @@
+[Root]
+Most Recent Package=P-50 Dynamic Simulation Setup
+
+
+[Package|P-50 Dynamic Simulation Setup|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=L:\analysis tools\robot dynamics\P50 MUDS Setup
+
+[Package|P-50 Dynamic Simulation Setup|Configure DAO ISAMs]
+Applicable=No
+
+[Package|P-50 Dynamic Simulation Setup|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|P-50 Dynamic Simulation Setup|Files Found]
+
+[Package|P-50 Dynamic Simulation Setup|Files Released]
+
+[Package|P-50 Dynamic Simulation Setup|Missing Dependency Information]
+C:\WINNT\system32\FM20.DLL=
+C:\Program Files\Microsoft Office\Office\EXCEL8.OLB=
+
+[Package|P-50 Dynamic Simulation Setup|Out-of-Date Dependency Information]
+
+[Package|P-50 Dynamic Simulation Setup|Files Added]
+
+[Package|P-50 Dynamic Simulation Setup|Files Removed]
+
+[Package|P-50 Dynamic Simulation Setup|Files In Project]
+L:\4500-p50\analysis\P-50 MUDS\P50-MUDS.exe=Yes
+C:\WINNT\system32\MSVBVM60.DLL=Yes
+C:\WINNT\system32\OLEAUT32.DLL=Yes
+C:\WINNT\system32\OLEPRO32.DLL=Yes
+C:\WINNT\system32\ASYCFILT.DLL=Yes
+C:\WINNT\system32\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\Program Files\Microsoft Office\Office\EXCEL8.OLB=Yes
+C:\WINNT\system32\MSCOMCTL.OCX=Yes
+C:\WINNT\system32\MSCOMCT2.OCX=Yes
+C:\WINNT\system32\FM20.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINNT\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+
+[Package|P-50 Dynamic Simulation Setup|Configure Registry Files]
+Applicable=No
+
+[Package|P-50 Dynamic Simulation Setup|Configure Remote Servers]
+Applicable=No
+
+[Package|P-50 Dynamic Simulation Setup|Install Locations]
+L:\4500-p50\analysis\P-50 MUDS\P50-MUDS.exe=$(AppPath)
+C:\WINNT\system32\MSVBVM60.DLL=$(WinSysPathSysFile)
+C:\WINNT\system32\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\WINNT\system32\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\WINNT\system32\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\WINNT\system32\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Office\Office\EXCEL8.OLB=$(WinSysPath)
+C:\WINNT\system32\MSCOMCTL.OCX=$(WinSysPath)
+C:\WINNT\system32\MSCOMCT2.OCX=$(WinSysPath)
+C:\WINNT\system32\FM20.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINNT\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+
+[Package|P-50 Dynamic Simulation Setup|Configure Shared Files]
+Applicable=Yes
+L:\4500-p50\analysis\P-50 MUDS\P50-MUDS.exe=No
+
+[Package|P-50 Dynamic Simulation Setup|Distribution]
+Type=single
+Size=1.44 MB
+Title=P50MUDS
+
+[Package|P-50 Dynamic Simulation Setup|IconGroups]
+Group0=P50MUDS
+PrivateGroup0=True
+Parent0=$(Programs)
+
+[Package|P-50 Dynamic Simulation Setup|P50MUDS]
+Icon1=P50-MUDS.exe
+Title1=P50MUDS
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|P-50 Dynamic Simulation Setup|Package]
+PackageFolder=L:\analysis tools\robot dynamics\P50 MUDS Setup
+ProjectFolder=L:\4500-p50\analysis\P-50 MUDS
+ServerSideCab=
+File1=L:\analysis tools\robot dynamics\P50 MUDS Setup\setup.exe
+File2=L:\analysis tools\robot dynamics\P50 MUDS Setup\Setup.Lst
+File3=L:\analysis tools\robot dynamics\P50 MUDS Setup\P50-MUDS.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
