@@ -1,12 +1,11 @@
 
 package edu.rhhs.frc;
 
+import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.rhhs.frc.commands.ExampleCommand;
-import edu.rhhs.frc.subsystems.ExampleSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -15,10 +14,9 @@ import edu.rhhs.frc.subsystems.ExampleSubsystem;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends IterativeRobot {
+public class RobotMainNew extends IterativeRobot {
 
-	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
-	public static OI oi;
+	public static final DriveTrain driveTrain = new DriveTrain();
 
     Command autonomousCommand;
 
@@ -27,9 +25,7 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-		oi = new OI();
-        // instantiate the command used for the autonomous period
-        autonomousCommand = new ExampleCommand(0.5);
+//        autonomousCommand = new ExampleCommand();
     }
 	
 	public void disabledPeriodic() {
