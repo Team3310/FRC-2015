@@ -2,9 +2,12 @@ package edu.rhhs.frc;
 
 import edu.rhhs.frc.commands.FireBinGrabber;
 import edu.rhhs.frc.commands.MoveBinGrabber;
+import edu.rhhs.frc.commands.TalonTestVelocityControl;
 import edu.rhhs.frc.controller.XboxController;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -14,14 +17,14 @@ public class OI
 {	
 	private static OI instance;
 
+	private XboxController m_xboxController;
 	private Joystick m_joystick1;
     private Joystick m_joystick2;
-	private XboxController m_xboxController;
 	
 	private OI() {
+		m_xboxController = new XboxController(RobotMap.XBOX_USB_ID);
         m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
         m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
-	    m_xboxController = new XboxController(RobotMap.XBOX_USB_ID);
 	    
 	    JoystickButton fireBinGrabber = new JoystickButton(m_xboxController.getJoyStick(), XboxController.B_BUTTON);
         fireBinGrabber.whenPressed(new FireBinGrabber(.4, 10));
@@ -33,9 +36,10 @@ public class OI
         JoystickButton moveBinGrabberDown = new JoystickButton(m_xboxController.getJoyStick(), XboxController.Y_BUTTON);
         moveBinGrabberDown.whenPressed(new MoveBinGrabber(-0.5));
         moveBinGrabberDown.whenReleased(new MoveBinGrabber(0));
-	    /*InternalButton motor1 = new InternalButton();
-		motor1.whenReleased(new ExampleCommand(0.5));
-		SmartDashboard.putData("Motor On", motor1);*/
+	    
+        InternalButton motor1 = new InternalButton();
+		motor1.whenReleased(new TalonTestVelocityControl());
+		SmartDashboard.putData("Talon Test", motor1);
 	}
 	
 	public static OI getInstance() {

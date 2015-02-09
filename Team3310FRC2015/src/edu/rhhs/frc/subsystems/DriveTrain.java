@@ -4,19 +4,21 @@ import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CANTalon.ControlMode;
+import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem
-{
+{	
 	public static final int CONTROLLER_JOYSTICK_ARCADE = 0;
 	public static final int CONTROLLER_JOYSTICK_TANK = 1;
 	public static final int CONTROLLER_JOYSTICK_CHEESY = 2;
 	public static final int CONTROLLER_XBOX_CHEESY = 3;
 	public static final int CONTROLLER_XBOX_ARCADE_LEFT = 4;
 	public static final int CONTROLLER_XBOX_ARCADE_RIGHT = 5;
-	public static final int CONTROLLER_WHEEL = 6;
+	//public static final int CONTROLLER_WHEEL = 6;
 
 	private CANTalon m_frontLeftMotor;
 	private CANTalon m_frontRightMotor;
@@ -50,6 +52,12 @@ public class DriveTrain extends Subsystem
 		this.m_frontRightMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
 		this.m_rearLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
 		this.m_rearRightMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
+		m_rearLeftMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+		m_rearRightMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+		m_rearLeftMotor.reverseSensor(true);
+		//How much of Encoder position = 1 revolution? Customary to our robot?
+		m_rearLeftMotor.setPosition(0);
+		m_rearRightMotor.setPosition(0);
  
 		try {
             m_drive = new RobotDrive(m_frontLeftMotor, m_rearLeftMotor, m_frontRightMotor, m_rearRightMotor);
@@ -76,12 +84,23 @@ public class DriveTrain extends Subsystem
 		setDefaultCommand(new DriveWithJoystick()); // set default command
 	}
 	
+	public void setVelocity(double velocityDegPerSec) {
+		m_rearLeftMotor.setPID(0.3, 0.0, 0.0);
+		m_rearLeftMotor.setF(0.01);
+		m_rearLeftMotor.changeControlMode(ControlMode.Speed);
+		m_rearLeftMotor.set(velocityDegPerSec);
+		m_rearLeftMotor.enableControl();
+	}
+	
+	public boolean isAtTarget() {
+		return m_rearLeftMotor.getClosedLoopError() < 100;
+	}
+	
 	public void setDriveMode(int driveMode) {
 		m_controllerMode = driveMode;
 	}
 
 	public void driveWithJoystick() {
-
 		if (m_drive != null) {
 			switch(m_controllerMode) {
 			case CONTROLLER_JOYSTICK_ARCADE:
@@ -136,7 +155,33 @@ public class DriveTrain extends Subsystem
 			// m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 			// break;
 			}
+			SmartDashboard.putNumber("Rear Left Pos (deg)", convertEncodePositionToDeg(m_rearLeftMotor.getPosition()));
+			SmartDashboard.putNumber("Rear Right Pos (deg)", convertEncodePositionToDeg(m_rearRightMotor.getPosition()));
+			SmartDashboard.putNumber("Rear Left Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getSpeed()));
+			SmartDashboard.putNumber("Rear Right Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearRightMotor.getSpeed()));
+			SmartDashboard.putNumber("Rear Left Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearLeftMotor.getSpeed()));
+			SmartDashboard.putNumber("Rear Right Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearRightMotor.getSpeed()));
 		}
+	}
+	
+	private double convertEncodePositionToDeg(double encoderValue) {
+		return 360.0 * encoderValue/ (4 * RobotMap.GRAYHILL_ENCODER_COUNT);
+	}
+
+	private double convertDegToEncoderPosition(double inputValue) {
+		return (4 * RobotMap.GRAYHILL_ENCODER_COUNT) / 360.0;
+	}
+
+	private double convertEncoderVelocityToDegPerSec(double encoderValue) {
+		return convertEncodePositionToDeg(encoderValue) * 10;
+	}
+
+	private double convertEncoderVelocityToFtPerSec(double encoderValue) {
+		return convertEncoderVelocityToDegPerSec(encoderValue) * RobotMap.WHEEL_DIAMETER_IN * Math.PI / 12.0 / 360.0;
+	}
+
+	private double convertDegPerSecToEncoderVelocity(double encoderValue) {
+		return convertDegToEncoderPosition(encoderValue) / 10.0;
 	}
 
 	private double adjustForSensitivity(double scale, double trim, double steer, int nonLinearFactor, double wheelNonLinearity) {
