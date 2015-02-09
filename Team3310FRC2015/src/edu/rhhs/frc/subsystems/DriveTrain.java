@@ -12,21 +12,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem
 {	
-	public static final int CONTROLLER_JOYSTICK_ARCADE = 0;
+	// Talons 
+	private CANTalon m_frontLeftMotor;
+	private CANTalon m_frontRightMotor;
+	private CANTalon m_rearLeftMotor;
+	private CANTalon m_rearRightMotor;
+	
+	private CANTalon.ControlMode m_talonControlMode = CANTalon.ControlMode.PercentVbus;
+    
+	private double m_error;
+    private double m_kP = 0.3;
+    private double m_kI = 0.0;
+    private double m_kD = 0.0;
+    private double m_kF = 0.0003;
+    private int m_iZone = 100;
+    private double m_rampRatePID = 1.0;
+    private double m_rampRateVBus = 10.0;
+    private int m_profile = 0;
+	 
+    private RobotDrive m_drive;
+    
+    // Controllers
+    public static final int CONTROLLER_JOYSTICK_ARCADE = 0;
 	public static final int CONTROLLER_JOYSTICK_TANK = 1;
 	public static final int CONTROLLER_JOYSTICK_CHEESY = 2;
 	public static final int CONTROLLER_XBOX_CHEESY = 3;
 	public static final int CONTROLLER_XBOX_ARCADE_LEFT = 4;
 	public static final int CONTROLLER_XBOX_ARCADE_RIGHT = 5;
-	//public static final int CONTROLLER_WHEEL = 6;
+	public static final int CONTROLLER_WHEEL = 6;
 
-	private CANTalon m_frontLeftMotor;
-	private CANTalon m_frontRightMotor;
-	private CANTalon m_rearLeftMotor;
-	private CANTalon m_rearRightMotor;
- 
-    private RobotDrive m_drive;
-    
     public static final double STEER_NON_LINEARITY = 0.9;
     public static final double MOVE_NON_LINEARITY = 0.9;
     
@@ -44,28 +58,43 @@ public class DriveTrain extends Subsystem
     
     private double m_moveTrim = 0.0;
     private double m_steerTrim = 0.0;
-	
+    
     private int m_controllerMode = CONTROLLER_XBOX_CHEESY;
 
     public DriveTrain() {
-		this.m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
-		this.m_frontRightMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
-		this.m_rearLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
-		this.m_rearRightMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
-		m_rearLeftMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		m_rearRightMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		m_rearLeftMotor.reverseSensor(true);
-		//How much of Encoder position = 1 revolution? Customary to our robot?
-		m_rearLeftMotor.setPosition(0);
-		m_rearRightMotor.setPosition(0);
  
 		try {
-            m_drive = new RobotDrive(m_frontLeftMotor, m_rearLeftMotor, m_frontRightMotor, m_rearRightMotor);
-            
+			m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
+			m_frontRightMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
+			
+			m_rearLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+			m_rearRightMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
+			
+			// The front motors are setup to "follow" the rear motors
+			m_frontLeftMotor.changeControlMode(CANTalon.ControlMode.Follower);
+			m_frontLeftMotor.set(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+
+			m_frontRightMotor.changeControlMode(CANTalon.ControlMode.Follower);
+			m_frontRightMotor.set(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
+
+			// The rear motors have encoders attached so they will be used for the main control input
+			m_rearLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
+			m_rearLeftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile); 
+			m_rearLeftMotor.setPosition(0);
+			m_rearLeftMotor.setVoltageRampRate(m_rampRateVBus);
+			m_rearLeftMotor.reverseSensor(true);
+
+			m_rearRightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
+			m_rearRightMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile); 
+			m_rearRightMotor.setPosition(0);
+			m_rearRightMotor.setVoltageRampRate(m_rampRateVBus);
+
+			// Start with the Talons in throttle mode
+			setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
+			
+			m_drive = new RobotDrive(m_rearLeftMotor, m_rearRightMotor);            
             m_drive.setSafetyEnabled(false);
-            m_drive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
-            m_drive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
             
 //            SmartDashboard.putNumber("Move NonLinear ", m_moveNonLinear);
@@ -81,27 +110,54 @@ public class DriveTrain extends Subsystem
 	
 	@Override
 	public void initDefaultCommand() {
-		setDefaultCommand(new DriveWithJoystick()); // set default command
+		setDefaultCommand(new DriveWithJoystick()); 
 	}
 	
-	public void setVelocity(double velocityDegPerSec) {
-		m_rearLeftMotor.setPID(0.3, 0.0, 0.0);
-		m_rearLeftMotor.setF(0.01);
-		m_rearLeftMotor.changeControlMode(ControlMode.Speed);
-		m_rearLeftMotor.set(velocityDegPerSec);
-		m_rearLeftMotor.enableControl();
+	private void setTalonControlMode(CANTalon.ControlMode mode, double leftInput, double rightInput) {
+		m_talonControlMode = mode;
+		m_rearLeftMotor.changeControlMode(m_talonControlMode);
+		m_rearRightMotor.changeControlMode(m_talonControlMode);
+		setTalonInput(leftInput, rightInput);
 	}
 	
-	public boolean isAtTarget() {
-		return m_rearLeftMotor.getClosedLoopError() < 100;
+	private void setTalonInput(double leftInput, double rightInput) {
+		m_rearLeftMotor.set(leftInput);
+		m_rearRightMotor.set(rightInput);
 	}
 	
-	public void setDriveMode(int driveMode) {
+	public void startVelocityPID(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
+		setTalonControlMode(CANTalon.ControlMode.Speed, 
+				convertDegPerSecToEncoderVelocity(leftTargetDegPerSec), 
+				convertDegPerSecToEncoderVelocity(rightTargetDegPerSec));
+		m_error = errorDegPerSec;
+	}
+	
+	public void stopPID() {
+		setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
+	}
+	
+	public boolean isAtLeftTarget() {
+		return Math.abs(m_rearLeftMotor.getClosedLoopError()) < m_error;
+	}
+	
+	public boolean isAtRightTarget() {
+		return Math.abs(m_rearRightMotor.getClosedLoopError()) < m_error;
+	}
+	
+	public double getLeftError() {
+		return m_rearLeftMotor.getClosedLoopError();
+	}
+	
+	public double getRightError() {
+		return m_rearRightMotor.getClosedLoopError();
+	}
+	
+	public void setControllerMode(int driveMode) {
 		m_controllerMode = driveMode;
 	}
 
 	public void driveWithJoystick() {
-		if (m_drive != null) {
+		if (m_drive != null && m_talonControlMode == CANTalon.ControlMode.PercentVbus) {
 			switch(m_controllerMode) {
 			case CONTROLLER_JOYSTICK_ARCADE:
 				m_moveInput = OI.getInstance().getJoystick1().getY();
@@ -155,33 +211,27 @@ public class DriveTrain extends Subsystem
 			// m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 			// break;
 			}
-			SmartDashboard.putNumber("Rear Left Pos (deg)", convertEncodePositionToDeg(m_rearLeftMotor.getPosition()));
-			SmartDashboard.putNumber("Rear Right Pos (deg)", convertEncodePositionToDeg(m_rearRightMotor.getPosition()));
-			SmartDashboard.putNumber("Rear Left Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getSpeed()));
-			SmartDashboard.putNumber("Rear Right Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearRightMotor.getSpeed()));
-			SmartDashboard.putNumber("Rear Left Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearLeftMotor.getSpeed()));
-			SmartDashboard.putNumber("Rear Right Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearRightMotor.getSpeed()));
 		}
 	}
 	
-	private double convertEncodePositionToDeg(double encoderValue) {
+	private double convertEncoderPositionToDeg(double encoderValue) {
 		return 360.0 * encoderValue/ (4 * RobotMap.GRAYHILL_ENCODER_COUNT);
 	}
 
-	private double convertDegToEncoderPosition(double inputValue) {
-		return (4 * RobotMap.GRAYHILL_ENCODER_COUNT) / 360.0;
+	private double convertDegToEncoderPosition(double degValue) {
+		return (degValue * 4 * RobotMap.GRAYHILL_ENCODER_COUNT) / 360.0;
 	}
 
 	private double convertEncoderVelocityToDegPerSec(double encoderValue) {
-		return convertEncodePositionToDeg(encoderValue) * 10;
+		return convertEncoderPositionToDeg(encoderValue) * 10;
 	}
 
 	private double convertEncoderVelocityToFtPerSec(double encoderValue) {
 		return convertEncoderVelocityToDegPerSec(encoderValue) * RobotMap.WHEEL_DIAMETER_IN * Math.PI / 12.0 / 360.0;
 	}
 
-	private double convertDegPerSecToEncoderVelocity(double encoderValue) {
-		return convertDegToEncoderPosition(encoderValue) / 10.0;
+	private double convertDegPerSecToEncoderVelocity(double degPerSecValue) {
+		return convertDegToEncoderPosition(degPerSecValue) / 10.0;
 	}
 
 	private double adjustForSensitivity(double scale, double trim, double steer, int nonLinearFactor, double wheelNonLinearity) {
@@ -217,4 +267,12 @@ public class DriveTrain extends Subsystem
 		return Math.asin(steerNonLinearity * steer) / Math.asin(steerNonLinearity);
 	}
 
+	public void updateStatus() {
+		SmartDashboard.putNumber("Rear Left Pos (deg)", convertEncoderPositionToDeg(m_rearLeftMotor.getPosition()));
+		SmartDashboard.putNumber("Rear Right Pos (deg)", convertEncoderPositionToDeg(m_rearRightMotor.getPosition()));
+		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getSpeed()));
+		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearRightMotor.getSpeed()));
+		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearLeftMotor.getSpeed()));
+		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearRightMotor.getSpeed()));		
+	}
 }

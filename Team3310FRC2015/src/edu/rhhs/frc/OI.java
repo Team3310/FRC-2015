@@ -37,9 +37,9 @@ public class OI
         moveBinGrabberDown.whenPressed(new MoveBinGrabber(-0.5));
         moveBinGrabberDown.whenReleased(new MoveBinGrabber(0));
 	    
-        InternalButton motor1 = new InternalButton();
-		motor1.whenReleased(new TalonTestVelocityControl());
-		SmartDashboard.putData("Talon Test", motor1);
+        InternalButton talonTest = new InternalButton();
+        talonTest.whenReleased(new TalonTestVelocityControl(90, 90, 1, 10));
+		SmartDashboard.putData("Talon Test", talonTest);
 	}
 	
 	public static OI getInstance() {

@@ -7,15 +7,25 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class TalonTestVelocityControl extends Command {
+	
+	private double leftTargetDegPerSec;
+	private double rightTargetDegPerSec;
+	private double errorDegPerSec;
+	private double timeoutSeconds;
 
-    public TalonTestVelocityControl() {
+    public TalonTestVelocityControl(double rightVelocityDegPerSec, double leftVelocityDegPerSec, double errorDegPerSec, double timeoutSeconds) {
         // Use requires() here to declare subsystem dependencies
+    	this.leftTargetDegPerSec = leftVelocityDegPerSec;
+    	this.rightTargetDegPerSec = rightVelocityDegPerSec;
+    	this.errorDegPerSec = errorDegPerSec;
+    	this.timeoutSeconds = timeoutSeconds;
         requires(RobotMain.driveTrain);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	RobotMain.driveTrain.setVelocity(90);
+    	RobotMain.driveTrain.startVelocityPID(leftTargetDegPerSec, rightTargetDegPerSec, errorDegPerSec);
+    	setTimeout(timeoutSeconds);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -24,11 +34,12 @@ public class TalonTestVelocityControl extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return isTimedOut();
     }
 
     // Called once after isFinished returns true
     protected void end() {
+    	RobotMain.driveTrain.stopPID();
     }
 
     // Called when another command which requires one or more of the same

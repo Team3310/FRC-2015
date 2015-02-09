@@ -3,6 +3,7 @@ package edu.rhhs.frc.subsystems;
 import edu.rhhs.frc.RobotMap;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *	BinGrabber (name to be determined) is a subsystem that controls the two motors associated with each of the two arms (codenames: "Bubba" and "Gump").
@@ -34,4 +35,7 @@ public class BinGrabber extends Subsystem
     	m_leftMotor.set(speed);
     	m_rightMotor.set(speed);
     }
+    
+	public void updateStatus() {
+	}
 }

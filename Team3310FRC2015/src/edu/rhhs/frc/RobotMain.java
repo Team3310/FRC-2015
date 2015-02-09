@@ -71,7 +71,7 @@ public class RobotMain extends IterativeRobot
         if (autonomousCommand != null) {
         	autonomousCommand.cancel();
         }
-        driveTrain.setDriveMode(((Integer)driveModeChooser.getSelected()).intValue());
+        driveTrain.setControllerMode(((Integer)driveModeChooser.getSelected()).intValue());
     }
 
     /**
@@ -94,5 +94,15 @@ public class RobotMain extends IterativeRobot
      */
     public void testPeriodic() {
         LiveWindow.run();
+    }
+    
+    public void updateStatus() {
+    	try {
+    		driveTrain.updateStatus();
+    		binGrabber.updateStatus();
+    	}
+    	catch (Exception e) {
+    		// Do nothing... just don't want to stop the robot
+    	}
     }
 }
