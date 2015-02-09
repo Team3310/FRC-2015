@@ -6,10 +6,14 @@ package edu.rhhs.frc;
  * floating around.
  */
 public class RobotMap {
-    // USB Port IDs
+
+	public static final double GRAYHILL_ENCODER_COUNT = 256;
+	public static final double WHEEL_DIAMETER_IN = 6.25;
+	
+	// USB Port IDs
+	public static final int XBOX_USB_ID = 0;
     public static final int JOYSTICK_1_USB_ID = 1;
     public static final int JOYSTICK_2_USB_ID = 2;
-    public static final int XBOX_USB_ID = 0;
 
     // XBox Controller Buttons
 //    public static final int XBOX_SHOOTER_PITCH_ANGLE_LOAD_BUTTON = XboxController.B_BUTTON;

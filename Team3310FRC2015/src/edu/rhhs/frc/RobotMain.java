@@ -41,7 +41,9 @@ public class RobotMain extends IterativeRobot
     	driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
     	driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
         SmartDashboard.putData("Drive Mode", driveModeChooser);
-	}
+        
+        System.out.println("\nRobot code successfully enabled!");
+    }
 	
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
