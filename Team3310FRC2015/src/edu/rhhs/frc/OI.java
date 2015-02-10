@@ -38,7 +38,7 @@ public class OI
         moveBinGrabberDown.whenReleased(new MoveBinGrabber(0));
 	    
         InternalButton talonTest = new InternalButton();
-        talonTest.whenReleased(new TalonTestVelocityControl(90, 90, 1, 10));
+        talonTest.whenReleased(new TalonTestVelocityControl(1000,1000, 1, 4));
 		SmartDashboard.putData("Talon Test", talonTest);
 	}
 	

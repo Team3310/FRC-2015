@@ -19,15 +19,16 @@ public class DriveTrain extends Subsystem
 	private CANTalon m_rearRightMotor;
 	
 	private CANTalon.ControlMode m_talonControlMode = CANTalon.ControlMode.PercentVbus;
-    
+	private double m_rearLeftTarget;
+	
 	private double m_error;
-    private double m_kP = 0.3;
-    private double m_kI = 0.0;
+    private double m_kP = 0.15;
+    private double m_kI = 0.003;
     private double m_kD = 0.0;
-    private double m_kF = 0.0003;
-    private int m_iZone = 100;
-    private double m_rampRatePID = 1.0;
-    private double m_rampRateVBus = 10.0;
+    private double m_kF = 1.4; 
+    private int m_iZone = 0;
+    private double m_rampRatePID = 0.0;
+    private double m_rampRateVBus = 0.0;
     private int m_profile = 0;
 	 
     private RobotDrive m_drive;
@@ -71,8 +72,9 @@ public class DriveTrain extends Subsystem
 			m_rearRightMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
 			
 			// The front motors are setup to "follow" the rear motors
-			m_frontLeftMotor.changeControlMode(CANTalon.ControlMode.Follower);
-			m_frontLeftMotor.set(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+//			m_frontLeftMotor.changeControlMode(CANTalon.ControlMode.Follower);
+//			m_frontLeftMotor.set(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+			m_frontLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 
 			m_frontRightMotor.changeControlMode(CANTalon.ControlMode.Follower);
 			m_frontRightMotor.set(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
@@ -88,6 +90,7 @@ public class DriveTrain extends Subsystem
 			m_rearRightMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile); 
 			m_rearRightMotor.setPosition(0);
 			m_rearRightMotor.setVoltageRampRate(m_rampRateVBus);
+			m_rearRightMotor.reverseOutput(true);
 
 			// Start with the Talons in throttle mode
 			setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
@@ -126,10 +129,16 @@ public class DriveTrain extends Subsystem
 	}
 	
 	public void startVelocityPID(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
+		m_rearLeftMotor.setPosition(0);
+		m_rearRightMotor.setPosition(0);
+		m_rearLeftTarget = leftTargetDegPerSec;
 		setTalonControlMode(CANTalon.ControlMode.Speed, 
 				convertDegPerSecToEncoderVelocity(leftTargetDegPerSec), 
 				convertDegPerSecToEncoderVelocity(rightTargetDegPerSec));
 		m_error = errorDegPerSec;
+
+		double encoderSpeed = convertDegPerSecToEncoderVelocity(leftTargetDegPerSec);
+		double outputDegSec = convertEncoderVelocityToDegPerSec(encoderSpeed);
 	}
 	
 	public void stopPID() {
@@ -214,6 +223,11 @@ public class DriveTrain extends Subsystem
 		}
 	}
 	
+	// MA3 Analog Encoder raw output value goes from 0 to 1024.
+	private double convertAnalogPositionToDeg(double analogValue, double zeroValue) {
+		return (360.0 / 1024.0) * (analogValue - zeroValue);
+	}
+	
 	private double convertEncoderPositionToDeg(double encoderValue) {
 		return 360.0 * encoderValue/ (4 * RobotMap.GRAYHILL_ENCODER_COUNT);
 	}
@@ -268,11 +282,20 @@ public class DriveTrain extends Subsystem
 	}
 
 	public void updateStatus() {
+		SmartDashboard.putNumber("Rear Left Encoder Speed Talon", m_rearLeftMotor.getSpeed());
+		SmartDashboard.putNumber("Rear Left Target Input", convertDegPerSecToEncoderVelocity(m_rearLeftTarget));
+		SmartDashboard.putNumber("Rear Left SetPoint Talon", m_rearLeftMotor.getSetpoint());
+		SmartDashboard.putNumber("Rear Left Output Talon", m_rearLeftMotor.get());
+		SmartDashboard.putNumber("Rear Left Error Talon", m_rearLeftMotor.getClosedLoopError());
+		SmartDashboard.putNumber("Rear Left Error", convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getClosedLoopError()));
+		SmartDashboard.putNumber("Rear Right Error", convertEncoderVelocityToDegPerSec(m_rearRightMotor.getClosedLoopError()));
 		SmartDashboard.putNumber("Rear Left Pos (deg)", convertEncoderPositionToDeg(m_rearLeftMotor.getPosition()));
 		SmartDashboard.putNumber("Rear Right Pos (deg)", convertEncoderPositionToDeg(m_rearRightMotor.getPosition()));
 		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getSpeed()));
 		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", convertEncoderVelocityToDegPerSec(m_rearRightMotor.getSpeed()));
 		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearLeftMotor.getSpeed()));
 		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", convertEncoderVelocityToFtPerSec(m_rearRightMotor.getSpeed()));		
+		SmartDashboard.putNumber("Front Left Pos (raw)", m_frontLeftMotor.getAnalogInRaw());		
+		SmartDashboard.putNumber("Front Left Pos (deg)", convertAnalogPositionToDeg(m_frontLeftMotor.getAnalogInRaw(), 512));		
 	}
 }

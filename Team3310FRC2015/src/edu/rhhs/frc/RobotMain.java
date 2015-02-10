@@ -42,11 +42,13 @@ public class RobotMain extends IterativeRobot
     	driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
         SmartDashboard.putData("Drive Mode", driveModeChooser);
         
+        updateStatus();
         System.out.println("\nRobot code successfully enabled!");
     }
 	
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
+        updateStatus();
 	}
 
     public void autonomousInit() {
@@ -54,6 +56,7 @@ public class RobotMain extends IterativeRobot
         if (autonomousCommand != null) { 
         	autonomousCommand.start();
         }
+        updateStatus();
     }
 
     /**
@@ -61,7 +64,8 @@ public class RobotMain extends IterativeRobot
      */
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
-    }
+        updateStatus();
+   }
 
     public void teleopInit() {
 		// This makes sure that the autonomous stops running when
@@ -72,6 +76,7 @@ public class RobotMain extends IterativeRobot
         	autonomousCommand.cancel();
         }
         driveTrain.setControllerMode(((Integer)driveModeChooser.getSelected()).intValue());
+        updateStatus();
     }
 
     /**
@@ -79,7 +84,7 @@ public class RobotMain extends IterativeRobot
      * You can use it to reset subsystems before shutting down.
      */
     public void disabledInit(){
-
+        updateStatus();
     }
 
     /**
@@ -87,6 +92,7 @@ public class RobotMain extends IterativeRobot
      */
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
+        updateStatus();
     }
     
     /**
@@ -94,6 +100,7 @@ public class RobotMain extends IterativeRobot
      */
     public void testPeriodic() {
         LiveWindow.run();
+        updateStatus();
     }
     
     public void updateStatus() {

@@ -13,7 +13,7 @@ public class TalonTestVelocityControl extends Command {
 	private double errorDegPerSec;
 	private double timeoutSeconds;
 
-    public TalonTestVelocityControl(double rightVelocityDegPerSec, double leftVelocityDegPerSec, double errorDegPerSec, double timeoutSeconds) {
+    public TalonTestVelocityControl(double leftVelocityDegPerSec, double rightVelocityDegPerSec, double errorDegPerSec, double timeoutSeconds) {
         // Use requires() here to declare subsystem dependencies
     	this.leftTargetDegPerSec = leftVelocityDegPerSec;
     	this.rightTargetDegPerSec = rightVelocityDegPerSec;
