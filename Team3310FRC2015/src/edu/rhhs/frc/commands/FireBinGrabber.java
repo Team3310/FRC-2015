@@ -17,7 +17,7 @@ public class FireBinGrabber extends Command
 	@Override
 	protected void initialize() {
 		this.setTimeout((double) (milliseconds / 1000));
-		RobotMain.binGrabber.setSpeed(speed);
+		RobotMain.binGrabber.setSpeed(speed, speed);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class FireBinGrabber extends Command
 
 	@Override
 	protected void end() {
-		RobotMain.binGrabber.setSpeed(0.0);
+		RobotMain.binGrabber.setSpeed(0.0, 0.0);
 	}
 
 	@Override

@@ -2,8 +2,10 @@ package edu.rhhs.frc;
 
 import edu.rhhs.frc.commands.FireBinGrabber;
 import edu.rhhs.frc.commands.MoveBinGrabber;
+import edu.rhhs.frc.commands.TalonTestPositionControl;
 import edu.rhhs.frc.commands.TalonTestVelocityControl;
 import edu.rhhs.frc.controller.XboxController;
+import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -37,9 +39,21 @@ public class OI
         moveBinGrabberDown.whenPressed(new MoveBinGrabber(-0.5));
         moveBinGrabberDown.whenReleased(new MoveBinGrabber(0));
 	    
-        InternalButton talonTest = new InternalButton();
-        talonTest.whenReleased(new TalonTestVelocityControl(1000,1000, 1, 4));
-		SmartDashboard.putData("Talon Test", talonTest);
+        InternalButton talonTestVel = new InternalButton();
+        talonTestVel.whenReleased(new TalonTestVelocityControl(1000,1000, 1, 4));
+		SmartDashboard.putData("Talon Test Velocity", talonTestVel);
+		
+		InternalButton talonTestDeployed = new InternalButton();
+        talonTestDeployed.whenReleased(new TalonTestPositionControl(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 4));
+		SmartDashboard.putData("Talon Test Position_Deployed", talonTestDeployed);
+		
+		InternalButton talonTestStow = new InternalButton();
+        talonTestStow.whenReleased(new TalonTestPositionControl(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 4));
+		SmartDashboard.putData("Talon Test Position_Stowed", talonTestStow);
+		
+		InternalButton talonTestDrag = new InternalButton();
+        talonTestDrag.whenReleased(new TalonTestPositionControl(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 4));
+		SmartDashboard.putData("Talon Test Position_Drag", talonTestDrag);
 	}
 	
 	public static OI getInstance() {

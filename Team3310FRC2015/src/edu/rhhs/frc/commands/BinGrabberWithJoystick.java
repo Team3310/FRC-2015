@@ -3,28 +3,24 @@ package edu.rhhs.frc.commands;
 import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class MoveBinGrabber extends Command
+public class BinGrabberWithJoystick extends Command 
 {
-	private double speed;
-	
-	public MoveBinGrabber(double speed) {
-		this.speed = speed;
+	public BinGrabberWithJoystick() {
 		requires(RobotMain.binGrabber);
 	}
 	
 	@Override
 	protected void initialize() {
-		RobotMain.binGrabber.setSpeed(speed, speed);
 	}
 
 	@Override
 	protected void execute() {
-		
+		RobotMain.binGrabber.controlWithJoystick();
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -36,5 +32,4 @@ public class MoveBinGrabber extends Command
 	protected void interrupted() {
 		
 	}
-
 }

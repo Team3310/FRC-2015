@@ -29,8 +29,8 @@ public class RobotMap {
     public static final int DRIVETRAIN_FRONT_RIGHT_CAN_ID = 2;
     public static final int DRIVETRAIN_REAR_LEFT_CAN_ID = 3;
     public static final int DRIVETRAIN_REAR_RIGHT_CAN_ID = 4;
-    public static final int BINGRABBER_RIGHT_CAN_ID = 9;
-    public static final int BINGRABBER_LEFT_CAN_ID = 10;
+    public static final int BINGRABBER_LEFT_CAN_ID = 9;
+    public static final int BINGRABBER_RIGHT_CAN_ID = 10;
     
     // roboRIO Digital IO Port IDs 
 //    public static final int RIGHT_DRIVE_ENCODER_A_DSC_DIO_ID = 1;

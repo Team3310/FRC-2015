@@ -3,25 +3,25 @@ package edu.rhhs.frc.commands;
 import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class TalonTestVelocityControl extends Command 
+public class TalonTestPositionControl extends Command 
 {
-	private double leftTargetDegPerSec;
-	private double rightTargetDegPerSec;
-	private double errorDegPerSec;
+	private double leftTargetDeg;
+	private double rightTargetDeg;
+	private double errorDeg;
 	private double timeoutSeconds;
 
-    public TalonTestVelocityControl(double leftVelocityDegPerSec, double rightVelocityDegPerSec, double errorDegPerSec, double timeoutSeconds) {
+    public TalonTestPositionControl(double leftPositionDeg, double rightPositionDeg, double errorDeg, double timeoutSeconds) {
         // Use requires() here to declare subsystem dependencies
-    	this.leftTargetDegPerSec = leftVelocityDegPerSec;
-    	this.rightTargetDegPerSec = rightVelocityDegPerSec;
-    	this.errorDegPerSec = errorDegPerSec;
+    	this.leftTargetDeg = leftPositionDeg;
+    	this.rightTargetDeg = rightPositionDeg;
+    	this.errorDeg = errorDeg;
     	this.timeoutSeconds = timeoutSeconds;
-        requires(RobotMain.driveTrain);
+        requires(RobotMain.binGrabber);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	RobotMain.driveTrain.startVelocityPID(leftTargetDegPerSec, rightTargetDegPerSec, errorDegPerSec);
+    	RobotMain.binGrabber.startPositionPID(leftTargetDeg, rightTargetDeg, errorDeg);
     	setTimeout(timeoutSeconds);
     }
 
@@ -36,7 +36,7 @@ public class TalonTestVelocityControl extends Command
 
     // Called once after isFinished returns true
     protected void end() {
-    	RobotMain.driveTrain.stopPID();
+    	RobotMain.binGrabber.stopPID();
     }
 
     // Called when another command which requires one or more of the same

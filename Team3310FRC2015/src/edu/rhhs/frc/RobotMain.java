@@ -34,9 +34,9 @@ public class RobotMain extends IterativeRobot
         // instantiate the command used for the autonomous period
         //autonomousCommand = new ExampleCommand(0.5);
     	driveModeChooser = new SendableChooser();
-    	driveModeChooser.addObject("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+    	driveModeChooser.addDefault("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
     	driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-    	driveModeChooser.addDefault("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+    	driveModeChooser.addObject("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
     	driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
     	driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
     	driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
