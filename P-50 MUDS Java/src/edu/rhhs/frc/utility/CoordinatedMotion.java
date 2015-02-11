@@ -15,7 +15,7 @@ public class CoordinatedMotion {
 	// -------------------------------------------------------------------------
 
 
-	public double[][] coMotion(int Npts, double[][] dJoint, double[] VpathIn, 
+	public static double[][] coMotion(int Npts, double[][] dJoint, double[] VpathIn, 
 	             double[] JointSpeed, double[] Tacc1, double[] Tacc2, 
 	             boolean islinear, double[] CNT, 
 	             double CartAcc1, double CartAcc2, double itp, 
@@ -94,7 +94,7 @@ public class CoordinatedMotion {
 	        
 	        // Calculate T4 for linear moves
         for (int i = 0; i < Npts; i++) {
-	            PathLength[i] = Math.sqrt(dJoint[i][1]*dJoint[i][1] + dJoint[i][2]*dJoint[i][2] + dJoint[i][3]*dJoint[i][3]);
+	            PathLength[i] = Math.sqrt(dJoint[i][0]*dJoint[i][0] + dJoint[i][1]*dJoint[i][1] + dJoint[i][2]*dJoint[i][2]);
 	    		for (int j = 0; j < 3; j++) {
 	                T4[i][j] = Math.abs(PathLength[i] / ActualPathSpeed[i][j]);
 	                T4[i][j] = Math.ceil(T4[i][j] / itp);

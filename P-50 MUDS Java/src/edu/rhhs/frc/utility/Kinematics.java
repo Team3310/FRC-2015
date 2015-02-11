@@ -176,7 +176,7 @@ public class Kinematics {
 	//    [0] Pos() is enters as servo output, but exits as actual joint
 	// ----------------------------------------------------------------------------
 
-	public double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[][] InputPos) {
+	public static double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[][] InputPos) {
 	        
 	    double[][] CartPos = new double[NumPoints][3];
 	    
