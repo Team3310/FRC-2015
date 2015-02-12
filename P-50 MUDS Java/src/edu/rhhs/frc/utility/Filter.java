@@ -136,7 +136,7 @@ public class Filter {
 	            TotalWeight = 0.0;
 	        
 	            for (int j = 0; j < SFL2; j++) {
-	                Weight[j] = Math.exp(-j / SFL2);
+	                Weight[j] = Math.exp(-(double)(j+1) / (double)SFL2);
 	                TotalWeight = TotalWeight + Weight[j];
 	            }
 	        } 

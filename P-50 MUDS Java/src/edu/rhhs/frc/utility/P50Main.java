@@ -12,19 +12,17 @@ public class P50Main {
     boolean ElbowUp = true; 
     boolean Front = true; 
 
-    boolean islinear = true; 
-
-    // isLinear == true
-    int NumPath = 1;  // Number of paths = number of taught points - 1
-    double[][] TaughtPos = {{0.101,0.102,0.103},{0.201,0.202,0.203}}; // path taught xyz positions in meters
-    double[] Vpath = {1.5};  // m/sec 
+    boolean isLinear = true;
+    int NumPath = 2;  // Number of paths = number of taught points - 1
+    double[][] TaughtPos = {{0.101,0.102,0.103},{0.201,0.202,0.203},{0.301,0.302,0.303}}; // path taught xyz positions in meters
+    double[] Vpath = {1.5, 1.5};  // m/sec 
     double CartAccel1 = 400.0/1000.0;   // linear accel in seconds
     double CartAccel2 = 200.0/1000.0;   // linear accel in seconds 
     double[] JointSpeed = {0.0, 0.0, 0.0}; // Not needed for isLinear = true
     double[] JNTaccel1 = {0.0, 0.0, 0.0};   // Not needed for isLinear = true 
     double[] JNTaccel2 = {0.0, 0.0, 0.0};   // Not needed for isLinear = true 
     
-    // isLinear == false
+//    boolean isLinear = false;
 //    int NumPath = 1; 
 //    double[][] TaughtPos = {{Math.toRadians(45),Math.toRadians(45),Math.toRadians(45)},{Math.toRadians(90),Math.toRadians(90),Math.toRadians(90)}}; // path taught joint angle in rad
 //    double[] Vpath = {100.0};  // joint velocities in percent 
@@ -39,7 +37,7 @@ public class P50Main {
     double itp = 8.0/1000.0;  // Controller update rate seconds 
     int outPoints = 4;   //  Output rate milliseconds
     double Ted = itp;   // Servo filter exponential decay
-    boolean ExpEnable = false;
+    boolean ExpEnable = true;
 
     public P50Main() {
     	
@@ -69,7 +67,7 @@ public class P50Main {
 	    // Call procedure to determine coordinated motion.
 	    CoordinatedMotion coordinatedMotion = new CoordinatedMotion();
         CoordinatedMotion.CoMotionOutput coMotionOutput = coordinatedMotion.coMotion(	
-        		NumPath, dDis, Vpath, JointSpeed, JNTaccel1, JNTaccel2, islinear, CNT, 
+        		NumPath, dDis, Vpath, JointSpeed, JNTaccel1, JNTaccel2, isLinear, CNT, 
                 CartAccel1, CartAccel2, itp);
 
         // RealPathSpeed missing...
@@ -83,23 +81,25 @@ public class P50Main {
         // Modified by PDC on 12/5/00
     	IKINOutput iKINOutput = null;
     	Kinematics kinematics = new Kinematics();
-    	if (islinear == true) { 
+    	if (isLinear == true) { 
         	System.out.println("Calculating Inverse Kinematics");
         	iKINOutput = kinematics.iKIN(coMotionFilterOutput.PosFilter, coMotionFilterOutput.NumITPs, ArmLength, ElbowUp, Front);
                                 
             // Reshow the input form and notify user of unreachable point
             if (iKINOutput.errorFlag == true) { 
                 System.out.println("Point Unreachable. Reteach!");
+                return;
             }
         }
     	else {
     		iKINOutput = kinematics.getInstanceIKINOutput(coMotionFilterOutput.NumITPs);
+    		iKINOutput.userAngles = coMotionFilterOutput.PosFilter;
     	}
         
         System.out.println("RJ-3 Filter Running");
 
         // Runs the RJ-3 joint filter
-        double[][] Out2 = Filter.filter(islinear, JNTaccel1, JNTaccel2, CartAccel1, CartAccel2, 
+        double[][] Out2 = Filter.filter(isLinear, JNTaccel1, JNTaccel2, CartAccel1, CartAccel2, 
         		coMotionFilterOutput.NumITPs, iKINOutput.userAngles);
  
         // Input code to call the Servo filters
