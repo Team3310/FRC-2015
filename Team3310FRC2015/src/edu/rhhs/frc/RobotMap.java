@@ -29,13 +29,23 @@ public class RobotMap {
     public static final int DRIVETRAIN_FRONT_RIGHT_CAN_ID = 2;
     public static final int DRIVETRAIN_REAR_LEFT_CAN_ID = 3;
     public static final int DRIVETRAIN_REAR_RIGHT_CAN_ID = 4;
-    public static final int BINGRABBER_LEFT_CAN_ID = 9;
-    public static final int BINGRABBER_RIGHT_CAN_ID = 10;
+    public static final int ROBOT_ARM_J1_CAN_ID = 5;
+    public static final int ROBOT_ARM_J2_CAN_ID = 6;
+    public static final int ROBOT_ARM_J3_CAN_ID = 8;
+    public static final int ROBOT_ARM_J4_CAN_ID = 7;
+    public static final int BIN_GRABBER_LEFT_CAN_ID = 9;
+    public static final int BIN_GRABBER_RIGHT_CAN_ID = 10;
     
     // roboRIO Digital IO Port IDs 
 //    public static final int RIGHT_DRIVE_ENCODER_A_DSC_DIO_ID = 1;
 
     // Pneumatics Control Module CAN IDs
-//    public static final int SHIFT_EXTEND_PNEUMATIC_MODULE_ID = 1;
-    
+    public static final int TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID = 0;
+    public static final int TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID = 1;
+    public static final int BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID = 2;
+    public static final int BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID = 3;
+    public static final int BIN_GRABBER_PIVOT_LOCK_EXTEND_PNEUMATIC_MODULE_ID = 4;
+    public static final int BIN_GRABBER_PIVOT_LOCK_RETRACT_PNEUMATIC_MODULE_ID = 5;
+    public static final int STABILZER_EXTEND_PNEUMATIC_MODULE_ID = 6;
+    public static final int STABILZER_RETRACT_PNEUMATIC_MODULE_ID = 7;
 }

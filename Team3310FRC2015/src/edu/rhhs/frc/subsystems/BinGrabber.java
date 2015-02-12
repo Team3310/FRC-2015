@@ -5,6 +5,8 @@ import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.BinGrabberWithJoystick;
 import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,12 +15,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class BinGrabber extends Subsystem 
 {
-	private static final double LEFT_ANALOG_ZERO = 362.0;
-	private static final double RIGHT_ANALOG_ZERO = -590.0;
+	private static final double LEFT_ANALOG_ZERO_PRACTICE = 362.0;
+	private static final double RIGHT_ANALOG_ZERO_PRACTICE = -590.0;
+	
 	public static final double DEPLOYED_POSITION_DEG = 70;
+	public static final double DEPLOYED_POSITION_TIMED_DEG = DEPLOYED_POSITION_DEG - 10;
 	public static final double STOWED_POSITION_DEG = 0;
 	public static final double DRAG_BIN_POSITION_DEG = 60;
 			
+	private DoubleSolenoid m_clawPositionSolenoid;
+	private DoubleSolenoid m_pivotLockSolenoid;
+	
 	private CANTalon m_rightMotor;
 	private CANTalon m_leftMotor;
 
@@ -37,8 +44,8 @@ public class BinGrabber extends Subsystem
 	private int m_profile = 0;
 
 	public BinGrabber() {
-		m_rightMotor = new CANTalon(RobotMap.BINGRABBER_RIGHT_CAN_ID);
-		m_leftMotor = new CANTalon(RobotMap.BINGRABBER_LEFT_CAN_ID);
+		m_rightMotor = new CANTalon(RobotMap.BIN_GRABBER_RIGHT_CAN_ID);
+		m_leftMotor = new CANTalon(RobotMap.BIN_GRABBER_LEFT_CAN_ID);
 
 		m_leftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 		m_leftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
@@ -58,15 +65,34 @@ public class BinGrabber extends Subsystem
 
 		// Start with the Talons in throttle mode
 		setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
+		
+		m_clawPositionSolenoid = new DoubleSolenoid(RobotMap.BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID);
+		m_pivotLockSolenoid = new DoubleSolenoid(RobotMap.BIN_GRABBER_PIVOT_LOCK_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.BIN_GRABBER_PIVOT_LOCK_RETRACT_PNEUMATIC_MODULE_ID);
 	}
 
 	@Override
 	public void initDefaultCommand() {
-		setDefaultCommand(new BinGrabberWithJoystick());
+//		setDefaultCommand(new BinGrabberWithJoystick());
+	}
+	
+	public void setClawPosition(Value solenoidState) {
+		m_clawPositionSolenoid.set(solenoidState);
+	}
+
+	public void setPivotLockPosition(Value solenoidState) {
+		m_pivotLockSolenoid.set(solenoidState);
 	}
 
 	public void setSpeed(double leftSpeed, double rightSpeed) {
 		m_leftMotor.set(leftSpeed);
+		m_rightMotor.set(rightSpeed);
+	}
+	
+	public void setLeftSpeed(double leftSpeed) {
+		m_leftMotor.set(leftSpeed);
+	}
+	
+	public void setRightSpeed(double rightSpeed) {
 		m_rightMotor.set(rightSpeed);
 	}
 	
@@ -86,8 +112,8 @@ public class BinGrabber extends Subsystem
 		m_leftTarget = leftTargetDeg;
 		m_rightTarget = rightTargetDeg;
 		setTalonControlMode(CANTalon.ControlMode.Position, 
-				RobotUtility.convertDegToAnalogPosition(leftTargetDeg, LEFT_ANALOG_ZERO), 
-				RobotUtility.convertDegToAnalogPosition(rightTargetDeg, RIGHT_ANALOG_ZERO));
+				RobotUtility.convertDegToAnalogPosition(leftTargetDeg, LEFT_ANALOG_ZERO_PRACTICE), 
+				RobotUtility.convertDegToAnalogPosition(rightTargetDeg, RIGHT_ANALOG_ZERO_PRACTICE));
 		m_error = errorDeg;
 	}
 	
@@ -103,12 +129,21 @@ public class BinGrabber extends Subsystem
 		return Math.abs(m_rightMotor.getClosedLoopError()) < m_error;
 	}
 	
-	public double getLeftError() {
-		return m_leftMotor.getClosedLoopError();
+	public double getLeftErrorDeg() {
+		return RobotUtility.convertAnalogPositionToDeg(m_leftMotor.getClosedLoopError(), LEFT_ANALOG_ZERO_PRACTICE);
 	}
 	
-	public double getRightError() {
-		return m_rightMotor.getClosedLoopError();
+	public double getRightErrorDeg() {
+		return RobotUtility.convertAnalogPositionToDeg(m_rightMotor.getClosedLoopError(), RIGHT_ANALOG_ZERO_PRACTICE);
+	}
+	
+	// TODO put zero values in global practice/comp robot flag
+	public double getLeftPositionDeg() {
+		return RobotUtility.convertAnalogPositionToDeg(m_leftMotor.getAnalogInRaw(), LEFT_ANALOG_ZERO_PRACTICE);
+	}
+	
+	public double getRightPositionDeg() {
+		return RobotUtility.convertAnalogPositionToDeg(m_rightMotor.getAnalogInRaw(), RIGHT_ANALOG_ZERO_PRACTICE);
 	}
 	
 	public void controlWithJoystick() {
@@ -121,7 +156,7 @@ public class BinGrabber extends Subsystem
 		SmartDashboard.putNumber("Left Bin Grabber getAnalogInRaw)", m_leftMotor.getAnalogInRaw());
 		SmartDashboard.putNumber("Right Bin Grabber getPosition", m_rightMotor.getPosition());
 		SmartDashboard.putNumber("Right Bin Grabber Analog Position (raw)", m_rightMotor.getAnalogInRaw());
-		SmartDashboard.putNumber("Left Bin Grabber Position (Deg)", RobotUtility.convertAnalogPositionToDeg(m_leftMotor.getAnalogInRaw(), LEFT_ANALOG_ZERO));
-		SmartDashboard.putNumber("Right Bin Grabber Position (Deg)", RobotUtility.convertAnalogPositionToDeg(m_rightMotor.getAnalogInRaw(), RIGHT_ANALOG_ZERO));
+		SmartDashboard.putNumber("Left Bin Grabber Position (Deg)", getLeftPositionDeg());
+		SmartDashboard.putNumber("Right Bin Grabber Position (Deg)", getRightPositionDeg());
 	}
 }

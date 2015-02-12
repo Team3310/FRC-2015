@@ -3,26 +3,26 @@ package edu.rhhs.frc.commands;
 import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class TalonTestPositionControl extends Command 
+public class BinGrabberPositionPID extends Command 
 {
 	private double leftTargetDeg;
 	private double rightTargetDeg;
 	private double errorDeg;
-	private double timeoutSeconds;
+	private double timeoutMs;
 
-    public TalonTestPositionControl(double leftPositionDeg, double rightPositionDeg, double errorDeg, double timeoutSeconds) {
+    public BinGrabberPositionPID(double leftPositionDeg, double rightPositionDeg, double errorDeg, double timeoutMs) {
         // Use requires() here to declare subsystem dependencies
     	this.leftTargetDeg = leftPositionDeg;
     	this.rightTargetDeg = rightPositionDeg;
     	this.errorDeg = errorDeg;
-    	this.timeoutSeconds = timeoutSeconds;
+    	this.timeoutMs = timeoutMs;
         requires(RobotMain.binGrabber);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	RobotMain.binGrabber.startPositionPID(leftTargetDeg, rightTargetDeg, errorDeg);
-    	setTimeout(timeoutSeconds);
+    	setTimeout(timeoutMs/1000.0);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -31,7 +31,7 @@ public class TalonTestPositionControl extends Command
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return isTimedOut();
+        return isTimedOut() || (RobotMain.binGrabber.getLeftErrorDeg() < errorDeg && RobotMain.binGrabber.getRightErrorDeg() < errorDeg);
     }
 
     // Called once after isFinished returns true
@@ -42,5 +42,6 @@ public class TalonTestPositionControl extends Command
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	end();
     }
 }

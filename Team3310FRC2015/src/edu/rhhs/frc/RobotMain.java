@@ -3,6 +3,7 @@ package edu.rhhs.frc;
 
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
+import edu.rhhs.frc.subsystems.RobotArm;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -21,6 +22,7 @@ public class RobotMain extends IterativeRobot
 {
 	public static final BinGrabber binGrabber = new BinGrabber();
 	public static final DriveTrain driveTrain = new DriveTrain();
+	public static final RobotArm robotArm = new RobotArm();
 
     private Command autonomousCommand;
     private SendableChooser driveModeChooser;
@@ -107,6 +109,7 @@ public class RobotMain extends IterativeRobot
     	try {
     		driveTrain.updateStatus();
     		binGrabber.updateStatus();
+    		robotArm.updateStatus();
     	}
     	catch (Exception e) {
     		// Do nothing... just don't want to stop the robot

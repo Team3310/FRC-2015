@@ -1,8 +1,9 @@
 package edu.rhhs.frc;
 
-import edu.rhhs.frc.commands.FireBinGrabber;
-import edu.rhhs.frc.commands.MoveBinGrabber;
-import edu.rhhs.frc.commands.TalonTestPositionControl;
+import edu.rhhs.frc.commands.BinGrabberDeployAngle;
+import edu.rhhs.frc.commands.BinGrabberDeployTimed;
+import edu.rhhs.frc.commands.BinGrabberSetSpeed;
+import edu.rhhs.frc.commands.BinGrabberPositionPID;
 import edu.rhhs.frc.commands.TalonTestVelocityControl;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
@@ -28,32 +29,37 @@ public class OI
         m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
         m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
 	    
-	    JoystickButton fireBinGrabber = new JoystickButton(m_xboxController.getJoyStick(), XboxController.B_BUTTON);
-        fireBinGrabber.whenPressed(new FireBinGrabber(.4, 10));
-        
         JoystickButton moveBinGrabberUp = new JoystickButton(m_xboxController.getJoyStick(), XboxController.A_BUTTON);
-        moveBinGrabberUp.whenPressed(new MoveBinGrabber(1.0));
-        moveBinGrabberUp.whenReleased(new MoveBinGrabber(0));
+        moveBinGrabberUp.whenPressed(new BinGrabberSetSpeed(1.0));
+        moveBinGrabberUp.whenReleased(new BinGrabberSetSpeed(0));
         
         JoystickButton moveBinGrabberDown = new JoystickButton(m_xboxController.getJoyStick(), XboxController.Y_BUTTON);
-        moveBinGrabberDown.whenPressed(new MoveBinGrabber(-0.5));
-        moveBinGrabberDown.whenReleased(new MoveBinGrabber(0));
+        moveBinGrabberDown.whenPressed(new BinGrabberSetSpeed(-0.5));
+        moveBinGrabberDown.whenReleased(new BinGrabberSetSpeed(0));
 	    
-        InternalButton talonTestVel = new InternalButton();
+        InternalButton binGrabberDeployTimed = new InternalButton();
+        binGrabberDeployTimed.whenReleased(new BinGrabberDeployTimed(1, 100));
+		SmartDashboard.putData("Bin Grabber Deploy Timed", binGrabberDeployTimed);
+		
+        InternalButton binGrabberDeployAngle = new InternalButton();
+        binGrabberDeployAngle.whenReleased(new BinGrabberDeployAngle(1.0, BinGrabber.DEPLOYED_POSITION_TIMED_DEG, 300));
+		SmartDashboard.putData("Bin Grabber Deploy Angle", binGrabberDeployAngle);
+		
+		InternalButton binGrabberDeployPID = new InternalButton();
+        binGrabberDeployPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 4));
+		SmartDashboard.putData("Talon Test Position_Deployed", binGrabberDeployPID);
+		
+		InternalButton binGrabberStowedPID = new InternalButton();
+        binGrabberStowedPID.whenReleased(new BinGrabberPositionPID(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 4));
+		SmartDashboard.putData("Bin Grabber Position_Stowed", binGrabberStowedPID);
+		
+		InternalButton binGrabberDragPID = new InternalButton();
+        binGrabberDragPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 4));
+		SmartDashboard.putData("Bin Grabber Position_Drag", binGrabberDragPID);
+
+		InternalButton talonTestVel = new InternalButton();
         talonTestVel.whenReleased(new TalonTestVelocityControl(1000,1000, 1, 4));
-		SmartDashboard.putData("Talon Test Velocity", talonTestVel);
-		
-		InternalButton talonTestDeployed = new InternalButton();
-        talonTestDeployed.whenReleased(new TalonTestPositionControl(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 4));
-		SmartDashboard.putData("Talon Test Position_Deployed", talonTestDeployed);
-		
-		InternalButton talonTestStow = new InternalButton();
-        talonTestStow.whenReleased(new TalonTestPositionControl(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 4));
-		SmartDashboard.putData("Talon Test Position_Stowed", talonTestStow);
-		
-		InternalButton talonTestDrag = new InternalButton();
-        talonTestDrag.whenReleased(new TalonTestPositionControl(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 4));
-		SmartDashboard.putData("Talon Test Position_Drag", talonTestDrag);
+		SmartDashboard.putData("Talon Test Velocity", talonTestVel);		
 	}
 	
 	public static OI getInstance() {
