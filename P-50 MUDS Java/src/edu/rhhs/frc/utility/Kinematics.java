@@ -14,31 +14,41 @@ public class Kinematics {
 	* 
 	* Outputs:
 	*    [0] ErrorFlag - To notify the Main code that the position is unreachable
-	*    [1] Pos() - J1, J2, J3 position data
+	*    [1] userAngles() - J1, J2, J3 position data
 	* ----------------------------------------------------------------------------*/
 
-	public static double[][] iKIN(double[][] Pos, int NumPoints, double[] L, boolean ErrorFlag, boolean ElbowUp, boolean Front) {
-	                       
-	    // NOTE: Pos() enters the Subroutine as a cartesian value
-	    // and exits a Joint Angle.
-	    
-	    double Kappa;
+	public class IKINOutput {
+		double[][] userAngles;
+		boolean errorFlag;
+		
+		public IKINOutput(int NumPoints) {
+	        userAngles = new double[NumPoints + 1][3];
+		    errorFlag = false;
+		}
+	}
+	
+	public IKINOutput getInstanceIKINOutput(int NumPoints) {
+		return new IKINOutput(NumPoints);
+	}
+	
+	public IKINOutput iKIN(double[][] Pos, int NumPoints, double[] L, boolean ElbowUp, boolean Front) {
+	                       	    
+		IKINOutput out = new IKINOutput(NumPoints);
+		
+		double Kappa;
 	    double C1, C2, C3, S1, S2, S3;
 	    double Den, C2Num, S2Num;
-	    double[] Theta = new double[3];
-        double[][] userAngles = new double[NumPoints][3];
-	    
-	    ErrorFlag = false;
+	    double[] Theta = new double[3];    
 	    
 	    // Loop through each ITP and calculate the IKIN
-	    for (int i = 0; i < NumPoints; i++) {
+	    for (int i = 0; i < NumPoints + 1; i++) {
 	    
 	        if (Front == true) { // Front reach solution
-	            if (Pos[i][0] == 0 && Pos[i][1] == 0) {
+	            if (isZero(Pos[i][0]) && isZero(Pos[i][1])) {
 	                Theta[0] = 0;
 	            } 
 	            else {
-	                Theta[0] = Math.atan2(Pos[i][0], Pos[i][1]);
+	                Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]);
 	            }
 	            
 	        } 
@@ -47,7 +57,7 @@ public class Kinematics {
 	                Theta[0] = Math.PI;
 	            } 
 	            else {
-	                Theta[0] = Math.atan2(Pos[i][0], Pos[i][1]) + Math.PI;
+	                Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]) + Math.PI;
 	            }
 	        }
 	    
@@ -57,7 +67,7 @@ public class Kinematics {
 	        // Check to see if position is reachable & Calculate Theta3
 	        if (Math.abs(Kappa) > 1 ) {
 	            System.out.println("Position at time = " + NumPoints * 0.001 + " seconds is unreachable");
-	            ErrorFlag = true;
+	            out.errorFlag = true;
 	            return null;
 	        } 
 	        else if (Math.abs(Kappa) == 1) {
@@ -91,9 +101,9 @@ public class Kinematics {
 	                Pos[i][2] * (L[1] + L[2] * S3);
 	                
 	        // --Determine if in Singularity
-	        if (Den == 0) {
+	        if (isZero(Den)) {
 	        	System.out.println("Position at time = " + NumPoints * 0.001 + " seconds causes singularity");
-	            ErrorFlag = true;
+	            out.errorFlag = true;
 	            return null;
 	        } 
 	        else {
@@ -103,21 +113,21 @@ public class Kinematics {
 	        }
 	        
 	        // --Calculate Theta2
-	        if (C2 == 0 && S2 == 0 ) {
+	        if (isZero(C2) && isZero(S2)) {
 	            Theta[1] = 0;
 	        } else {
-	            Theta[1] = Math.atan2(C2, S2);
+	            Theta[1] = Math.atan2(S2, C2);
 	        }
 	        
 	        // Calculate User Angles and reallocate them to pos(i,?)
-	        userAngles[i][0] = Theta[0];
-	        userAngles[i][1]  = Math.PI / 2 - Theta[1];
-	        userAngles[i][2] = Theta[1] + Theta[2] - Math.PI / 2;
+	        out.userAngles[i][0] = Theta[0];
+	        out.userAngles[i][1]  = Math.PI / 2 - Theta[1];
+	        out.userAngles[i][2] = Theta[1] + Theta[2] - Math.PI / 2;
 	    }
 	       
-	    ErrorFlag = false;
+	    out.errorFlag = false;
 
-	    return userAngles;
+	    return out;
 	}
 
 	// This subroutine takes the Joint(User) angles and converts them to Kinematic
@@ -136,6 +146,10 @@ public class Kinematics {
 	    }
 	    
 	    return JointPos;
+	}
+	
+	public static boolean isZero(double value) {
+		return Math.abs(value) < 3 * Double.MIN_VALUE;
 	}
 
 	// Subroutine KinToUser:
@@ -176,11 +190,11 @@ public class Kinematics {
 	//    [0] Pos() is enters as servo output, but exits as actual joint
 	// ----------------------------------------------------------------------------
 
-	public double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[][] InputPos) {
+	public static double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[][] InputPos) {
 	        
-	    double[][] CartPos = new double[NumPoints][3];
+	    double[][] CartPos = new double[NumPoints + 1][3];
 	    
-	    for (int i = 0; i < NumPoints; i++) {
+	    for (int i = 0; i < NumPoints + 1; i++) {
 	    
 	// -------THE FOLLOWING CODE HAS BEEN MOVED TO THE MAIN SUBASSEMBLY
 	// -------RIGHT AFTER THE SERVO FILTER SUBROUTINE -----------------

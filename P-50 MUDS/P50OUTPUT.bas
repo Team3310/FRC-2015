@@ -9,7 +9,7 @@ Dim xlSheet4 As excel.Worksheet
 Dim xlSheetForces As excel.Worksheet
 Dim Profile As excel.Chart
 
-Dim Q As Integer
+Dim q As Integer
 
 Sub P50_OUTPUT(JntPos() As Double, JntAcc() As Double, JntVel() As Double, _
                CartPos() As Double, CartVel() As Double, CartAcc() As Double, _
@@ -60,10 +60,10 @@ XL.DisplayAlerts = False
 frmInput.lblInfo.Caption = "Adding a Workbook"
 XL.Workbooks.Add
 
-Q = XL.Workbooks.count
+q = XL.Workbooks.count
 
 
-Set xlSheet = XL.Workbooks(Q).Sheets(1)
+Set xlSheet = XL.Workbooks(q).Sheets(1)
 'Initialize variables
 irow = 10
 icol = 1
@@ -200,7 +200,7 @@ Next I
 'Output Joint Torques and RMS Torques
 If CalcDynamics = True Then
 
-    Set xlSheet2 = XL.Workbooks(Q).Sheets(2)
+    Set xlSheet2 = XL.Workbooks(q).Sheets(2)
     irow = 10
     icol = 1
     
@@ -329,7 +329,7 @@ If CalcDynamics = True Then
 
 '---If they want the force and moment data, then dump it to sheet 3
     If WantForce = True Then
-        Set xlSheetForces = XL.Workbooks(Q).Worksheets.Add(, xlSheet2)
+        Set xlSheetForces = XL.Workbooks(q).Worksheets.Add(, xlSheet2)
         
         xlSheetForces.Name = "Force & Moment Output"
         
@@ -520,8 +520,10 @@ Sub Sheet3_Output(NumPts As Integer)
     
     On Error GoTo 0
 
-
-    Set xlSheet3 = XL.Workbooks(Q).Sheets(XL.Sheets.count)
+    
+    
+    'Set xlSheet3 = XL.Workbooks(q).Sheets(XL.Sheets.count)
+    Set xlSheet3 = XL.Workbooks(q).Sheets.Add(, xlSheet)
     
     With xlSheet3
         .Cells(1, 1) = "INPUT DATA"
@@ -705,7 +707,7 @@ Dim J As Integer
 
 On Error GoTo 0
 
-Set xlSheet4 = XL.Workbooks(Q).Worksheets.Add(, xlSheet3)
+Set xlSheet4 = XL.Workbooks(q).Worksheets.Add(, xlSheet3)
 
 xlSheet4.Cells(1, 1) = "Dynamics User Input"
 
