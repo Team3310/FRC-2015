@@ -1,6 +1,10 @@
 package edu.rhhs.frc.utility;
 
-import jdk.nashorn.internal.codegen.CompilerConstants.Call;
+import edu.rhhs.frc.utility.CoordinatedMotion.CoMotionFilterOutput;
+import edu.rhhs.frc.utility.Filter.ServoFilterOutput;
+import edu.rhhs.frc.utility.Kinematics.IKINOutput;
+import edu.rhhs.frc.utility.P50Post.P50PostOutput;
+
 
 public class P50Main {
 
@@ -33,87 +37,18 @@ public class P50Main {
     double[] CNT = {0}; 
 
     double itp = 8.0/1000.0;  // Controller update rate seconds 
-    int OutPoints = 4;   //  Output rate milliseconds
+    int outPoints = 4;   //  Output rate milliseconds
     double Ted = itp;   // Servo filter exponential decay
-    
     boolean ExpEnable = false;
-    
-    double[] RealPathSpeed;
-    boolean CalcDynamics = false;
-    boolean Grounded = true;
-
-    // Declare all OUTPUT variables
-    double[] JntPos; 
-    double[] JntAcc; 
-    double[] JntVel;
-    double[][] CartPos; 
-    double[] CartAcc; 
-    double[] CartVel;
-    double[] Tweighted; 
-    double[] AveJntSpeed;
-    double[] MinJntSpeed; 
-    double[] MaxJntSpeed; 
-    double[] JntSpeed;
-    double[] MinPathSpeed; 
-    double[] MaxPathSpeed;
-    double[] AvePathSpeed; 
-    double[] Length;
-
-    
-    double[] Mass; 
-    double[] CG; 
-    double[] Inertia;
-    double[] Torque; 
-    double[] Force; 
-
-    double[] Trms;
-    double[] Tmax; 
-    double[] Tmin;
-
-    // Declare all other variables
-    double[][] Tseg = new double[NumPath][3];
-    int[] FL1; 
-    int[] FL2;
-    int Npts; 
-    int TotalPts; 
-    double[][] Out2;
-    double[][] ServoOut; 
-    double[][] dDis = new double[NumPath][3];
-    int RealPoints; 
-    double[][] Tcnt;
-    double[] LineLength = new double[NumPath]; 
-    double[][] PosFilterIn;
-    double[][] dDisStep; 
-    int NumITPs;
-    boolean FlipCond; 
-    boolean ErrorFlag;
-    boolean WantTorque; 
-    boolean WantForce; 
-    double[] Theta; 
-    double[] ThetaDot; 
-    double[] Theta2Dot;
-    double[] UserAngle; 
-    int DOF;
-    double[] A; 
-    double[] D; 
-    double[] Alpha; 
-    double[] Q;
 
     public P50Main() {
     	
     }
     
     public void calculatePaths() {
-        // Initialize variables
-        for (int i = 0; i < NumPath; i++) {
-            LineLength[i] = 0.0;
-            for (int j = 0; j < 3; j++) {
-                Tseg[i][j] = 0.0;
-                dDis[i][j] = 0.0;
-            }
-        }
         
         // Calculate the x(J1), y(J2), & z(J3) distance for each path.
+    	double[][] dDis = new double[NumPath][3];
         for (int i = 0; i < NumPath; i++) {
             for (int j = 0; j < 3; j++) {
                 dDis[i][j] = TaughtPos[i+1][j] - TaughtPos[i][j];
@@ -122,55 +57,68 @@ public class P50Main {
         
         System.out.println("Determining Coordinated Motion");
         		
-        // call procedure to determine coordinated motion.
-        Tcnt = CoordinatedMotion.coMotion(NumPath, dDis, Vpath, JointSpeed, JNTaccel1, 
-                                        JNTaccel2, islinear, CNT, 
-                                        CartAccel1, CartAccel2, itp, Tseg, LineLength);
+	    // Convert cartesian acceleration filters to integration points
+	    for (int j = 0; j < 3; j++) {
+	    	JNTaccel1[j] = Math.ceil(JNTaccel1[j] / itp);
+	    	JNTaccel2[j] = Math.ceil(JNTaccel2[j] / itp);
+	    }
+	    
+	    CartAccel1 = Math.ceil(CartAccel1 / itp);
+	    CartAccel2 = Math.ceil(CartAccel2 / itp);
+
+	    // Call procedure to determine coordinated motion.
+	    CoordinatedMotion coordinatedMotion = new CoordinatedMotion();
+        CoordinatedMotion.CoMotionOutput coMotionOutput = coordinatedMotion.coMotion(	
+        		NumPath, dDis, Vpath, JointSpeed, JNTaccel1, JNTaccel2, islinear, CNT, 
+                CartAccel1, CartAccel2, itp);
 
         // RealPathSpeed missing...
         System.out.println("Calculating Filter Inputs");
 
         // Procedure calculates all the input positions to the filter or Inverse Kin
-        CoordinatedMotion.filterInput(dDis, Tseg, Tcnt, TaughtPos, NumPath, 
-                                        PosFilterIn, NumITPs, dDisStep);
+        CoMotionFilterOutput coMotionFilterOutput = coordinatedMotion.filterInput(
+        		dDis, coMotionOutput.Tseg, coMotionOutput.Tcnt, TaughtPos, NumPath);
                                                 
         // This portion calculates Inverse Kinematics for a linear move.
         // Modified by PDC on 12/5/00
-        if (islinear == true) { 
+    	IKINOutput iKINOutput = null;
+    	Kinematics kinematics = new Kinematics();
+    	if (islinear == true) { 
         	System.out.println("Calculating Inverse Kinematics");
-        	PosFilterIn = Kinematics.iKIN(PosFilterIn, NumITPs, ArmLength, ErrorFlag, 
-                                ElbowUp, Front);
+        	iKINOutput = kinematics.iKIN(coMotionFilterOutput.PosFilter, coMotionFilterOutput.NumITPs, ArmLength, ElbowUp, Front);
                                 
-            // Error flag missing...
-            
             // Reshow the input form and notify user of unreachable point
-            if (ErrorFlag == true) { 
+            if (iKINOutput.errorFlag == true) { 
                 System.out.println("Point Unreachable. Reteach!");
             }
         }
+    	else {
+    		iKINOutput = kinematics.getInstanceIKINOutput(coMotionFilterOutput.NumITPs);
+    	}
         
         System.out.println("RJ-3 Filter Running");
 
         // Runs the RJ-3 joint filter
-        Out2 = Filter.filter(islinear, JNTaccel1, JNTaccel2, CartAccel1, CartAccel2, 
-                           NumITPs, PosFilterIn);
+        double[][] Out2 = Filter.filter(islinear, JNTaccel1, JNTaccel2, CartAccel1, CartAccel2, 
+        		coMotionFilterOutput.NumITPs, iKINOutput.userAngles);
  
         // Input code to call the Servo filters
-        ServoOut = Filter.servoFilter(itp, Ted, Out2, NumITPs, RealPoints, ExpEnable);
+        Filter filter = new Filter();
+        ServoFilterOutput serverFilterOutput = filter.servoFilter(itp, Ted, Out2, coMotionFilterOutput.NumITPs, ExpEnable);
         
         // Servo position [ServoOut()] is actually deltaPos, so we take the
         // joint position of the 1st taught point [PosFilterIn(0,J)] to
         // use as a starting point.
 
-        for (int i = 0; i < RealPoints; i++) {
+        for (int i = 0; i < serverFilterOutput.pointCount + 1; i++) {
             if (i == 0) {
                 for (int j = 0; j < 3; j++) {
-                    ServoOut[i][j] = PosFilterIn[i][j];
+                	serverFilterOutput.ServoOut[i][j] = iKINOutput.userAngles[i][j];
                 }
         	}                
             else {
                 for (int j = 0; j < 3; j++) {
-                    ServoOut[i][j] = ServoOut[i-1][j] + ServoOut[i][j];
+                	serverFilterOutput.ServoOut[i][j] = serverFilterOutput.ServoOut[i-1][j] + serverFilterOutput.ServoOut[i][j];
                 }
         	}
         }
@@ -181,17 +129,18 @@ public class P50Main {
         
         // CALL Kinematic routine to calculate X,Y,Z position
         // The Filter only outputs DeltaPosition in Joint Space.
-        CartPos = Kinematics.fKIN(ServoOut, RealPoints, ArmLength, PosFilterIn);
+        double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, ArmLength, iKINOutput.userAngles);
         
         // Used for filter output debug.
         // Call MoPlanDebug.MoPlan_Debug(NumITPs, Out2, RealPoints, ServoOut)
 
-
         System.out.println("Calculating Position, Velocity & Acceleration");
 
         // Call procedure to calculate velocity and acceleration
-        P50Post p50Post = new P50Post(Npts);
-        p50Post.VelAccPos(ServoOut, CartPos);
+        P50Post p50Post = new P50Post();
+        P50PostOutput p50PostOutput = p50Post.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos);
+
+        p50Post.output(p50PostOutput, outPoints);
 
         // Send results to the spreadsheet 
 //        Call P50_OUTPUT.P50_OUTPUT(ServoOut, JntAcc, JntVel, CartPos, 
@@ -205,8 +154,10 @@ public class P50Main {
 	} 
                     
     public static void main(String[] args) {
+    	long startTime = System.nanoTime();
     	P50Main main = new P50Main();
     	main.calculatePaths();
+    	System.out.println("Total time = " + (System.nanoTime() - startTime) / 1000000000.0);
     }
                                                     
 }
