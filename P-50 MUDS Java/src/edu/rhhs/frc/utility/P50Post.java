@@ -1,6 +1,5 @@
 package edu.rhhs.frc.utility;
 
-import com.sun.security.auth.module.JndiLoginModule;
 
 public class P50Post {
 		

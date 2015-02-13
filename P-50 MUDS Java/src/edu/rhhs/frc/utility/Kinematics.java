@@ -68,7 +68,7 @@ public class Kinematics {
 	        if (Math.abs(Kappa) > 1 ) {
 	            System.out.println("Position at time = " + NumPoints * 0.001 + " seconds is unreachable");
 	            out.errorFlag = true;
-	            return null;
+	            return out;
 	        } 
 	        else if (Math.abs(Kappa) == 1) {
 	            Theta[2] = Math.asin(Kappa);
