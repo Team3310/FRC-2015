@@ -15,7 +15,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RobotArm extends Subsystem {
     
-	private static final double J4_ANALOG_ZERO_PRACTICE = 512.0;
+	private static final double J4_ANALOG_ZERO_PRACTICE = 477.0;
+
+	private static final double J4_SENSOR_GEAR_RATIO = 60.0/30.0;
+
+	private static final double J4_MAX_ANGLE = 60.0;
+	private static final double J4_MIN_ANGLE = -60.0;
+	
+	private static final int POSITION_PROFILE = 0;
+	private static final int VELOCITY_PROFILE = 1;
 
 	private CANTalon m_j1Motor;
 	private CANTalon m_j2Motor;
@@ -28,7 +36,12 @@ public class RobotArm extends Subsystem {
     private PIDParams j1PositionPidParams = new PIDParams(0.3, 0.0, 0.0, 0.0, 0, 0.0);
     private PIDParams j2PositionPidParams = new PIDParams(0.3, 0.0, 0.0, 0.0, 0, 0.0);
     private PIDParams j3PositionPidParams = new PIDParams(0.3, 0.0, 0.0, 0.0, 0, 0.0);
-    private PIDParams j4PositionPidParams = new PIDParams(0.3, 0.0, 0.0, 0.0, 0, 0.0);
+    private PIDParams j4PositionPidParams = new PIDParams(4.0, 0.0, 0.0, 0.0, 0, 0.0);
+
+    private PIDParams j1VelocityPidParams = new PIDParams(0.3, 0.005, 0.0, 0.0, 0, 0.0);
+    private PIDParams j2VelocityPidParams = new PIDParams(0.3, 0.005, 0.0, 0.0, 0, 0.0);
+    private PIDParams j3VelocityPidParams = new PIDParams(0.3, 0.005, 0.0, 0.0, 0, 0.0);
+    private PIDParams j4VelocityPidParams = new PIDParams(1.0, 0.027, 0.0, 0.0, 0, 0.0);
 
     public RobotArm() {
 		m_j1Motor = new CANTalon(RobotMap.ROBOT_ARM_J1_CAN_ID);
@@ -50,14 +63,21 @@ public class RobotArm extends Subsystem {
 
 		m_j4Motor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 		m_j4Motor.reverseOutput(true);
-		m_j4Motor.reverseSensor(true);
+		m_j4Motor.reverseSensor(false);
 
-		j1PositionPidParams.setTalonPID(m_j1Motor, 0);
-		j2PositionPidParams.setTalonPID(m_j2Motor, 0);
-		j3PositionPidParams.setTalonPID(m_j3Motor, 0);
-		j4PositionPidParams.setTalonPID(m_j4Motor, 0);
+		j1PositionPidParams.setTalonPID(m_j1Motor, POSITION_PROFILE);
+		j2PositionPidParams.setTalonPID(m_j2Motor, POSITION_PROFILE);
+		j3PositionPidParams.setTalonPID(m_j3Motor, POSITION_PROFILE);
+		j4PositionPidParams.setTalonPID(m_j4Motor, POSITION_PROFILE);
 
-		setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0, 0, 0);
+		j1VelocityPidParams.setTalonPID(m_j1Motor, VELOCITY_PROFILE);
+		j2VelocityPidParams.setTalonPID(m_j2Motor, VELOCITY_PROFILE);
+		j3VelocityPidParams.setTalonPID(m_j3Motor, VELOCITY_PROFILE);
+		j4VelocityPidParams.setTalonPID(m_j4Motor, VELOCITY_PROFILE);
+
+//		setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0, 0, 0);
+//		setTalonControlMode(CANTalon.ControlMode.Speed, 0, 0, 0, 0);
+		setTalonControlMode(CANTalon.ControlMode.Position, 0, 0, 0, J4_ANALOG_ZERO_PRACTICE);
     }
     
     public void initDefaultCommand() {
@@ -70,6 +90,22 @@ public class RobotArm extends Subsystem {
 		m_j2Motor.changeControlMode(m_talonControlMode);
 		m_j3Motor.changeControlMode(m_talonControlMode);
 		m_j4Motor.changeControlMode(m_talonControlMode);
+		if (mode == CANTalon.ControlMode.Speed) {
+			m_j1Motor.setProfile(VELOCITY_PROFILE);
+			m_j2Motor.setProfile(VELOCITY_PROFILE);
+			m_j3Motor.setProfile(VELOCITY_PROFILE);
+			m_j4Motor.setProfile(VELOCITY_PROFILE);
+		}
+		else {
+			m_j1Motor.setProfile(POSITION_PROFILE);
+			m_j2Motor.setProfile(POSITION_PROFILE);
+			m_j3Motor.setProfile(POSITION_PROFILE);
+			m_j4Motor.setProfile(POSITION_PROFILE);
+			m_j4Motor.setForwardSoftLimit((int)RobotUtility.convertDegToAnalogPosition(70, J4_ANALOG_ZERO_PRACTICE, J4_SENSOR_GEAR_RATIO));
+			m_j4Motor.setReverseSoftLimit((int)RobotUtility.convertDegToAnalogPosition(-70, J4_ANALOG_ZERO_PRACTICE, J4_SENSOR_GEAR_RATIO));
+			m_j4Motor.enableForwardSoftLimit(true);
+			m_j4Motor.enableReverseSoftLimit(true);
+		}
 		setTalonInput(j1Input, j3Input, j3Input, j4Input);
 	}
 	
@@ -81,18 +117,48 @@ public class RobotArm extends Subsystem {
 	}
 	
 	public double getJ4PositionDeg() {
-		return RobotUtility.convertAnalogPositionToDeg(m_j4Motor.getAnalogInRaw(), J4_ANALOG_ZERO_PRACTICE);
+		return RobotUtility.convertAnalogPositionToDeg(m_j4Motor.getAnalogInRaw(), J4_ANALOG_ZERO_PRACTICE, J4_SENSOR_GEAR_RATIO);
+	}
+	
+	public double getJ4VelocityDegPerSec() {
+		return RobotUtility.convertAnalogVelocityToDegPerSec(m_j4Motor.getSpeed(), J4_SENSOR_GEAR_RATIO);
 	}
 	
 	public void controlWithJoystick() {
-		m_j4Motor.set(OI.getInstance().getXBoxController().getRightYAxis());
+//		m_j4Motor.set(-OI.getInstance().getXBoxController().getRightXAxis());
+		double throttle = OI.getInstance().getXBoxController().getRightXAxis();
+//		double speedCommand = RobotUtility.convertDegPerSecToAnalogVelocity(throttle*140, J4_SENSOR_GEAR_RATIO);
+//		SmartDashboard.putNumber("J4 Speed Command raw", speedCommand);
+//		SmartDashboard.putNumber("J4 Speed Command deg-sec", RobotUtility.convertAnalogVelocityToDegPerSec(speedCommand));
+//		SmartDashboard.putNumber("J4 Throttle", throttle);
+//		m_j4Motor.set(speedCommand);
+
+		double positionCommand = throttle * J4_MAX_ANGLE;
+		SmartDashboard.putNumber("J4 Position Attempted Command (deg)", positionCommand);
+		SmartDashboard.putNumber("J4 Throttle", throttle);
+		
+		setJ4PositionDeg(positionCommand);
+	}
+	
+	public void setJ4PositionDeg(double positionCommandDeg) {
+		if (positionCommandDeg > J4_MAX_ANGLE) {
+			positionCommandDeg = J4_MAX_ANGLE;
+		}
+		if (positionCommandDeg < J4_MIN_ANGLE) {
+			positionCommandDeg = J4_MIN_ANGLE;
+		}
+		SmartDashboard.putNumber("J4 Position Actual Command (deg)", positionCommandDeg);
+		
+		m_j4Motor.set(RobotUtility.convertDegToAnalogPosition(positionCommandDeg, J4_ANALOG_ZERO_PRACTICE, J4_SENSOR_GEAR_RATIO));
 	}
 
 	public void updateStatus() {
 		SmartDashboard.putNumber("J4 Analog Raw", m_j4Motor.getAnalogInRaw());
 		SmartDashboard.putNumber("J4 Position (raw)", m_j4Motor.getPosition());
 		SmartDashboard.putNumber("J4 Position (deg)", getJ4PositionDeg());
-		SmartDashboard.putNumber("J4 Throttle", m_j4Motor.get());
+		SmartDashboard.putNumber("J4 Speed (raw)", m_j4Motor.getSpeed());
+		SmartDashboard.putNumber("J4 Error (raw)", m_j4Motor.getClosedLoopError());
+		SmartDashboard.putNumber("J4 Speed (deg-sec)", getJ4VelocityDegPerSec());
 	}
 }
 

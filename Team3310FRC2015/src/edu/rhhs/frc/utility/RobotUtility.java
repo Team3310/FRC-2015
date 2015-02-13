@@ -13,6 +13,31 @@ public class RobotUtility
 		return (degValue * (1024.0 / 360.0)) + zeroValue;
 	}
 
+	public static double convertAnalogVelocityToDegPerSec(double analogValue) {
+		return (360.0 / 1024.0) * analogValue * 10;
+	}
+
+	public static double convertDegPerSecToAnalogVelocity(double degPerSecValue) {
+		return degPerSecValue * (1024.0 / 360.0) / 10.0;
+	}
+
+	// With gear ratio
+	public static double convertAnalogPositionToDeg(double analogValue, double zeroValue, double gearRatio) {
+		return convertAnalogPositionToDeg(analogValue, zeroValue) / gearRatio;
+	}
+	
+	public static double convertDegToAnalogPosition(double degValue, double zeroValue, double gearRatio) {
+		return convertDegToAnalogPosition(degValue * gearRatio, zeroValue) ;
+	}
+
+	public static double convertAnalogVelocityToDegPerSec(double analogValue, double gearRatio) {
+		return convertAnalogVelocityToDegPerSec(analogValue) / gearRatio;
+	}
+
+	public static double convertDegPerSecToAnalogVelocity(double degPerSecValue, double gearRatio) {
+		return convertDegPerSecToAnalogVelocity(degPerSecValue * gearRatio);
+	}
+
 	public static double convertEncoderPositionToDeg(double encoderValue) {
 		return 360.0 * encoderValue / (4 * RobotMap.GRAYHILL_ENCODER_COUNT);
 	}
