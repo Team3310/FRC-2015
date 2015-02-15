@@ -2,12 +2,9 @@ package edu.rhhs.frc.subsystems;
 
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
-import edu.rhhs.frc.commands.BinGrabberWithJoystick;
-import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -81,6 +78,9 @@ public class BinGrabber extends Subsystem
 	@Override
 	public void initDefaultCommand() {
 //		setDefaultCommand(new BinGrabberWithJoystick());
+	}
+	
+	public void teleopInit() {
 	}
 	
 	public void setClawPosition(BinGrabberState position) {

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem
@@ -61,6 +62,8 @@ public class DriveTrain extends Subsystem
     private double m_steerTrim = 0.0;
     
     private int m_controllerMode = CONTROLLER_XBOX_CHEESY;
+    
+    private SendableChooser driveModeChooser;
 
     public DriveTrain() {
 		try {
@@ -104,6 +107,16 @@ public class DriveTrain extends Subsystem
 //            SmartDashboard.putNumber("Steer Scale ", m_steerScale);
 //            SmartDashboard.putNumber("Move Trim ", -m_moveTrim);
 //            SmartDashboard.putNumber("Steer Trim ", m_steerTrim); 
+            
+            driveModeChooser = new SendableChooser();
+        	driveModeChooser.addDefault("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+        	driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
+        	driveModeChooser.addObject("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+        	driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
+        	driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
+        	driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
+            SmartDashboard.putData("Drive Mode", driveModeChooser);            
+            
         } catch (Exception e) {
             System.out.println("Unknown error initializing drivetrain.  Message = " + e.getMessage());
         }
@@ -112,6 +125,10 @@ public class DriveTrain extends Subsystem
 	@Override
 	public void initDefaultCommand() {
 		setDefaultCommand(new DriveWithJoystick()); 
+	}
+	
+	public void teleopInit() {
+        setControllerMode(((Integer)driveModeChooser.getSelected()).intValue());
 	}
 	
 	private void setTalonControlMode(CANTalon.ControlMode mode, double leftInput, double rightInput) {

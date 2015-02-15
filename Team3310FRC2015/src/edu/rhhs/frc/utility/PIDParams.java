@@ -1,6 +1,5 @@
 package edu.rhhs.frc.utility;
 
-import edu.wpi.first.wpilibj.CANTalon;
 
 public class PIDParams {
     public double kP = 0;
@@ -21,9 +20,4 @@ public class PIDParams {
         this.iZone = iZone;
         this.rampRatePID = rampRatePID;
     }
-    
-    public void setTalonPID(CANTalon motorController, int profile) {
-    	motorController.setPID(kP, kI, kD, kF, iZone, rampRatePID, profile); 
-    }
-
 }

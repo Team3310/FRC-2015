@@ -25,7 +25,7 @@ public class RobotMain extends IterativeRobot
 	public static final RobotArm robotArm = new RobotArm();
 
     private Command autonomousCommand;
-    private SendableChooser driveModeChooser;
+    private SendableChooser autonomousChooser;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -35,15 +35,7 @@ public class RobotMain extends IterativeRobot
     	 
         // instantiate the command used for the autonomous period
         //autonomousCommand = new ExampleCommand(0.5);
-    	driveModeChooser = new SendableChooser();
-    	driveModeChooser.addDefault("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
-    	driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-    	driveModeChooser.addObject("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
-    	driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
-    	driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
-    	driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
-        SmartDashboard.putData("Drive Mode", driveModeChooser);
-        
+    	
         updateStatus();
         System.out.println("\nRobot code successfully enabled!");
     }
@@ -77,7 +69,9 @@ public class RobotMain extends IterativeRobot
         if (autonomousCommand != null) {
         	autonomousCommand.cancel();
         }
-        driveTrain.setControllerMode(((Integer)driveModeChooser.getSelected()).intValue());
+        driveTrain.teleopInit();
+        robotArm.teleopInit();
+        binGrabber.teleopInit();
         updateStatus();
     }
 

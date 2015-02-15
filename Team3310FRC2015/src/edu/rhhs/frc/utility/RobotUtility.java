@@ -4,6 +4,11 @@ import edu.rhhs.frc.RobotMap;
 
 public class RobotUtility 
 {
+	public static enum ControlMode {VBUS, POSITION, VELOCITY};
+
+	public static final int POSITION_PROFILE = 0;
+	public static final int VELOCITY_PROFILE = 1;
+
 	// MA3 Analog Encoder raw output value goes from 0 to 1024.
 	public static double convertAnalogPositionToDeg(double analogValue, double zeroValue) {
 		return (360.0 / 1024.0) * (analogValue - zeroValue);
