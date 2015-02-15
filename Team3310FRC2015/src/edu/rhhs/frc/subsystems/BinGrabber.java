@@ -3,6 +3,7 @@ package edu.rhhs.frc.subsystems;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.BinGrabberWithJoystick;
+import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -15,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class BinGrabber extends Subsystem 
 {
+	public static enum BinGrabberState {EXTENDED, RETRACTED};
+	
 	private static final double LEFT_ANALOG_ZERO_PRACTICE = 362.0;
 	private static final double RIGHT_ANALOG_ZERO_PRACTICE = -590.0;
 	
@@ -44,30 +47,35 @@ public class BinGrabber extends Subsystem
 	private int m_profile = 0;
 
 	public BinGrabber() {
-		m_rightMotor = new CANTalon(RobotMap.BIN_GRABBER_RIGHT_CAN_ID);
-		m_leftMotor = new CANTalon(RobotMap.BIN_GRABBER_LEFT_CAN_ID);
-
-		m_leftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
-		m_leftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
-		m_leftMotor.setVoltageRampRate(m_rampRateVBus);
-		//m_leftMotor.enableForwardSoftLimit(true);
-		//m_leftMotor.enableReverseSoftLimit(true);
-		//m_leftMotor.setForwardSoftLimit((int) RobotUtility.convertDegToAnalogPosition(DEPLOYED_POSITION_DEG, LEFT_ANALOG_ZERO));
-		//m_leftMotor.setReverseSoftLimit((int) RobotUtility.convertDegToAnalogPosition(STOWED_POSITION_DEG, LEFT_ANALOG_ZERO));
-		m_leftMotor.reverseOutput(true);
-		m_leftMotor.reverseSensor(false);
-
-		m_rightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
-		m_rightMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
-		m_rightMotor.setVoltageRampRate(m_rampRateVBus);
-		m_rightMotor.reverseOutput(false);
-		m_rightMotor.reverseSensor(true);
-
-		// Start with the Talons in throttle mode
-		setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
-		
-		m_clawPositionSolenoid = new DoubleSolenoid(RobotMap.BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID);
-		m_pivotLockSolenoid = new DoubleSolenoid(RobotMap.BIN_GRABBER_PIVOT_LOCK_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.BIN_GRABBER_PIVOT_LOCK_RETRACT_PNEUMATIC_MODULE_ID);
+		try {
+			m_rightMotor = new CANTalon(RobotMap.BIN_GRABBER_RIGHT_CAN_ID);
+			m_leftMotor = new CANTalon(RobotMap.BIN_GRABBER_LEFT_CAN_ID);
+	
+			m_leftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
+			m_leftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
+			m_leftMotor.setVoltageRampRate(m_rampRateVBus);
+			//m_leftMotor.enableForwardSoftLimit(true);
+			//m_leftMotor.enableReverseSoftLimit(true);
+			//m_leftMotor.setForwardSoftLimit((int) RobotUtility.convertDegToAnalogPosition(DEPLOYED_POSITION_DEG, LEFT_ANALOG_ZERO));
+			//m_leftMotor.setReverseSoftLimit((int) RobotUtility.convertDegToAnalogPosition(STOWED_POSITION_DEG, LEFT_ANALOG_ZERO));
+			m_leftMotor.reverseOutput(true);
+			m_leftMotor.reverseSensor(false);
+	
+			m_rightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
+			m_rightMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
+			m_rightMotor.setVoltageRampRate(m_rampRateVBus);
+			m_rightMotor.reverseOutput(false);
+			m_rightMotor.reverseSensor(true);
+	
+			// Start with the Talons in throttle mode
+			setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
+			
+			m_clawPositionSolenoid = new DoubleSolenoid(RobotMap.BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID);
+			m_pivotLockSolenoid = new DoubleSolenoid(RobotMap.BIN_GRABBER_PIVOT_LOCK_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.BIN_GRABBER_PIVOT_LOCK_RETRACT_PNEUMATIC_MODULE_ID);
+		} 
+		catch (Exception e) {
+	        System.out.println("Unknown error initializing bin grabber.  Message = " + e.getMessage());
+	    }
 	}
 
 	@Override
@@ -75,12 +83,22 @@ public class BinGrabber extends Subsystem
 //		setDefaultCommand(new BinGrabberWithJoystick());
 	}
 	
-	public void setClawPosition(Value solenoidState) {
-		m_clawPositionSolenoid.set(solenoidState);
+	public void setClawPosition(BinGrabberState position) {
+		if (position == BinGrabberState.EXTENDED) {
+    		m_clawPositionSolenoid.set(DoubleSolenoid.Value.kForward);
+    	}
+		else {
+			m_clawPositionSolenoid.set(DoubleSolenoid.Value.kReverse);
+		}
 	}
 
-	public void setPivotLockPosition(Value solenoidState) {
-		m_pivotLockSolenoid.set(solenoidState);
+	public void setPivotLockPosition(BinGrabberState position) {
+		if (position == BinGrabberState.EXTENDED) {
+    		m_pivotLockSolenoid.set(DoubleSolenoid.Value.kForward);
+    	}
+		else {
+			m_pivotLockSolenoid.set(DoubleSolenoid.Value.kReverse);
+		}
 	}
 
 	public void setSpeed(double leftSpeed, double rightSpeed) {

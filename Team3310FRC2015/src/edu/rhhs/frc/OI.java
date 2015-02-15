@@ -1,12 +1,17 @@
 package edu.rhhs.frc;
 
+import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAngle;
 import edu.rhhs.frc.commands.BinGrabberDeployTimed;
-import edu.rhhs.frc.commands.BinGrabberSetSpeed;
+import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
 import edu.rhhs.frc.commands.BinGrabberPositionPID;
+import edu.rhhs.frc.commands.BinGrabberSetSpeed;
 import edu.rhhs.frc.commands.TalonTestVelocityControl;
+import edu.rhhs.frc.commands.ToteGrabberAutoClose;
+import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
+import edu.rhhs.frc.subsystems.RobotArm;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -60,6 +65,34 @@ public class OI
 		InternalButton talonTestVel = new InternalButton();
         talonTestVel.whenReleased(new TalonTestVelocityControl(1000,1000, 1, 4));
 		SmartDashboard.putData("Talon Test Velocity", talonTestVel);		
+
+		InternalButton toteGrabberOpen = new InternalButton();
+		toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
+		SmartDashboard.putData("Tote Grabber Open", toteGrabberOpen);
+
+		InternalButton toteGrabberClosed = new InternalButton();
+		toteGrabberClosed.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSED));
+		SmartDashboard.putData("Tote Grabber Closed", toteGrabberClosed);
+
+		InternalButton toteGrabberAuto = new InternalButton();
+		toteGrabberAuto.whenReleased(new ToteGrabberAutoClose());
+		SmartDashboard.putData("Tote Grabber Auto Close", toteGrabberAuto);
+		
+		InternalButton binGrabberClawOpen = new InternalButton();
+		binGrabberClawOpen.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.EXTENDED));
+		SmartDashboard.putData("Bin Grabber Claw Open", binGrabberClawOpen);
+		
+		InternalButton binGrabberClawClosed = new InternalButton();
+		binGrabberClawClosed.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
+		SmartDashboard.putData("Bin Grabber Claw Closed", binGrabberClawClosed);
+		
+		InternalButton binGrabberPivotLock = new InternalButton();
+		binGrabberPivotLock.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.EXTENDED));
+		SmartDashboard.putData("Bin Grabber Pivot Lock", binGrabberPivotLock);
+		
+		InternalButton binGrabberPivotUnlock = new InternalButton();
+		binGrabberPivotUnlock.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
+		SmartDashboard.putData("Bin Grabber Pivot Unlock", binGrabberPivotUnlock);
 	}
 	
 	public static OI getInstance() {

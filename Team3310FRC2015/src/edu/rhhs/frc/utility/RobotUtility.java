@@ -57,4 +57,21 @@ public class RobotUtility
 	public static double convertDegPerSecToEncoderVelocity(double degPerSecValue) {
 		return convertDegToEncoderPosition(degPerSecValue) / 10.0;
 	}
+	
+	public static double convertEncoderPositionToDeg(double encoderValue, double gearRatio) {
+		return convertEncoderPositionToDeg(encoderValue) / gearRatio;
+	}
+
+	public static double convertDegToEncoderPosition(double degValue, double gearRatio) {
+		return convertDegToEncoderPosition(degValue * gearRatio);
+	}
+
+	public static double convertEncoderVelocityToDegPerSec(double encoderValue, double gearRatio) {
+		return convertEncoderVelocityToDegPerSec(encoderValue) / gearRatio;
+	}
+
+	public static double convertDegPerSecToEncoderVelocity(double degPerSecValue, double gearRatio) {
+		return convertDegPerSecToEncoderVelocity(degPerSecValue * gearRatio);
+	}
+	
 }

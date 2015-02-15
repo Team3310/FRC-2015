@@ -19,7 +19,6 @@ public class DriveTrain extends Subsystem
 	private CANTalon m_rearRightMotor;
 	
 	private CANTalon.ControlMode m_talonControlMode = CANTalon.ControlMode.PercentVbus;
-	private DigitalInput di;
 	private double m_rearLeftTarget;
 	
 	private double m_error;
@@ -65,7 +64,6 @@ public class DriveTrain extends Subsystem
 
     public DriveTrain() {
 		try {
-			di = new DigitalInput(0);
 			m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
 			m_frontRightMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
 			
@@ -163,7 +161,8 @@ public class DriveTrain extends Subsystem
 	}
 
 	public void driveWithJoystick() {
-		if (m_drive != null && m_talonControlMode == CANTalon.ControlMode.PercentVbus) {
+		if (false) {
+//		if (m_drive != null && m_talonControlMode == CANTalon.ControlMode.PercentVbus) {
 			switch(m_controllerMode) {
 			case CONTROLLER_JOYSTICK_ARCADE:
 				m_moveInput = OI.getInstance().getJoystick1().getY();
@@ -255,12 +254,7 @@ public class DriveTrain extends Subsystem
 		return Math.asin(steerNonLinearity * steer) / Math.asin(steerNonLinearity);
 	}
 	
-	private String getSwitchPosition() {
-		return (!di.get()) ? "Open" : "Closed";
-	}
-
 	public void updateStatus() {
-		SmartDashboard.putString("Switch 2", getSwitchPosition());
 		SmartDashboard.putNumber("Rear Left Encoder Speed Talon", m_rearLeftMotor.getSpeed());
 		SmartDashboard.putNumber("Rear Left Target Input", RobotUtility.convertDegPerSecToEncoderVelocity(m_rearLeftTarget));
 		SmartDashboard.putNumber("Rear Left SetPoint Talon", m_rearLeftMotor.getSetpoint());
