@@ -10,17 +10,19 @@ import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
-public class RobotArm extends Subsystem {
+public class RobotArm extends PIDSubsystem {
 	
 	public static enum ToteGrabberPosition {OPEN, CLOSED};
     
+	private static final double OUTER_LOOP_UPDATE_RATE_SEC = 0.010;
+	
 	private static final double J1_ENCODER_OFFSET_DEG = 0.0;
 	private static final double J2_ENCODER_OFFSET_DEG = 0.0;
 	private static final double J3_ENCODER_OFFSET_DEG = 90.0;
@@ -75,6 +77,7 @@ public class RobotArm extends Subsystem {
     private RobotUtility.ControlMode m_robotArmControlMode = RobotUtility.ControlMode.VELOCITY;
 
     public RobotArm() {
+    	super(0.0, 0.0, 0.0, OUTER_LOOP_UPDATE_RATE_SEC);
     	try {
 			m_j1Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J1_CAN_ID, J1_SENSOR_GEAR_RATIO, J1_ENCODER_OFFSET_DEG, J1_ENCODER_INIT_DEG, J1_MIN_ANGLE_DEG, J1_MAX_ANGLE_DEG);
 			m_j2Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J2_CAN_ID, J2_SENSOR_GEAR_RATIO, J2_ENCODER_OFFSET_DEG, J2_ENCODER_INIT_DEG, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
@@ -239,6 +242,18 @@ public class RobotArm extends Subsystem {
 
 		SmartDashboard.putBoolean("IR Tote Grabber Switch", getToteGrabberSwitch());
 		SmartDashboard.putString("Tote Grabber Position", 	getToteGrabberPosition().toString());
+	}
+
+	@Override
+	protected double returnPIDInput() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	protected void usePIDOutput(double output) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

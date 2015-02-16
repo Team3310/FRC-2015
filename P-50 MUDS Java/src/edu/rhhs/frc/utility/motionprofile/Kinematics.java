@@ -1,4 +1,4 @@
-package edu.rhhs.frc.utility;
+package edu.rhhs.frc.utility.motionprofile;
 
 public class Kinematics {
 	/*---------------------------------------------------------------------------
