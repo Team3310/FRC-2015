@@ -63,8 +63,6 @@ public class DriveTrain extends Subsystem
     
     private int m_controllerMode = CONTROLLER_XBOX_CHEESY;
     
-    private SendableChooser driveModeChooser;
-
     public DriveTrain() {
 		try {
 			m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
@@ -100,24 +98,8 @@ public class DriveTrain extends Subsystem
             m_drive.setSafetyEnabled(false);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
-            
-//            SmartDashboard.putNumber("Move NonLinear ", m_moveNonLinear);
-//            SmartDashboard.putNumber("Steer NonLinear ", m_steerNonLinear);
-//            SmartDashboard.putNumber("Move Scale ", m_moveScale);
-//            SmartDashboard.putNumber("Steer Scale ", m_steerScale);
-//            SmartDashboard.putNumber("Move Trim ", -m_moveTrim);
-//            SmartDashboard.putNumber("Steer Trim ", m_steerTrim); 
-            
-            driveModeChooser = new SendableChooser();
-        	driveModeChooser.addDefault("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
-        	driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-        	driveModeChooser.addObject("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
-        	driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
-        	driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
-        	driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
-            SmartDashboard.putData("Drive Mode", driveModeChooser);            
-            
-        } catch (Exception e) {
+        } 
+		catch (Exception e) {
             System.out.println("Unknown error initializing drivetrain.  Message = " + e.getMessage());
         }
 	}
@@ -125,10 +107,6 @@ public class DriveTrain extends Subsystem
 	@Override
 	public void initDefaultCommand() {
 		setDefaultCommand(new DriveWithJoystick()); 
-	}
-	
-	public void teleopInit() {
-        setControllerMode(((Integer)driveModeChooser.getSelected()).intValue());
 	}
 	
 	private void setTalonControlMode(CANTalon.ControlMode mode, double leftInput, double rightInput) {
@@ -178,8 +156,7 @@ public class DriveTrain extends Subsystem
 	}
 
 	public void driveWithJoystick() {
-		if (false) {
-//		if (m_drive != null && m_talonControlMode == CANTalon.ControlMode.PercentVbus) {
+		if (m_drive != null && m_talonControlMode == CANTalon.ControlMode.PercentVbus) {
 			switch(m_controllerMode) {
 			case CONTROLLER_JOYSTICK_ARCADE:
 				m_moveInput = OI.getInstance().getJoystick1().getY();
@@ -203,41 +180,30 @@ public class DriveTrain extends Subsystem
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 				break;
 			case CONTROLLER_XBOX_CHEESY:
-				m_moveInput = OI.getInstance().getXBoxController().getLeftYAxis();
-				m_steerInput = OI.getInstance().getXBoxController().getRightXAxis();
+				m_moveInput = OI.getInstance().getXBoxController1().getLeftYAxis();
+				m_steerInput = OI.getInstance().getXBoxController1().getRightXAxis();
 				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
 				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 				break;
 			case CONTROLLER_XBOX_ARCADE_RIGHT:
-				m_moveInput = OI.getInstance().getXBoxController().getRightYAxis();
-				m_steerInput = OI.getInstance().getXBoxController().getRightXAxis();
+				m_moveInput = OI.getInstance().getXBoxController1().getRightYAxis();
+				m_steerInput = OI.getInstance().getXBoxController1().getRightXAxis();
 				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
 				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 				break;
 			case CONTROLLER_XBOX_ARCADE_LEFT:
-				m_moveInput = OI.getInstance().getXBoxController().getLeftYAxis();
-				m_steerInput = OI.getInstance().getXBoxController().getLeftXAxis();
+				m_moveInput = OI.getInstance().getXBoxController1().getLeftYAxis();
+				m_steerInput = OI.getInstance().getXBoxController1().getLeftXAxis();
 				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
 				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 				break;
-			// case CONTROLLER_WHEEL:
-			// m_moveInput = OI.getInstance().getJoystick1().getY();
-			// m_steerInput = OI.getInstance().getSteeringWheel().getX();
-			// m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim,
-			// m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-			// m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim,
-			// m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
-			// m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
-			// break;
 			}
 		}
 	}
 	
-	
-
 	private double adjustForSensitivity(double scale, double trim, double steer, int nonLinearFactor, double wheelNonLinearity) {
 		steer += trim;
 		steer *= scale;
@@ -272,20 +238,11 @@ public class DriveTrain extends Subsystem
 	}
 	
 	public void updateStatus() {
-		SmartDashboard.putNumber("Rear Left Encoder Speed Talon", m_rearLeftMotor.getSpeed());
-		SmartDashboard.putNumber("Rear Left Target Input", RobotUtility.convertDegPerSecToEncoderVelocity(m_rearLeftTarget));
-		SmartDashboard.putNumber("Rear Left SetPoint Talon", m_rearLeftMotor.getSetpoint());
-		SmartDashboard.putNumber("Rear Left Output Talon", m_rearLeftMotor.get());
-		SmartDashboard.putNumber("Rear Left Error Talon", m_rearLeftMotor.getClosedLoopError());
-		SmartDashboard.putNumber("Rear Left Error", RobotUtility.convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getClosedLoopError()));
-		SmartDashboard.putNumber("Rear Right Error", RobotUtility.convertEncoderVelocityToDegPerSec(m_rearRightMotor.getClosedLoopError()));
 		SmartDashboard.putNumber("Rear Left Pos (deg)", RobotUtility.convertEncoderPositionToDeg(m_rearLeftMotor.getPosition()));
 		SmartDashboard.putNumber("Rear Right Pos (deg)", RobotUtility.convertEncoderPositionToDeg(m_rearRightMotor.getPosition()));
 		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", RobotUtility.convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getSpeed()));
 		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", RobotUtility.convertEncoderVelocityToDegPerSec(m_rearRightMotor.getSpeed()));
 		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", RobotUtility.convertEncoderVelocityToFtPerSec(m_rearLeftMotor.getSpeed()));
 		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", RobotUtility.convertEncoderVelocityToFtPerSec(m_rearRightMotor.getSpeed()));		
-		SmartDashboard.putNumber("Front Left Pos (raw)", m_frontLeftMotor.getAnalogInRaw());		
-		SmartDashboard.putNumber("Front Left Pos (deg)", RobotUtility.convertAnalogPositionToDeg(m_frontLeftMotor.getAnalogInRaw(), 512));		
 	}
 }

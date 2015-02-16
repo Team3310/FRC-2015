@@ -4,6 +4,7 @@ package edu.rhhs.frc;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
+import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -24,8 +25,10 @@ public class RobotMain extends IterativeRobot
 	public static final DriveTrain driveTrain = new DriveTrain();
 	public static final RobotArm robotArm = new RobotArm();
 
-    private Command autonomousCommand;
-    private SendableChooser autonomousChooser;
+    private Command m_autonomousCommand;
+    private SendableChooser m_autonomousChooser;
+    private SendableChooser m_driveModeChooser;
+    private SendableChooser m_robotArmControlModeChooser;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -35,7 +38,22 @@ public class RobotMain extends IterativeRobot
     	 
         // instantiate the command used for the autonomous period
         //autonomousCommand = new ExampleCommand(0.5);
-    	
+        
+        m_driveModeChooser = new SendableChooser();
+    	m_driveModeChooser.addDefault("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+    	m_driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
+    	m_driveModeChooser.addObject("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+    	m_driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
+    	m_driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
+    	m_driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
+        SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
+
+        m_robotArmControlModeChooser = new SendableChooser();
+    	m_robotArmControlModeChooser.addObject ("VBus", RobotUtility.ControlMode.VBUS);
+    	m_robotArmControlModeChooser.addObject("Position", RobotUtility.ControlMode.POSITION);
+    	m_robotArmControlModeChooser.addDefault ("Velocity", RobotUtility.ControlMode.VELOCITY);
+        SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
+   	
         updateStatus();
         System.out.println("\nRobot code successfully enabled!");
     }
@@ -47,8 +65,8 @@ public class RobotMain extends IterativeRobot
 
     public void autonomousInit() {
         // schedule the autonomous command (example)
-        if (autonomousCommand != null) { 
-        	autonomousCommand.start();
+        if (m_autonomousCommand != null) { 
+        	m_autonomousCommand.start();
         }
         updateStatus();
     }
@@ -66,12 +84,11 @@ public class RobotMain extends IterativeRobot
         // teleop starts running. If you want the autonomous to 
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if (autonomousCommand != null) {
-        	autonomousCommand.cancel();
+        if (m_autonomousCommand != null) {
+        	m_autonomousCommand.cancel();
         }
-        driveTrain.teleopInit();
-        robotArm.teleopInit();
-        binGrabber.teleopInit();
+        driveTrain.setControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
+        robotArm.setControlMode((RobotUtility.ControlMode)m_robotArmControlModeChooser.getSelected());
         updateStatus();
     }
 

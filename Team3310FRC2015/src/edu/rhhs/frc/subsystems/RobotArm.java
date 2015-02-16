@@ -47,9 +47,9 @@ public class RobotArm extends Subsystem {
 	private static final double J4_MAX_ANGLE_DEG = 60.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 
-	private static final double J1_MAX_SPEED_DEG_PER_SEC = 100.0;
+	private static final double J1_MAX_SPEED_DEG_PER_SEC = 140.0;
 	private static final double J2_MAX_SPEED_DEG_PER_SEC = 40.0;
-	private static final double J3_MAX_SPEED_DEG_PER_SEC = 100.0;
+	private static final double J3_MAX_SPEED_DEG_PER_SEC = 40.0;
 	private static final double J4_MAX_SPEED_DEG_PER_SEC = 40.0;
 	
 	private CANTalonEncoderPID m_j1Motor;
@@ -58,7 +58,7 @@ public class RobotArm extends Subsystem {
 	private CANTalonAnalogPID  m_j4Motor;
 	
     private PIDParams j1PositionPidParams = new PIDParams(1.4, 0.0, 0.001, 0.0, 50, 0.0);
-    private PIDParams j2PositionPidParams = new PIDParams(7.0, 0.0, 0.01, 0.0, 50, 0.0);
+    private PIDParams j2PositionPidParams = new PIDParams(8.0, 0.04, 0.0, 0.0, 100, 0.0);
     private PIDParams j3PositionPidParams = new PIDParams(2.0, 0.0, 0.003, 0.167, 50, 0.0);
     private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0.0);
 
@@ -71,7 +71,6 @@ public class RobotArm extends Subsystem {
 	
 	private DoubleSolenoid m_toteGrabberSolenoid;
 	
-    private SendableChooser m_robotArmControlModeChooser;
     private RobotUtility.ControlMode m_robotArmControlMode = RobotUtility.ControlMode.VELOCITY;
 
     public RobotArm() {
@@ -123,13 +122,7 @@ public class RobotArm extends Subsystem {
 
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH);	
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
-			setToteGrabberPosition(ToteGrabberPosition.OPEN);
-			
-	    	m_robotArmControlModeChooser = new SendableChooser();
-	    	m_robotArmControlModeChooser.addObject ("VBus", RobotUtility.ControlMode.VBUS);
-	    	m_robotArmControlModeChooser.addObject("Position", RobotUtility.ControlMode.POSITION);
-	    	m_robotArmControlModeChooser.addDefault ("Velocity", RobotUtility.ControlMode.VELOCITY);
-	        SmartDashboard.putData("Robot Arm Control", m_robotArmControlModeChooser);
+			setToteGrabberPosition(ToteGrabberPosition.OPEN);			
     	}
 		catch (Exception e) {
 	        System.out.println("Unknown error initializing robot arm.  Message = " + e.getMessage());
@@ -140,8 +133,12 @@ public class RobotArm extends Subsystem {
 		setDefaultCommand(new RobotArmWithJoystick());
     }
     
-	public void teleopInit() {
-        m_robotArmControlMode = (RobotUtility.ControlMode)m_robotArmControlModeChooser.getSelected();
+	public void setControlMode(RobotUtility.ControlMode mode) {
+        m_robotArmControlMode = mode;
+        m_j1Motor.setControlMode(mode);
+        m_j2Motor.setControlMode(mode);
+        m_j3Motor.setControlMode(mode);
+        m_j4Motor.setControlMode(mode);
 	}
 	
     public boolean getToteGrabberSwitch() {
@@ -165,10 +162,10 @@ public class RobotArm extends Subsystem {
     }
     	
 	public void controlWithJoystick() {
-		double throttleRightX = OI.getInstance().getXBoxController().getRightXAxis();
-		double throttleRightY = OI.getInstance().getXBoxController().getRightYAxis();
-		double throttleLeftX = OI.getInstance().getXBoxController().getLeftXAxis();
-		double throttleLeftY = OI.getInstance().getXBoxController().getLeftYAxis();
+		double throttleRightX = OI.getInstance().getXBoxController2().getRightXAxis();
+		double throttleRightY = OI.getInstance().getXBoxController2().getRightYAxis();
+		double throttleLeftX = OI.getInstance().getXBoxController2().getLeftXAxis();
+		double throttleLeftY = OI.getInstance().getXBoxController2().getLeftYAxis();
 
 		SmartDashboard.putNumber("Right X Throttle", throttleRightX);
 		SmartDashboard.putNumber("Right Y Throttle", throttleRightY);
@@ -181,10 +178,10 @@ public class RobotArm extends Subsystem {
 			double velocityCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC;
 			double velocityCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC;
 			
-			SmartDashboard.putNumber("Stick Command J1", velocityCommandJ1);
-			SmartDashboard.putNumber("Stick Command J2", velocityCommandJ2);
-			SmartDashboard.putNumber("Stick Command J3", velocityCommandJ3);
-			SmartDashboard.putNumber("Stick Command J4", velocityCommandJ4);
+			SmartDashboard.putNumber("J1 Stick Command", velocityCommandJ1);
+			SmartDashboard.putNumber("J2 Stick Command", velocityCommandJ2);
+			SmartDashboard.putNumber("J3 Stick Command", velocityCommandJ3);
+			SmartDashboard.putNumber("J4 Stick Command", velocityCommandJ4);
 
 			m_j1Motor.setStickInputVelocityDegPerSec(velocityCommandJ1);
 			m_j2Motor.setStickInputVelocityDegPerSec(velocityCommandJ2);
@@ -197,10 +194,10 @@ public class RobotArm extends Subsystem {
 			double positionCommandJ3 = -throttleLeftY  * Math.min(J3_MAX_ANGLE_DEG, Math.abs(J3_MIN_ANGLE_DEG));
 			double positionCommandJ4 = -throttleLeftX  * Math.min(J4_MAX_ANGLE_DEG, Math.abs(J4_MIN_ANGLE_DEG));
 
-			SmartDashboard.putNumber("Stick Command J1", positionCommandJ1);
-			SmartDashboard.putNumber("Stick Command J2", positionCommandJ2);
-			SmartDashboard.putNumber("Stick Command J3", positionCommandJ3);
-			SmartDashboard.putNumber("Stick Command J4", positionCommandJ4);
+			SmartDashboard.putNumber("J1 Stick Command", positionCommandJ1);
+			SmartDashboard.putNumber("J2 Stick Command", positionCommandJ2);
+			SmartDashboard.putNumber("J3 Stick Command", positionCommandJ3);
+			SmartDashboard.putNumber("J4 Stick Command", positionCommandJ4);
 
 			m_j1Motor.setPIDPositionDeg(positionCommandJ1);
 			m_j2Motor.setPIDPositionDeg(positionCommandJ2);
@@ -208,10 +205,10 @@ public class RobotArm extends Subsystem {
 			m_j4Motor.setPIDPositionDeg(positionCommandJ4);
 		}
 		else if (m_robotArmControlMode == RobotUtility.ControlMode.VBUS) {
-			SmartDashboard.putNumber("Stick Command J1", -throttleRightX);
-			SmartDashboard.putNumber("Stick Command J2", -throttleRightY);
-			SmartDashboard.putNumber("Stick Command J3", -throttleLeftY);
-			SmartDashboard.putNumber("Stick Command J4", -throttleLeftX);
+			SmartDashboard.putNumber("J1 Stick Command", -throttleRightX);
+			SmartDashboard.putNumber("J2 Stick Command", -throttleRightY);
+			SmartDashboard.putNumber("J3 Stick Command", -throttleLeftY);
+			SmartDashboard.putNumber("J4 Stick Command", -throttleLeftX);
 			
 			m_j1Motor.set(-throttleRightX);
 			m_j2Motor.set(-throttleRightY);

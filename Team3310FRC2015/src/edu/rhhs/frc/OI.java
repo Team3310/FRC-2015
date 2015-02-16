@@ -6,7 +6,7 @@ import edu.rhhs.frc.commands.BinGrabberDeployTimed;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
 import edu.rhhs.frc.commands.BinGrabberPositionPID;
 import edu.rhhs.frc.commands.BinGrabberSetSpeed;
-import edu.rhhs.frc.commands.TalonTestVelocityControl;
+import edu.rhhs.frc.commands.DriveTrainVelocityControl;
 import edu.rhhs.frc.commands.ToteGrabberAutoClose;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.controller.XboxController;
@@ -25,20 +25,22 @@ public class OI
 {	
 	private static OI instance;
 
-	private XboxController m_xboxController;
+	private XboxController m_xboxController1;
+	private XboxController m_xboxController2;
 	private Joystick m_joystick1;
     private Joystick m_joystick2;
 	
 	private OI() {
-		m_xboxController = new XboxController(RobotMap.XBOX_USB_ID);
+		m_xboxController1 = new XboxController(RobotMap.XBOX_1_USB_ID);
+		m_xboxController2 = new XboxController(RobotMap.XBOX_2_USB_ID);
         m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
         m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
 	    
-        JoystickButton moveBinGrabberUp = new JoystickButton(m_xboxController.getJoyStick(), XboxController.A_BUTTON);
+        JoystickButton moveBinGrabberUp = new JoystickButton(m_xboxController1.getJoyStick(), XboxController.A_BUTTON);
         moveBinGrabberUp.whenPressed(new BinGrabberSetSpeed(1.0));
         moveBinGrabberUp.whenReleased(new BinGrabberSetSpeed(0));
         
-        JoystickButton moveBinGrabberDown = new JoystickButton(m_xboxController.getJoyStick(), XboxController.Y_BUTTON);
+        JoystickButton moveBinGrabberDown = new JoystickButton(m_xboxController1.getJoyStick(), XboxController.Y_BUTTON);
         moveBinGrabberDown.whenPressed(new BinGrabberSetSpeed(-0.5));
         moveBinGrabberDown.whenReleased(new BinGrabberSetSpeed(0));
 	    
@@ -48,23 +50,23 @@ public class OI
 		
         InternalButton binGrabberDeployAngle = new InternalButton();
         binGrabberDeployAngle.whenReleased(new BinGrabberDeployAngle(1.0, BinGrabber.DEPLOYED_POSITION_TIMED_DEG, 300));
-		SmartDashboard.putData("Bin Grabber Deploy Angle", binGrabberDeployAngle);
+		SmartDashboard.putData("Bin Grabber Deploy Angle Limit", binGrabberDeployAngle);
 		
 		InternalButton binGrabberDeployPID = new InternalButton();
         binGrabberDeployPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 4));
-		SmartDashboard.putData("Talon Test Position_Deployed", binGrabberDeployPID);
+		SmartDashboard.putData("Bin Grabber Deploy Position PID", binGrabberDeployPID);
 		
 		InternalButton binGrabberStowedPID = new InternalButton();
         binGrabberStowedPID.whenReleased(new BinGrabberPositionPID(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 4));
-		SmartDashboard.putData("Bin Grabber Position_Stowed", binGrabberStowedPID);
+		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPID);
 		
 		InternalButton binGrabberDragPID = new InternalButton();
         binGrabberDragPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 4));
-		SmartDashboard.putData("Bin Grabber Position_Drag", binGrabberDragPID);
+		SmartDashboard.putData("Bin Grabber Drag Position PID", binGrabberDragPID);
 
-		InternalButton talonTestVel = new InternalButton();
-        talonTestVel.whenReleased(new TalonTestVelocityControl(1000,1000, 1, 4));
-		SmartDashboard.putData("Talon Test Velocity", talonTestVel);		
+		InternalButton drivetrainTestVel = new InternalButton();
+		drivetrainTestVel.whenReleased(new DriveTrainVelocityControl(1000, 1000, 1, 4));
+		SmartDashboard.putData("DriveTrain Test Velocity PID", drivetrainTestVel);		
 
 		InternalButton toteGrabberOpen = new InternalButton();
 		toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
@@ -110,8 +112,12 @@ public class OI
         return m_joystick2;
     }
     
-	public XboxController getXBoxController() {
-        return m_xboxController;
+	public XboxController getXBoxController1() {
+        return m_xboxController1;
+    }
+
+	public XboxController getXBoxController2() {
+        return m_xboxController2;
     }
 }
 

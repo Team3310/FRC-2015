@@ -51,10 +51,6 @@ public class BinGrabber extends Subsystem
 			m_leftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 			m_leftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
 			m_leftMotor.setVoltageRampRate(m_rampRateVBus);
-			//m_leftMotor.enableForwardSoftLimit(true);
-			//m_leftMotor.enableReverseSoftLimit(true);
-			//m_leftMotor.setForwardSoftLimit((int) RobotUtility.convertDegToAnalogPosition(DEPLOYED_POSITION_DEG, LEFT_ANALOG_ZERO));
-			//m_leftMotor.setReverseSoftLimit((int) RobotUtility.convertDegToAnalogPosition(STOWED_POSITION_DEG, LEFT_ANALOG_ZERO));
 			m_leftMotor.reverseOutput(true);
 			m_leftMotor.reverseSensor(false);
 	
@@ -165,15 +161,16 @@ public class BinGrabber extends Subsystem
 	}
 	
 	public void controlWithJoystick() {
-		setTalonInput(0, -OI.getInstance().getXBoxController().getRightYAxis());
+//		setTalonInput(0, -OI.getInstance().getXBoxController().getRightYAxis());
 	}
 
 	public void updateStatus() {
-		SmartDashboard.putNumber("Left Bin Grabber Throttle (raw)", m_leftMotor.get());
-		SmartDashboard.putNumber("Right Bin Grabber get", m_rightMotor.get());
-		SmartDashboard.putNumber("Left Bin Grabber getAnalogInRaw)", m_leftMotor.getAnalogInRaw());
-		SmartDashboard.putNumber("Right Bin Grabber getPosition", m_rightMotor.getPosition());
+		SmartDashboard.putNumber("Left Bin Grabber Get", m_leftMotor.get());
+		SmartDashboard.putNumber("Right Bin Grabber Get", m_rightMotor.get());
+
+		SmartDashboard.putNumber("Left Bin Grabber Analog Position (raw)", m_leftMotor.getAnalogInRaw());
 		SmartDashboard.putNumber("Right Bin Grabber Analog Position (raw)", m_rightMotor.getAnalogInRaw());
+
 		SmartDashboard.putNumber("Left Bin Grabber Position (Deg)", getLeftPositionDeg());
 		SmartDashboard.putNumber("Right Bin Grabber Position (Deg)", getRightPositionDeg());
 	}

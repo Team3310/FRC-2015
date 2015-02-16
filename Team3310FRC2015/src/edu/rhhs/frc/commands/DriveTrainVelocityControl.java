@@ -3,14 +3,14 @@ package edu.rhhs.frc.commands;
 import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class TalonTestVelocityControl extends Command 
+public class DriveTrainVelocityControl extends Command 
 {
 	private double leftTargetDegPerSec;
 	private double rightTargetDegPerSec;
 	private double errorDegPerSec;
 	private double timeoutSeconds;
 
-    public TalonTestVelocityControl(double leftVelocityDegPerSec, double rightVelocityDegPerSec, double errorDegPerSec, double timeoutSeconds) {
+    public DriveTrainVelocityControl(double leftVelocityDegPerSec, double rightVelocityDegPerSec, double errorDegPerSec, double timeoutSeconds) {
         // Use requires() here to declare subsystem dependencies
     	this.leftTargetDegPerSec = leftVelocityDegPerSec;
     	this.rightTargetDegPerSec = rightVelocityDegPerSec;
