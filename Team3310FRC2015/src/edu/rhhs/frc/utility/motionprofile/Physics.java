@@ -33,8 +33,8 @@ public class Physics {
 		    }
 		    
 		    
-		  // Calculate J1, J2, and J3 Speed & Acceleration
-		  for (int j = 0; j < 3; j++) {
+		  // Calculate J1, J2, J3, and J4 Speed & Acceleration
+		  for (int j = 0; j < 4; j++) {
 		      
 		      // Determine the Start values for V and A
 		      out.jointVel[0][j] = 0.0;
@@ -50,7 +50,7 @@ public class Physics {
 		  
 		  // Determine Max, Min, and Ave joint speeds and path speeds
 		  // Initialize parameters
-		  for (int j = 0; j < 3; j++) {
+		  for (int j = 0; j < 4; j++) {
 		      out.maxJVel[j] = out.jointVel[0][j];
 		      out.minJVel[j] = out.jointVel[0][j];
 		      out.averageJVel[j] = 0.0;
@@ -88,7 +88,7 @@ public class Physics {
 		  for (int i = 0; i < Npts + 1; i++) {
 		      
 		      // Sum each joint velocity value
-		      for (int j = 0; j < 3; j++) {
+		      for (int j = 0; j < 4; j++) {
 		          out.averageJVel[j] = out.averageJVel[j] + Math.abs(out.jointVel[i][j]);
 		      }
 		      
@@ -97,7 +97,7 @@ public class Physics {
 		  }
 		  
 		  // Calculate the average speed
-		  for (int j = 0; j < 3; j++) {
+		  for (int j = 0; j < 4; j++) {
 		      out.averageJVel[j] = out.averageJVel[j] / Npts;
 		  }
 		  
@@ -106,21 +106,17 @@ public class Physics {
 		          
 		  // Convert all joint angles to degrees and all distances to mm.
 		  for (int i = 0; i < Npts + 1; i++) {
-		      for (int j = 0; j < 3; j++) {
+		      for (int j = 0; j < 4; j++) {
 		          CartPos[i][j] = CartPos[i][j] * 1000.0;           				// mm
 		          out.cartVel[i][j] = out.cartVel[i][j] * 1000.0;           		// mm/s
 		          out.cartAccel[i][j] = out.cartAccel[i][j] * 1000.0;      		 	// mm/s^2
 		          JointPos[i][j] = JointPos[i][j] * 180.0 / Math.PI;     			// deg
 		          out.jointVel[i][j] = out.jointVel[i][j] * 180.0 / Math.PI;     	// deg/s
 		          out.jointAccel[i][j] = out.jointAccel[i][j] * 180.0 / Math.PI; 	// deg/s^2
-		      }
-		      
-		      out.cartVel[i][3] = out.cartVel[i][3] * 1000.0;               		// mm/s
-		      out.cartAccel[i][3] = out.cartAccel[i][3] * 1000.0;          			// mm/s^2
-		      
+		      }		      
 		  }
 		  
-		  for (int j = 0; j < 3; j++) {
+		  for (int j = 0; j < 4; j++) {
 		      out.averageJVel[j] = out.averageJVel[j] * 180.0 / Math.PI;           	// deg/s
 		      out.maxJVel[j] = out.maxJVel[j] * 180.0 / Math.PI;                  	// deg/s
 		      out.minJVel[j] = out.minJVel[j] * 180.0 / Math.PI;                  	// deg/s

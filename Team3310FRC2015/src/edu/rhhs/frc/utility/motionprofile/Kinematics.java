@@ -22,7 +22,7 @@ public class Kinematics {
 		boolean errorFlag;
 		
 		public IKINOutput(int NumPoints) {
-	        userAngles = new double[NumPoints + 1][3];
+	        userAngles = new double[NumPoints + 1][4];
 		    errorFlag = false;
 		}
 	}
@@ -38,7 +38,7 @@ public class Kinematics {
 		double Kappa;
 	    double C1, C2, C3, S1, S2, S3;
 	    double Den, C2Num, S2Num;
-	    double[] Theta = new double[3];    
+	    double[] Theta = new double[4];    
 	    
 	    // Loop through each ITP and calculate the IKIN
 	    for (int i = 0; i < NumPoints + 1; i++) {
@@ -123,6 +123,7 @@ public class Kinematics {
 	        out.userAngles[i][0] = Theta[0];
 	        out.userAngles[i][1]  = Math.PI / 2 - Theta[1];
 	        out.userAngles[i][2] = Theta[1] + Theta[2] - Math.PI / 2;
+	        out.userAngles[i][3] = Pos[i][3] - Theta[0];
 	    }
 	       
 	    out.errorFlag = false;
@@ -192,7 +193,7 @@ public class Kinematics {
 
 	public static double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[][] InputPos) {
 	        
-	    double[][] CartPos = new double[NumPoints + 1][3];
+	    double[][] CartPos = new double[NumPoints + 1][4];
 	    
 	    for (int i = 0; i < NumPoints + 1; i++) {
 	    
@@ -224,6 +225,7 @@ public class Kinematics {
 	                        
 	        // Z position
 	        CartPos[i][2] = L[2] * Math.sin(Pos[i][2]) + L[1] * Math.cos(Pos[i][1]);
+	        CartPos[i][3] = Pos[i][0] + Pos[i][3];
 	    }  
 	    
 	    return CartPos;

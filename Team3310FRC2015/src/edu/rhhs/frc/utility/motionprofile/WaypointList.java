@@ -10,19 +10,11 @@ public class WaypointList {
 		
 	}
 
-	public WaypointList(ArrayList<double[]> pointCoordinates) {
-		this.coordinates = pointCoordinates;
+	public void addWaypoint(double x, double y, double z, double toolAngleDeg) {
+		coordinates.add(new double[] {x, y, z, toolAngleDeg});
 	}
 	
-	public void addWaypoint(double[] coordinate) {
-		coordinates.add(coordinate);
-	}
-	
-	public void addWaypoint(double x, double y, double z) {
-		coordinates.add(new double[] {x, y, z});
-	}
-	
-	public double[][] getCoordinates() {
+	public double[][] getWaypoints() {
 		double[][] output = new double[coordinates.size()][3];
 		for (int i = 0; i < coordinates.size(); i++) {
 			output[i] = coordinates.get(i);
@@ -30,4 +22,5 @@ public class WaypointList {
 		
 		return output;
 	}
+	
 }

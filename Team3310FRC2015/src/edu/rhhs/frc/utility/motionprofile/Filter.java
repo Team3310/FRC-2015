@@ -1,5 +1,7 @@
 package edu.rhhs.frc.utility.motionprofile;
 
+import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
+
 public class Filter {
 	/*
 	***********************************************************************************
@@ -18,7 +20,7 @@ public class Filter {
 	************************************************************************************ 
 	*/
 
-	public static double[][] filter(boolean islinear, double[] Tacc1, double[] Tacc2, double CartAcc1,
+	public static double[][] filter(ProfileMode profileMode, double[] Tacc1, double[] Tacc2, double CartAcc1,
 			double CartAcc2, int NumITPs, double[][] PosIn) {
 
 	    double[] Fil1 = null;
@@ -27,18 +29,18 @@ public class Filter {
 	    int FL1 = 0;
 	    int FL2 = 0;
 	    
-	    double[][] Out2 = new double[NumITPs + 1][3];
+	    double[][] Out2 = new double[NumITPs + 1][4];
 	    
-	    if (islinear == true) {
+	    if (profileMode == ProfileMode.CartesianInputLinearMotion) {
 	        FL1 = (int)Math.round(CartAcc1);
 	        FL2 = (int)Math.round(CartAcc2);
 	        Fil1 = new double[FL1]; 
 	        Fil2 = new double[FL2];
 	    }
 	    
-	    for (int k = 0; k < 3; k++) {
+	    for (int k = 0; k < 4; k++) {
 	            
-	        if (islinear == false) {
+	        if (profileMode != ProfileMode.CartesianInputLinearMotion == true || (profileMode == ProfileMode.CartesianInputLinearMotion == true && k == 3)) {
 	            FL1 = (int)Math.round(Tacc1[k]);
 	            FL2 = (int)Math.round(Tacc2[k]);
 		        Fil1 = new double[FL1]; 
@@ -110,7 +112,7 @@ public class Filter {
 	    double TotalWeight;
 	    double Out1In2;
 
-	    out.ServoOut = new double[3][TotalPts * SFL1 + SFL2 + 1];
+	    out.ServoOut = new double[4][TotalPts * SFL1 + SFL2 + 1];
 	    
 	    /* ServoOut is dimensioned backwards, because we need to redimension
 	    'the number of points.  That can only be done if the number of points
@@ -126,7 +128,7 @@ public class Filter {
 //	        SFIL2[i] = 0.0;
 //	    }
 	    
-	    for (int k = 0; k < 3; k++) {
+	    for (int k = 0; k < 4; k++) {
 	        // Set servo output to 0 at time 0
 	        out.ServoOut[k][0] = 0.0;
 	        Sout = 1.0;
@@ -147,9 +149,7 @@ public class Filter {
 	                Weight[j] = 1.0;
 	            }
 	        }
-	    
-	//        ReDim Preserve out.ServoOut(1 To 3, 0 To TotalPts * SFL1 + SFL2)
-	        
+	    	        
 	        // Loop until all servo filters are clear
 	        int i = 0;
 	        while (i < TotalPts * SFL1 + SFL2) {
@@ -203,11 +203,11 @@ public class Filter {
 	    }
 	    
 	    // Transpose the ServoOut array to be the same as the other arrays.
-	    double[][] ServoOutTranspose = new double[out.pointCount + 1][3];
+	    double[][] ServoOutTranspose = new double[out.pointCount + 1][4];
 	    
 	    // ---Transpose ServoOut and save the contents to a temporary array
 	    for (int i = 0;  i < out.pointCount + 1; i++) {
-	        for (int j = 0; j < 3; j++) {
+	        for (int j = 0; j < 4; j++) {
 	            ServoOutTranspose[i][j] = out.ServoOut[j][i];
 	        }
 	    }
