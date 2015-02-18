@@ -28,10 +28,10 @@ public class RobotArm extends PIDSubsystem {
 	private static final double J3_ENCODER_OFFSET_DEG = 90.0;
 	private static final double J4_ENCODER_OFFSET_DEG = 0.0;
 	
-	private static final double J1_ENCODER_INIT_DEG = 0.0;
-	private static final double J2_ENCODER_INIT_DEG = 0.0;
+	private static final double J1_ENCODER_INIT_DEG = J1_ENCODER_OFFSET_DEG;
+	private static final double J2_ENCODER_INIT_DEG = J2_ENCODER_OFFSET_DEG;
 	private static final double J3_ENCODER_INIT_DEG = J3_ENCODER_OFFSET_DEG;
-	private static final double J4_ENCODER_INIT_DEG = 0.0;
+	private static final double J4_ENCODER_INIT_DEG = J4_ENCODER_OFFSET_DEG;
 
 	private static final int 	J4_ANALOG_ZERO_PRACTICE = 512;
 
@@ -42,17 +42,17 @@ public class RobotArm extends PIDSubsystem {
 
 	private static final double J1_MAX_ANGLE_DEG = 170.0;
 	private static final double J1_MIN_ANGLE_DEG = -170.0;
-	private static final double J2_MAX_ANGLE_DEG = 70.0;
-	private static final double J2_MIN_ANGLE_DEG = -20.0;
+	private static final double J2_MAX_ANGLE_DEG = 90.0;
+	private static final double J2_MIN_ANGLE_DEG = -30.0;
 	private static final double J3_MAX_ANGLE_DEG = 20.0;
-	private static final double J3_MIN_ANGLE_DEG = -20.0;
-	private static final double J4_MAX_ANGLE_DEG = 60.0;
-	private static final double J4_MIN_ANGLE_DEG = -60.0;
+	private static final double J3_MIN_ANGLE_DEG = -60.0;
+	private static final double J4_MAX_ANGLE_DEG = 70.0;
+	private static final double J4_MIN_ANGLE_DEG = -70.0;
 
-	private static final double J1_MAX_SPEED_DEG_PER_SEC = 140.0;
-	private static final double J2_MAX_SPEED_DEG_PER_SEC = 40.0;
-	private static final double J3_MAX_SPEED_DEG_PER_SEC = 40.0;
-	private static final double J4_MAX_SPEED_DEG_PER_SEC = 40.0;
+	private static final double J1_MAX_SPEED_DEG_PER_SEC = 180.0;
+	private static final double J2_MAX_SPEED_DEG_PER_SEC = 60.0;
+	private static final double J3_MAX_SPEED_DEG_PER_SEC = 60.0;
+	private static final double J4_MAX_SPEED_DEG_PER_SEC = 200.0;
 	
 	private CANTalonEncoderPID m_j1Motor;
 	private CANTalonEncoderPID m_j2Motor;
@@ -60,8 +60,8 @@ public class RobotArm extends PIDSubsystem {
 	private CANTalonAnalogPID  m_j4Motor;
 	
     private PIDParams j1PositionPidParams = new PIDParams(1.4, 0.0, 0.001, 0.0, 50, 0.0);
-    private PIDParams j2PositionPidParams = new PIDParams(8.0, 0.04, 0.0, 0.0, 100, 0.0);
-    private PIDParams j3PositionPidParams = new PIDParams(2.0, 0.0, 0.003, 0.167, 50, 0.0);
+    private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0, 0.01, 0.167, 50, 0.0);
+    private PIDParams j3PositionPidParams = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
     private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0.0);
 
     private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0.0);
@@ -73,7 +73,7 @@ public class RobotArm extends PIDSubsystem {
 	
 	private DoubleSolenoid m_toteGrabberSolenoid;
 	
-    private RobotUtility.ControlMode m_robotArmControlMode = RobotUtility.ControlMode.VELOCITY;
+    private RobotUtility.ControlMode m_robotArmControlMode = RobotUtility.ControlMode.VELOCITY_POSITION_HOLD;
 
     public RobotArm() {
     	super(0.0, 0.0, 0.0, OUTER_LOOP_UPDATE_RATE_SEC);
@@ -82,6 +82,11 @@ public class RobotArm extends PIDSubsystem {
 			m_j2Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J2_CAN_ID, J2_SENSOR_GEAR_RATIO, J2_ENCODER_OFFSET_DEG, J2_ENCODER_INIT_DEG, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
 			m_j3Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J3_CAN_ID, J3_SENSOR_GEAR_RATIO, J3_ENCODER_OFFSET_DEG, J3_ENCODER_INIT_DEG, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
 			m_j4Motor = new CANTalonAnalogPID (RobotMap.ROBOT_ARM_J4_CAN_ID, J4_SENSOR_GEAR_RATIO, J4_ENCODER_OFFSET_DEG, J4_ENCODER_INIT_DEG, J4_MIN_ANGLE_DEG, J4_MAX_ANGLE_DEG, J4_ANALOG_ZERO_PRACTICE);
+			
+			m_j1Motor.setSafetyEnabled(false);
+			m_j2Motor.setSafetyEnabled(false);
+			m_j3Motor.setSafetyEnabled(false);
+			m_j4Motor.setSafetyEnabled(false);
 			
 			m_j1Motor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
 			m_j1Motor.reverseOutput(true);
@@ -175,7 +180,7 @@ public class RobotArm extends PIDSubsystem {
 		SmartDashboard.putNumber("Left X Throttle" , throttleLeftX);
 		SmartDashboard.putNumber("Left Y Throttle" , throttleLeftY);
 
-		if (m_robotArmControlMode == RobotUtility.ControlMode.VELOCITY) {
+		if (m_robotArmControlMode == RobotUtility.ControlMode.VELOCITY_POSITION_HOLD) {
 			double velocityCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC;
 			double velocityCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC;
 			double velocityCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC;
@@ -192,10 +197,10 @@ public class RobotArm extends PIDSubsystem {
 			m_j4Motor.setStickInputVelocityDegPerSec(velocityCommandJ4);
 		}
 		else if (m_robotArmControlMode == RobotUtility.ControlMode.POSITION) {
-			double positionCommandJ1 = -throttleRightX * Math.min(J1_MAX_ANGLE_DEG, Math.abs(J1_MIN_ANGLE_DEG));
-			double positionCommandJ2 = -throttleRightY * Math.min(J2_MAX_ANGLE_DEG, Math.abs(J2_MIN_ANGLE_DEG));
-			double positionCommandJ3 = -throttleLeftY  * Math.min(J3_MAX_ANGLE_DEG, Math.abs(J3_MIN_ANGLE_DEG));
-			double positionCommandJ4 = -throttleLeftX  * Math.min(J4_MAX_ANGLE_DEG, Math.abs(J4_MIN_ANGLE_DEG));
+			double positionCommandJ1 = -throttleRightX * Math.max(J1_MAX_ANGLE_DEG/2, Math.abs(J1_MIN_ANGLE_DEG/2));
+			double positionCommandJ2 = -throttleRightY * Math.max(J2_MAX_ANGLE_DEG, Math.abs(J2_MIN_ANGLE_DEG));
+			double positionCommandJ3 = -throttleLeftY  * Math.max(J3_MAX_ANGLE_DEG, Math.abs(J3_MIN_ANGLE_DEG));
+			double positionCommandJ4 = -throttleLeftX  * Math.max(J4_MAX_ANGLE_DEG, Math.abs(J4_MIN_ANGLE_DEG));
 
 			SmartDashboard.putNumber("J1 Stick Command", positionCommandJ1);
 			SmartDashboard.putNumber("J2 Stick Command", positionCommandJ2);
@@ -207,16 +212,16 @@ public class RobotArm extends PIDSubsystem {
 			m_j3Motor.setPIDPositionDeg(positionCommandJ3);
 			m_j4Motor.setPIDPositionDeg(positionCommandJ4);
 		}
-		else if (m_robotArmControlMode == RobotUtility.ControlMode.VBUS) {
-			SmartDashboard.putNumber("J1 Stick Command", -throttleRightX);
-			SmartDashboard.putNumber("J2 Stick Command", -throttleRightY);
-			SmartDashboard.putNumber("J3 Stick Command", -throttleLeftY);
-			SmartDashboard.putNumber("J4 Stick Command", -throttleLeftX);
+		else if (m_robotArmControlMode == RobotUtility.ControlMode.PERCENT_VBUS) {
+			SmartDashboard.putNumber("J1 Stick Command", throttleRightX);
+			SmartDashboard.putNumber("J2 Stick Command", throttleRightY);
+			SmartDashboard.putNumber("J3 Stick Command", throttleLeftY);
+			SmartDashboard.putNumber("J4 Stick Command", throttleLeftX);
 			
-			m_j1Motor.set(-throttleRightX);
-			m_j2Motor.set(-throttleRightY);
-			m_j3Motor.set(-throttleLeftY);
-			m_j4Motor.set(-throttleLeftX);
+			m_j1Motor.set(throttleRightX);
+			m_j2Motor.set(throttleRightY);
+			m_j3Motor.set(throttleLeftY);
+			m_j4Motor.set(throttleLeftX);
 		}	
 	}
 	

@@ -1,11 +1,13 @@
 package edu.rhhs.frc;
 
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
+import edu.rhhs.frc.commands.BinGrabberDeployAndGo;
 import edu.rhhs.frc.commands.BinGrabberDeployAngle;
 import edu.rhhs.frc.commands.BinGrabberDeployTimed;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
 import edu.rhhs.frc.commands.BinGrabberPositionPID;
 import edu.rhhs.frc.commands.BinGrabberSetSpeed;
+import edu.rhhs.frc.commands.DriveTrainSpeedTimeout;
 import edu.rhhs.frc.commands.DriveTrainVelocityControl;
 import edu.rhhs.frc.commands.ToteGrabberAutoClose;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
@@ -37,15 +39,15 @@ public class OI
         m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
 	    
         JoystickButton moveBinGrabberUp = new JoystickButton(m_xboxController1.getJoyStick(), XboxController.A_BUTTON);
-        moveBinGrabberUp.whenPressed(new BinGrabberSetSpeed(1.0));
+        moveBinGrabberUp.whenPressed(new BinGrabberSetSpeed(0.3));
         moveBinGrabberUp.whenReleased(new BinGrabberSetSpeed(0));
         
         JoystickButton moveBinGrabberDown = new JoystickButton(m_xboxController1.getJoyStick(), XboxController.Y_BUTTON);
-        moveBinGrabberDown.whenPressed(new BinGrabberSetSpeed(-0.5));
+        moveBinGrabberDown.whenPressed(new BinGrabberSetSpeed(-0.3));
         moveBinGrabberDown.whenReleased(new BinGrabberSetSpeed(0));
 	    
         InternalButton binGrabberDeployTimed = new InternalButton();
-        binGrabberDeployTimed.whenReleased(new BinGrabberDeployTimed(1, 100));
+        binGrabberDeployTimed.whenReleased(new BinGrabberDeployTimed(1.0, 300));
 		SmartDashboard.putData("Bin Grabber Deploy Timed", binGrabberDeployTimed);
 		
         InternalButton binGrabberDeployAngle = new InternalButton();
@@ -53,20 +55,32 @@ public class OI
 		SmartDashboard.putData("Bin Grabber Deploy Angle Limit", binGrabberDeployAngle);
 		
 		InternalButton binGrabberDeployPID = new InternalButton();
-        binGrabberDeployPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 4));
+        binGrabberDeployPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 1000));
 		SmartDashboard.putData("Bin Grabber Deploy Position PID", binGrabberDeployPID);
 		
 		InternalButton binGrabberStowedPID = new InternalButton();
-        binGrabberStowedPID.whenReleased(new BinGrabberPositionPID(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 4));
+        binGrabberStowedPID.whenReleased(new BinGrabberPositionPID(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 1000));
 		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPID);
 		
 		InternalButton binGrabberDragPID = new InternalButton();
-        binGrabberDragPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 4));
+        binGrabberDragPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 1000));
 		SmartDashboard.putData("Bin Grabber Drag Position PID", binGrabberDragPID);
 
+		InternalButton binGrabberDeployAndGo = new InternalButton();
+		binGrabberDeployAndGo.whenReleased(new BinGrabberDeployAndGo());
+		SmartDashboard.putData("Bin Grabber Deploy and Go", binGrabberDeployAndGo);
+
+		InternalButton drivetrainTestSpeed = new InternalButton();
+		drivetrainTestSpeed.whenReleased(new DriveTrainSpeedTimeout(1, 3));
+		SmartDashboard.putData("DriveTrain Test Speed", drivetrainTestSpeed);		
+
 		InternalButton drivetrainTestVel = new InternalButton();
-		drivetrainTestVel.whenReleased(new DriveTrainVelocityControl(1000, 1000, 1, 4));
+		drivetrainTestVel.whenReleased(new DriveTrainVelocityControl(1500, 1500, 1, 2));
 		SmartDashboard.putData("DriveTrain Test Velocity PID", drivetrainTestVel);		
+
+		InternalButton drivetrainTestPosition = new InternalButton();
+		drivetrainTestPosition.whenReleased(new DriveTrainVelocityControl(60, 60, 1, 4));
+		SmartDashboard.putData("DriveTrain Test Position PID", drivetrainTestPosition);		
 
 		InternalButton toteGrabberOpen = new InternalButton();
 		toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));

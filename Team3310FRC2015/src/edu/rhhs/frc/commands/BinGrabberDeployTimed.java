@@ -6,18 +6,18 @@ import edu.wpi.first.wpilibj.command.Command;
 public class BinGrabberDeployTimed extends Command 
 {
 	private double speed;
-	private int milliseconds;
+	private int timeoutMs;
 	
-	public BinGrabberDeployTimed(double speed, int milliseconds) {
+	public BinGrabberDeployTimed(double speed, int timeoutMs) {
 		this.speed = speed;
-		this.milliseconds = milliseconds;
+		this.timeoutMs = timeoutMs;
 		requires(RobotMain.binGrabber);
 	}
 	
 	@Override
 	protected void initialize() {
-		this.setTimeout((double) (milliseconds / 1000));
 		RobotMain.binGrabber.setSpeed(speed, speed);
+		this.setTimeout((double) (timeoutMs / 1000.0));
 	}
 
 	@Override

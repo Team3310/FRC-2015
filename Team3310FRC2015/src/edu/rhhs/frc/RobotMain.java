@@ -40,18 +40,19 @@ public class RobotMain extends IterativeRobot
         //autonomousCommand = new ExampleCommand(0.5);
         
         m_driveModeChooser = new SendableChooser();
-    	m_driveModeChooser.addDefault("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+    	m_driveModeChooser.addObject("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
     	m_driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-    	m_driveModeChooser.addObject("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+    	m_driveModeChooser.addDefault("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
     	m_driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
     	m_driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
     	m_driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
         SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
 
         m_robotArmControlModeChooser = new SendableChooser();
-    	m_robotArmControlModeChooser.addObject ("VBus", RobotUtility.ControlMode.VBUS);
-    	m_robotArmControlModeChooser.addObject("Position", RobotUtility.ControlMode.POSITION);
-    	m_robotArmControlModeChooser.addDefault ("Velocity", RobotUtility.ControlMode.VELOCITY);
+    	m_robotArmControlModeChooser.addObject ("VBu Only", RobotUtility.ControlMode.PERCENT_VBUS);
+    	m_robotArmControlModeChooser.addObject ("VBus- Position Hold", RobotUtility.ControlMode.VBUS_POSITION_HOLD);
+    	m_robotArmControlModeChooser.addDefault("Position", RobotUtility.ControlMode.POSITION);
+    	m_robotArmControlModeChooser.addObject ("Velocity Position Hold", RobotUtility.ControlMode.VELOCITY_POSITION_HOLD);
         SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
    	
         updateStatus();

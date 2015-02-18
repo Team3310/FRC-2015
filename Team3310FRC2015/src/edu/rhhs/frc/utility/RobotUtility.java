@@ -4,7 +4,7 @@ import edu.rhhs.frc.RobotMap;
 
 public class RobotUtility 
 {
-	public static enum ControlMode {VBUS, POSITION, VELOCITY};
+	public static enum ControlMode {PERCENT_VBUS, VBUS_POSITION_HOLD, POSITION, VELOCITY, VELOCITY_POSITION_HOLD};
 
 	public static final int POSITION_PROFILE = 0;
 	public static final int VELOCITY_PROFILE = 1;
@@ -47,6 +47,18 @@ public class RobotUtility
 		return 360.0 * encoderValue / (4 * RobotMap.GRAYHILL_ENCODER_COUNT);
 	}
 
+	public static double convertEncoderPositionToInches(double encoderValue) {
+		return convertEncoderPositionToDeg(encoderValue) * RobotMap.WHEEL_INCHES_PER_DEG;
+	}
+
+	public static double convertEncoderPositionToInches(double encoderValue, double gearRatio) {
+		return convertEncoderPositionToDeg(encoderValue, gearRatio) * RobotMap.WHEEL_INCHES_PER_DEG;
+	}
+
+	public static double convertInchesToEncoderPosition(double inchesValue) {
+		return convertDegToEncoderPosition(inchesValue / RobotMap.WHEEL_INCHES_PER_DEG);
+	}
+
 	public static double convertDegToEncoderPosition(double degValue) {
 		return (degValue * 4 * RobotMap.GRAYHILL_ENCODER_COUNT) / 360.0;
 	}
@@ -57,6 +69,10 @@ public class RobotUtility
 
 	public static double convertEncoderVelocityToFtPerSec(double encoderValue) {
 		return convertEncoderVelocityToDegPerSec(encoderValue) * RobotMap.WHEEL_DIAMETER_IN * Math.PI / 12.0 / 360.0;
+	}
+
+	public static double convertEncoderVelocityToFtPerSec(double encoderValue, double gearRatio) {
+		return convertEncoderVelocityToDegPerSec(encoderValue, gearRatio) * RobotMap.WHEEL_DIAMETER_IN * Math.PI / 12.0 / 360.0;
 	}
 
 	public static double convertDegPerSecToEncoderVelocity(double degPerSecValue) {
@@ -79,4 +95,36 @@ public class RobotUtility
 		return convertDegPerSecToEncoderVelocity(degPerSecValue * gearRatio);
 	}
 	
+    public static void main(String[] args) {
+    	double value = convertAnalogPositionToDeg(1024, 0);
+    	System.out.println("convertAnalogPositionToDeg(1024, 0) = " + value + " deg");
+ 
+    	value = convertDegToAnalogPosition(360, 0);
+    	System.out.println("convertDegToAnalogPosition(360, 0) = " + value + " encoder counts");
+
+    	value = convertAnalogPositionToDeg(1024, 512);
+    	System.out.println("convertAnalogPositionToDeg(1024, 512) = " + value + " deg");
+ 
+    	value = convertDegToAnalogPosition(180, 512);
+    	System.out.println("convertDegToAnalogPosition(180, 512) = " + value + " encoder counts");
+ 
+    	System.out.println(" ");
+
+    	value = convertEncoderPositionToDeg(1024);
+    	System.out.println("convertEncoderPositionToDeg(1024) = " + value + " deg");
+ 
+    	value = convertDegToEncoderPosition(360);
+    	System.out.println("convertDegToEncoderPosition(360) = " + value + " encoder counts");
+   
+    	System.out.println(" ");
+
+    	double wheelCircum = RobotMap.WHEEL_DIAMETER_IN * Math.PI;
+    	System.out.println("wheelCircum = " + wheelCircum + " inches");
+
+    	value = convertEncoderPositionToInches(1024);
+    	System.out.println("convertEncoderPositionToInches(1024) = " + value + " inches");
+ 
+    	value = convertInchesToEncoderPosition(wheelCircum);
+    	System.out.println("convertInchesToEncoderPosition(" + wheelCircum + ") = " + value + " encoder counts");
+   }
 }

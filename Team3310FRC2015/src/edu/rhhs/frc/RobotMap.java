@@ -9,6 +9,7 @@ public class RobotMap {
 
 	public static final double GRAYHILL_ENCODER_COUNT = 256;
 	public static final double WHEEL_DIAMETER_IN = 6.25;
+	public static final double WHEEL_INCHES_PER_DEG = RobotMap.WHEEL_DIAMETER_IN * Math.PI / 360.0;
 	
 	// USB Port IDs
 	public static final int XBOX_1_USB_ID = 0;
@@ -45,8 +46,8 @@ public class RobotMap {
     public static final int TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID = 1;
     public static final int BIN_GRABBER_PIVOT_LOCK_EXTEND_PNEUMATIC_MODULE_ID = 2;
     public static final int BIN_GRABBER_PIVOT_LOCK_RETRACT_PNEUMATIC_MODULE_ID = 3;
-    public static final int BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID = 4;
-    public static final int BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID = 5;
+    public static final int BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID = 4;
+    public static final int BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID = 5;
     public static final int STABILZER_EXTEND_PNEUMATIC_MODULE_ID = 6;
     public static final int STABILZER_RETRACT_PNEUMATIC_MODULE_ID = 7;
     

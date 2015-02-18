@@ -30,15 +30,13 @@ public class BinGrabber extends Subsystem
 	private CANTalon m_leftMotor;
 
 	private CANTalon.ControlMode m_talonControlMode = CANTalon.ControlMode.PercentVbus;
-	private double m_leftTarget;
-	private double m_rightTarget;
 
 	private double m_error;
-	private double m_kP = 3.0;  // 10
-	private double m_kI = 0.000;
+	private double m_kP = 10.0;  // 10
+	private double m_kI = 0.001;
 	private double m_kD = 0.0;
 	private double m_kF = 0.0; 
-	private int m_iZone = 0;
+	private int m_iZone = 50;
 	private double m_rampRatePID = 0.0;
 	private double m_rampRateVBus = 0.0;
 	private int m_profile = 0;
@@ -47,6 +45,9 @@ public class BinGrabber extends Subsystem
 		try {
 			m_rightMotor = new CANTalon(RobotMap.BIN_GRABBER_RIGHT_CAN_ID);
 			m_leftMotor = new CANTalon(RobotMap.BIN_GRABBER_LEFT_CAN_ID);
+			
+			m_rightMotor.setSafetyEnabled(false);
+			m_leftMotor.setSafetyEnabled(false);
 	
 			m_leftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 			m_leftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile);
@@ -81,10 +82,10 @@ public class BinGrabber extends Subsystem
 	
 	public void setClawPosition(BinGrabberState position) {
 		if (position == BinGrabberState.EXTENDED) {
-    		m_clawPositionSolenoid.set(DoubleSolenoid.Value.kForward);
+			m_clawPositionSolenoid.set(DoubleSolenoid.Value.kForward);
     	}
 		else {
-			m_clawPositionSolenoid.set(DoubleSolenoid.Value.kReverse);
+    		m_clawPositionSolenoid.set(DoubleSolenoid.Value.kReverse);
 		}
 	}
 
@@ -98,12 +99,12 @@ public class BinGrabber extends Subsystem
 	}
 
 	public void setSpeed(double leftSpeed, double rightSpeed) {
-		m_leftMotor.set(leftSpeed);
-		m_rightMotor.set(rightSpeed);
+		setLeftSpeed(leftSpeed);
+		setRightSpeed(rightSpeed);
 	}
 	
 	public void setLeftSpeed(double leftSpeed) {
-		m_leftMotor.set(leftSpeed);
+		m_leftMotor.set(-leftSpeed);
 	}
 	
 	public void setRightSpeed(double rightSpeed) {
@@ -123,8 +124,6 @@ public class BinGrabber extends Subsystem
 	}
 	
 	public void startPositionPID(double leftTargetDeg, double rightTargetDeg, double errorDeg) {
-		m_leftTarget = leftTargetDeg;
-		m_rightTarget = rightTargetDeg;
 		setTalonControlMode(CANTalon.ControlMode.Position, 
 				RobotUtility.convertDegToAnalogPosition(leftTargetDeg, LEFT_ANALOG_ZERO_PRACTICE), 
 				RobotUtility.convertDegToAnalogPosition(rightTargetDeg, RIGHT_ANALOG_ZERO_PRACTICE));
@@ -153,11 +152,11 @@ public class BinGrabber extends Subsystem
 	
 	// TODO put zero values in global practice/comp robot flag
 	public double getLeftPositionDeg() {
-		return RobotUtility.convertAnalogPositionToDeg(m_leftMotor.getAnalogInRaw(), LEFT_ANALOG_ZERO_PRACTICE);
+		return RobotUtility.convertAnalogPositionToDeg(m_leftMotor.getPosition(), LEFT_ANALOG_ZERO_PRACTICE);
 	}
 	
 	public double getRightPositionDeg() {
-		return RobotUtility.convertAnalogPositionToDeg(m_rightMotor.getAnalogInRaw(), RIGHT_ANALOG_ZERO_PRACTICE);
+		return RobotUtility.convertAnalogPositionToDeg(m_rightMotor.getPosition(), RIGHT_ANALOG_ZERO_PRACTICE);
 	}
 	
 	public void controlWithJoystick() {
