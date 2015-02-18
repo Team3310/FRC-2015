@@ -7,11 +7,11 @@ import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.RobotUtility;
+import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -23,18 +23,23 @@ public class RobotArm extends PIDSubsystem {
     
 	private static final double OUTER_LOOP_UPDATE_RATE_SEC = 0.010;
 	
+	// Robot arm joint offset angles to help deal with feed forward gain (Kf * target)
+	// This offset is applied inside the Talon only, it gets added on for input, subtracted off on output
 	private static final double J1_ENCODER_OFFSET_DEG = 0.0;
 	private static final double J2_ENCODER_OFFSET_DEG = 0.0;
 	private static final double J3_ENCODER_OFFSET_DEG = 90.0;
 	private static final double J4_ENCODER_OFFSET_DEG = 0.0;
 	
-	private static final double J1_ENCODER_INIT_DEG = J1_ENCODER_OFFSET_DEG;
-	private static final double J2_ENCODER_INIT_DEG = J2_ENCODER_OFFSET_DEG;
-	private static final double J3_ENCODER_INIT_DEG = J3_ENCODER_OFFSET_DEG;
-	private static final double J4_ENCODER_INIT_DEG = J4_ENCODER_OFFSET_DEG;
+	// Robot arm joint angles when system is powered on (or new code is downloaded)
+	private static final double J1_ENCODER_INIT_DEG = 0.0;
+	private static final double J2_ENCODER_INIT_DEG = 0.0;
+	private static final double J3_ENCODER_INIT_DEG = 0.0;
+	private static final double J4_ENCODER_INIT_DEG = 0.0;
 
+	// J4 raw analog value when J4 is set to 0 deg 
 	private static final int 	J4_ANALOG_ZERO_PRACTICE = 512;
 
+	// Robot arm joint to sensor gear ratios
 	private static final double J1_SENSOR_GEAR_RATIO = 84.0/18.0;
 	private static final double J2_SENSOR_GEAR_RATIO = 84.0/18.0;
 	private static final double J3_SENSOR_GEAR_RATIO = 84.0/18.0;
@@ -75,6 +80,9 @@ public class RobotArm extends PIDSubsystem {
 	
     private RobotUtility.ControlMode m_robotArmControlMode = RobotUtility.ControlMode.VELOCITY_POSITION_HOLD;
 
+    private ProfileOutput m_currentMotionProfile;
+    private int m_currentProfileIndex;
+    
     public RobotArm() {
     	super(0.0, 0.0, 0.0, OUTER_LOOP_UPDATE_RATE_SEC);
     	try {
@@ -126,8 +134,8 @@ public class RobotArm extends PIDSubsystem {
 			m_j1Motor.setInitPosition();
 			m_j2Motor.setInitPosition();
 			m_j3Motor.setInitPosition();
-			m_j4Motor.setInitPosition();			
-
+			m_j4Motor.setInitPosition();	
+			
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH);	
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
 			setToteGrabberPosition(ToteGrabberPosition.OPEN);			
@@ -225,6 +233,34 @@ public class RobotArm extends PIDSubsystem {
 		}	
 	}
 	
+	// Motion profiling
+	public void startMotionProfile(ProfileOutput profile) {
+		m_currentProfileIndex = 0;
+		m_currentMotionProfile = profile;
+		this.enable();
+	}
+	
+	@Override
+	protected double returnPIDInput() {
+		return 0;
+	}
+
+	@Override
+	protected void usePIDOutput(double output) {
+		if (m_currentProfileIndex >= m_currentMotionProfile.jointPos.length) {
+			this.disable();
+			return;
+		}
+		
+		double[] jointAngles = m_currentMotionProfile.jointPos[m_currentProfileIndex];
+		m_j1Motor.setPIDPositionDeg(jointAngles[0]);
+		m_j2Motor.setPIDPositionDeg(jointAngles[1]);
+		m_j3Motor.setPIDPositionDeg(jointAngles[2]);
+		m_j4Motor.setPIDPositionDeg(jointAngles[3]);	
+		
+		m_currentProfileIndex++;
+	}
+
 	public void updateStatus() {
 		SmartDashboard.putNumber("J1 Position (raw)", 		m_j1Motor.getPosition());
 		SmartDashboard.putNumber("J1 Position (deg)", 		m_j1Motor.getPositionDeg());
@@ -244,18 +280,6 @@ public class RobotArm extends PIDSubsystem {
 
 		SmartDashboard.putBoolean("IR Tote Grabber Switch", getToteGrabberSwitch());
 		SmartDashboard.putString("Tote Grabber Position", 	getToteGrabberPosition().toString());
-	}
-
-	@Override
-	protected double returnPIDInput() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	protected void usePIDOutput(double output) {
-		// TODO Auto-generated method stub
-		
 	}
 }
 

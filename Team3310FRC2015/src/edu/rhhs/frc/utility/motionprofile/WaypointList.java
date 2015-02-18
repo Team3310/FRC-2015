@@ -5,13 +5,18 @@ import java.util.ArrayList;
 public class WaypointList {
 
 	private ArrayList<double[]> coordinates = new ArrayList<double[]>();
+	private MotionProfile.ProfileMode profileMode;
 	
-	public WaypointList() {
-		
+	public WaypointList(MotionProfile.ProfileMode profileMode) {
+		this.profileMode = profileMode;
 	}
 
 	public void addWaypoint(double x, double y, double z, double toolAngleDeg) {
 		coordinates.add(new double[] {x, y, z, toolAngleDeg});
+	}
+	
+	public void addWaypoint(double[] xyztool) {
+		coordinates.add(xyztool);
 	}
 	
 	public double[][] getWaypoints() {
@@ -23,4 +28,7 @@ public class WaypointList {
 		return output;
 	}
 	
+	public MotionProfile.ProfileMode getProfileMode() {
+		return profileMode;
+	}
 }

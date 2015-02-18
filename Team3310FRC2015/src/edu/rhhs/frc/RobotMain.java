@@ -30,6 +30,8 @@ public class RobotMain extends IterativeRobot
     private SendableChooser m_driveModeChooser;
     private SendableChooser m_robotArmControlModeChooser;
 
+    private long m_loopTime;
+    
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -38,7 +40,7 @@ public class RobotMain extends IterativeRobot
     	 
         // instantiate the command used for the autonomous period
         //autonomousCommand = new ExampleCommand(0.5);
-        
+        m_loopTime = System.nanoTime();
         m_driveModeChooser = new SendableChooser();
     	m_driveModeChooser.addObject("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
     	m_driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
@@ -88,7 +90,7 @@ public class RobotMain extends IterativeRobot
         if (m_autonomousCommand != null) {
         	m_autonomousCommand.cancel();
         }
-        driveTrain.setControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
+        driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
         robotArm.setControlMode((RobotUtility.ControlMode)m_robotArmControlModeChooser.getSelected());
         updateStatus();
     }
@@ -119,6 +121,9 @@ public class RobotMain extends IterativeRobot
     
     public void updateStatus() {
     	try {
+    		long currentTime = System.nanoTime();
+    		SmartDashboard.putNumber("Main loop time (ms)", (currentTime - m_loopTime) / 1000000.0);
+    		m_loopTime = currentTime;
     		driveTrain.updateStatus();
     		binGrabber.updateStatus();
     		robotArm.updateStatus();

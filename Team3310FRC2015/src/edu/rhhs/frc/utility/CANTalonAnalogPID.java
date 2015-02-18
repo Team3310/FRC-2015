@@ -25,6 +25,10 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID {
 		return RobotUtility.convertAnalogPositionToDeg(this.getAnalogInRaw(), zeroPositionRaw, sensorToOutputGearRatio) - offsetAngleDeg;
 	}
 	
+	public double getErrorDeg() {
+		return RobotUtility.convertAnalogPositionToDeg(this.getClosedLoopError(), zeroPositionRaw, sensorToOutputGearRatio) - offsetAngleDeg;
+	}
+
 	@Override
 	public double getVelocityDegPerSec() {
 		return RobotUtility.convertAnalogVelocityToDegPerSec(this.getSpeed(), sensorToOutputGearRatio);

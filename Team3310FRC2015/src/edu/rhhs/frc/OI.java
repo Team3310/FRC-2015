@@ -9,11 +9,16 @@ import edu.rhhs.frc.commands.BinGrabberPositionPID;
 import edu.rhhs.frc.commands.BinGrabberSetSpeed;
 import edu.rhhs.frc.commands.DriveTrainSpeedTimeout;
 import edu.rhhs.frc.commands.DriveTrainVelocityControl;
+import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
+import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
+import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.ToteGrabberAutoClose;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.RobotArm;
+import edu.rhhs.frc.utility.motionprofile.MotionProfile;
+import edu.rhhs.frc.utility.motionprofile.WaypointList;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -109,6 +114,22 @@ public class OI
 		InternalButton binGrabberPivotUnlock = new InternalButton();
 		binGrabberPivotUnlock.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
 		SmartDashboard.putData("Bin Grabber Pivot Unlock", binGrabberPivotUnlock);
+		
+    	WaypointList waypoints = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+    	waypoints.addWaypoint(0, 0, 0, 0);
+    	waypoints.addWaypoint(45, 0, 0, 0);
+
+		InternalButton motionProfileStart = new InternalButton();
+		motionProfileStart.whenPressed(new RobotArmMotionProfileStart(waypoints));
+		SmartDashboard.putData("Motion Profile Start", motionProfileStart);
+		
+		InternalButton motionProfilePause = new InternalButton();
+		motionProfilePause.whenPressed(new RobotArmMotionProfilePause());
+		SmartDashboard.putData("Motion Profile Pause", motionProfilePause);
+		
+		InternalButton motionProfileResume = new InternalButton();
+		motionProfileResume.whenPressed(new RobotArmMotionProfileResume());
+		SmartDashboard.putData("Motion Profile Resume", motionProfileResume);
 	}
 	
 	public static OI getInstance() {

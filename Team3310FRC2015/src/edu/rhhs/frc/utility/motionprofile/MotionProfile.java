@@ -7,17 +7,17 @@ import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
 public class MotionProfile {
 	public enum ProfileMode {CartesianInputLinearMotion, JointInputJointMotion, CartesianInputJointMotion};
 	
-	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 8.0/1000.0; 		// seconds
+	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
 	public static final double DEFAULT_PATH_VELOCITY = 1.5;   						// meters/second
-	public static final double DEFAULT_JOINT_VELOCITY = 90;   						// deg/second
+	public static final double DEFAULT_JOINT_VELOCITY = 150;   						// deg/second
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
 	public static final double DEFAULT_JOINT_ACCEL1 = DEFAULT_CARTESIAN_ACCEL1;   	// seconds
 	public static final double DEFAULT_JOINT_ACCEL2 = DEFAULT_CARTESIAN_ACCEL2;   	// seconds	
 	public static final double DEFAULT_END_TYPE_CNT = 0;   							// meters/second
 
-	public static final double INNER_ARM_LENGTH = 0.5;  // meters
-	public static final double OUTER_ARM_LENGTH = 0.5;  // meters	
+	public static final double INNER_ARM_LENGTH = 0.7112;  // meters
+	public static final double OUTER_ARM_LENGTH = 0.7620;  // meters	
 
 	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, 0};   // arm lengths in meters
 
@@ -58,9 +58,9 @@ public class MotionProfile {
     		DEFAULT_JOINT_ACCEL2, 
     		DEFAULT_JOINT_ACCEL2};    
     
-    public MotionProfile(WaypointList waypointList, ProfileMode profileMode) {
+    public MotionProfile(WaypointList waypointList) {
     	this.taughtPositions = waypointList.getWaypoints();
-    	this.profileMode = profileMode;
+    	this.profileMode = waypointList.getProfileMode();
     	initInputs();
     }
     
@@ -313,25 +313,25 @@ public class MotionProfile {
     public static void main(String[] args) {
     	long startTime = System.nanoTime();
         
-//    	WaypointList waypoints = new WaypointList();
+//    	WaypointList waypoints = new WaypointList(ProfileMode.CartesianInputLinearMotion);
 //    	waypoints.addWaypoint(0.101, 0.102, 0.103, 0);
 //    	waypoints.addWaypoint(0.201, 0.202, 0.203, 90);
-//    	MotionProfile profile = new MotionProfile(waypoints, ProfileMode.CartesianInputLinearMotion);
+//    	MotionProfile profile = new MotionProfile(waypoints);
    	
-//    	WaypointList waypoints = new WaypointList();
+//    	WaypointList waypoints = new WaypointList(ProfileMode.CartesianInputLinearMotion);
 //    	waypoints.addWaypoint(0.500, 0.500, 0.707, 90);
 //    	waypoints.addWaypoint(0.500, 0.000, 0.500, 0);
-//    	MotionProfile profile = new MotionProfile(waypoints, ProfileMode.CartesianInputLinearMotion);
+//    	MotionProfile profile = new MotionProfile(waypoints);
 
-//    	WaypointList waypoints = new WaypointList();
-//    	waypoints.addWaypoint(0, 0, 0, 0);
-//    	waypoints.addWaypoint(90, 90, 90, 90);
-//    	MotionProfile profile = new MotionProfile(waypoints, ProfileMode.JointInputJointMotion);
+    	WaypointList waypoints = new WaypointList(ProfileMode.JointInputJointMotion);
+    	waypoints.addWaypoint(0, 0, 0, 0);
+    	waypoints.addWaypoint(45, 0, 0, 0);
+    	MotionProfile profile = new MotionProfile(waypoints);
    	
-    	WaypointList waypoints = new WaypointList();
-    	waypoints.addWaypoint(0.500, 0.500, 0.707, 90);
-    	waypoints.addWaypoint(0.500, 0.000, 0.500, 0);
-    	MotionProfile profile = new MotionProfile(waypoints, ProfileMode.CartesianInputJointMotion);
+//    	WaypointList waypoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
+//    	waypoints.addWaypoint(0.500, 0.500, 0.707, 90);
+//    	waypoints.addWaypoint(0.500, 0.000, 0.500, 0);
+//    	MotionProfile profile = new MotionProfile(waypoints);
 
     	profile.calculatePath();
     	profile.printOutput();

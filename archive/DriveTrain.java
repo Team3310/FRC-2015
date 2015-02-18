@@ -3,12 +3,12 @@ package edu.rhhs.frc.subsystems;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
-import edu.rhhs.frc.utility.CANTalonEncoderPID;
-import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem
@@ -16,15 +16,21 @@ public class DriveTrain extends Subsystem
 	// Talons
 	private CANTalon m_frontLeftMotor;
 	private CANTalon m_frontRightMotor;
-	private CANTalonEncoderPID m_rearLeftMotor;
-	private CANTalonEncoderPID m_rearRightMotor;
+	private CANTalon m_rearLeftMotor;
+	private CANTalon m_rearRightMotor;
 	
-	private RobotUtility.ControlMode m_controlMode;
+	private CANTalon.ControlMode m_talonControlMode = CANTalon.ControlMode.PercentVbus;
+	private double m_rearLeftTarget;
 	
-	private PIDParams positionPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0.0);
-	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0.0);
-
 	private double m_error;
+    private double m_kP = 0.15;
+    private double m_kI = 0.003;
+    private double m_kD = 0.0;
+    private double m_kF = 1.4; 
+    private int m_iZone = 0;
+    private double m_rampRatePID = 0.0;
+    private double m_rampRateVBus = 0.0;
+    private int m_profile = 0;
 	 
     private RobotDrive m_drive;
     
@@ -36,7 +42,7 @@ public class DriveTrain extends Subsystem
 	public static final int CONTROLLER_XBOX_ARCADE_LEFT = 4;
 	public static final int CONTROLLER_XBOX_ARCADE_RIGHT = 5;
 	public static final int CONTROLLER_WHEEL = 6;
- 
+
     public static final double STEER_NON_LINEARITY = 0.9;
     public static final double MOVE_NON_LINEARITY = 0.9;
     
@@ -55,20 +61,15 @@ public class DriveTrain extends Subsystem
     private double m_moveTrim = 0.0;
     private double m_steerTrim = 0.0;
     
-	private int m_controllerMode;
+    private int m_controllerMode = CONTROLLER_XBOX_CHEESY;
     
     public DriveTrain() {
 		try {
 			m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
 			m_frontRightMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
 			
-			m_rearLeftMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
-			m_rearRightMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
-			
-			m_frontLeftMotor.setSafetyEnabled(false);
-			m_frontRightMotor.setSafetyEnabled(false);
-			m_rearLeftMotor.setSafetyEnabled(false);
-			m_rearRightMotor.setSafetyEnabled(false);
+			m_rearLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+			m_rearRightMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
 			
 			// The front motors are setup to "follow" the rear motors
 			m_frontLeftMotor.changeControlMode(CANTalon.ControlMode.Follower);
@@ -79,23 +80,19 @@ public class DriveTrain extends Subsystem
 
 			// The rear motors have encoders attached so they will be used for the main control input
 			m_rearLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearLeftMotor.setPIDParams(positionPidParams, RobotUtility.POSITION_PROFILE);
-			m_rearLeftMotor.setPIDParams(velocityPidParams, RobotUtility.VELOCITY_PROFILE);
-			m_rearLeftMotor.reverseSensor(true);
-			m_rearLeftMotor.reverseOutput(false);
+			m_rearLeftMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile); 
 			m_rearLeftMotor.setPosition(0);
+			m_rearLeftMotor.setVoltageRampRate(m_rampRateVBus);
+			m_rearLeftMotor.reverseSensor(true);
 
 			m_rearRightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearRightMotor.setPIDParams(positionPidParams, RobotUtility.POSITION_PROFILE);
-			m_rearRightMotor.setPIDParams(velocityPidParams, RobotUtility.VELOCITY_PROFILE);
-			m_rearRightMotor.reverseSensor(false);
-			m_rearRightMotor.reverseOutput(true);
+			m_rearRightMotor.setPID(m_kP, m_kI, m_kD, m_kF, m_iZone, m_rampRatePID, m_profile); 
 			m_rearRightMotor.setPosition(0);
+			m_rearRightMotor.setVoltageRampRate(m_rampRateVBus);
+			m_rearRightMotor.reverseOutput(true);
 
 			// Start with the Talons in throttle mode
-			setControlMode(RobotUtility.ControlMode.PERCENT_VBUS);
-			m_rearLeftMotor.set(0);
-			m_rearRightMotor.set(0);
+			setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
 			
 			m_drive = new RobotDrive(m_rearLeftMotor, m_rearRightMotor);            
             m_drive.setSafetyEnabled(false);
@@ -112,36 +109,30 @@ public class DriveTrain extends Subsystem
 		setDefaultCommand(new DriveWithJoystick()); 
 	}
 	
-	public void setControlMode(RobotUtility.ControlMode controlMode) {
-		m_rearLeftMotor.setControlMode(controlMode);
-		m_rearRightMotor.setControlMode(controlMode);
-		m_controlMode = controlMode;
+	private void setTalonControlMode(CANTalon.ControlMode mode, double leftInput, double rightInput) {
+		m_talonControlMode = mode;
+		m_rearLeftMotor.changeControlMode(m_talonControlMode);
+		m_rearRightMotor.changeControlMode(m_talonControlMode);
+		setTalonInput(leftInput, rightInput);
 	}
-		
-	public void startPIDVelocity(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
-		setControlMode(RobotUtility.ControlMode.VELOCITY);
-		m_rearLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
-		m_rearRightMotor.setPIDVelocityDegPerSecNoLimits(rightTargetDegPerSec);
+	
+	private void setTalonInput(double leftInput, double rightInput) {
+		m_rearLeftMotor.set(leftInput);
+		m_rearRightMotor.set(rightInput);
+	}
+	
+	public void startVelocityPID(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
+		m_rearLeftMotor.setPosition(0);
+		m_rearRightMotor.setPosition(0);
+		m_rearLeftTarget = leftTargetDegPerSec;
+		setTalonControlMode(CANTalon.ControlMode.Speed, 
+				RobotUtility.convertDegPerSecToEncoderVelocity(leftTargetDegPerSec), 
+				RobotUtility.convertDegPerSecToEncoderVelocity(rightTargetDegPerSec));
 		m_error = errorDegPerSec;
 	}
 	
-	public void startPIDPosition(double leftTargetInches, double rightTargetInches, double errorInches) {
-		setControlMode(RobotUtility.ControlMode.POSITION);
-		m_rearLeftMotor.setPosition(0);
-		m_rearRightMotor.setPosition(0);
-		m_rearLeftMotor.setPIDPositionInches(leftTargetInches);
-		m_rearRightMotor.setPIDPositionInches(rightTargetInches);
-		m_error = errorInches;
-	}
-	
 	public void stopPID() {
-		setSpeed(0);
-	}
-	
-	public void setSpeed(double speed) {
-		setControlMode(RobotUtility.ControlMode.PERCENT_VBUS);
-		m_rearLeftMotor.set(speed);
-		m_rearRightMotor.set(speed);
+		setTalonControlMode(CANTalon.ControlMode.PercentVbus, 0, 0);
 	}
 	
 	public boolean isAtLeftTarget() {
@@ -160,12 +151,12 @@ public class DriveTrain extends Subsystem
 		return m_rearRightMotor.getClosedLoopError();
 	}
 	
-	public void setJoystickControllerMode(int driveMode) {
+	public void setControllerMode(int driveMode) {
 		m_controllerMode = driveMode;
 	}
 
 	public void driveWithJoystick() {
-		if (m_drive != null && m_controlMode == RobotUtility.ControlMode.PERCENT_VBUS) {
+		if (m_drive != null && m_talonControlMode == CANTalon.ControlMode.PercentVbus) {
 			switch(m_controllerMode) {
 			case CONTROLLER_JOYSTICK_ARCADE:
 				m_moveInput = OI.getInstance().getJoystick1().getY();
@@ -247,11 +238,11 @@ public class DriveTrain extends Subsystem
 	}
 	
 	public void updateStatus() {
-		SmartDashboard.putNumber("Rear Left Pos (deg)", m_rearLeftMotor.getPositionDeg());
-		SmartDashboard.putNumber("Rear Right Pos (deg)", m_rearRightMotor.getPositionDeg());
-		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", m_rearLeftMotor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", m_rearRightMotor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", m_rearLeftMotor.getVelocityFtPerSec());
-		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_rearRightMotor.getVelocityFtPerSec());		
+		SmartDashboard.putNumber("Rear Left Pos (deg)", RobotUtility.convertEncoderPositionToDeg(m_rearLeftMotor.getPosition()));
+		SmartDashboard.putNumber("Rear Right Pos (deg)", RobotUtility.convertEncoderPositionToDeg(m_rearRightMotor.getPosition()));
+		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", RobotUtility.convertEncoderVelocityToDegPerSec(m_rearLeftMotor.getSpeed()));
+		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", RobotUtility.convertEncoderVelocityToDegPerSec(m_rearRightMotor.getSpeed()));
+		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", RobotUtility.convertEncoderVelocityToFtPerSec(m_rearLeftMotor.getSpeed()));
+		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", RobotUtility.convertEncoderVelocityToFtPerSec(m_rearRightMotor.getSpeed()));		
 	}
 }

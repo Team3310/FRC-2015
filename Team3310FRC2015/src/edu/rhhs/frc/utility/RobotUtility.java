@@ -8,6 +8,8 @@ public class RobotUtility
 
 	public static final int POSITION_PROFILE = 0;
 	public static final int VELOCITY_PROFILE = 1;
+	public static final int UP_POSITION_PROFILE = 0;
+	public static final int DOWN_POSITION_PROFILE = 1;
 
 	// MA3 Analog Encoder raw output value goes from 0 to 1024.
 	public static double convertAnalogPositionToDeg(double analogValue, double zeroValue) {

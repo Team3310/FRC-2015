@@ -54,12 +54,31 @@ public class CANTalonEncoderPID extends CANTalon {
 		this.changeControlMode(talonMode);
 	}
 
+	public void setControlMode(RobotUtility.ControlMode mode, int profile) {
+		CANTalon.ControlMode talonMode = CANTalon.ControlMode.PercentVbus;
+		if (mode == RobotUtility.ControlMode.POSITION) {
+			talonMode = CANTalon.ControlMode.Position;
+		}
+		else if (mode == RobotUtility.ControlMode.VELOCITY_POSITION_HOLD) {
+			talonMode = CANTalon.ControlMode.Speed;
+		}
+		else if (mode == RobotUtility.ControlMode.VELOCITY) {
+			talonMode = CANTalon.ControlMode.Speed;
+		}
+		else if (mode == RobotUtility.ControlMode.PERCENT_VBUS || mode == RobotUtility.ControlMode.VBUS_POSITION_HOLD) {
+			talonMode = CANTalon.ControlMode.PercentVbus;
+		}
+		controlMode = mode;
+		this.setProfile(profile);
+		this.changeControlMode(talonMode);
+	}
+
 	public void setPIDParams(PIDParams params, int profile) {
 		this.setPID(params.kP, params.kI, params.kD, params.kF, params.iZone, params.rampRatePID, profile); 
 	}
 	
 	public void inititializeSensorPosition() {
-		this.setPosition(RobotUtility.convertDegToEncoderPosition(initAngleDeg, sensorToOutputGearRatio));
+		this.setPosition(RobotUtility.convertDegToEncoderPosition(initAngleDeg + offsetAngleDeg, sensorToOutputGearRatio));
 	}
 	
 	public double getPositionDeg() {
