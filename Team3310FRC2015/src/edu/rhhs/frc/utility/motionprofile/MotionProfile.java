@@ -10,8 +10,8 @@ public class MotionProfile {
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
 	public static final double DEFAULT_PATH_VELOCITY = 1.5;   						// meters/second
 	public static final double DEFAULT_JOINT_VELOCITY = 150;   						// deg/second
-	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
-	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
+	public static final double DEFAULT_CARTESIAN_ACCEL1 = 200.0/1000.0;   			// seconds
+	public static final double DEFAULT_CARTESIAN_ACCEL2 = 100.0/1000.0;   			// seconds	
 	public static final double DEFAULT_JOINT_ACCEL1 = DEFAULT_CARTESIAN_ACCEL1;   	// seconds
 	public static final double DEFAULT_JOINT_ACCEL2 = DEFAULT_CARTESIAN_ACCEL2;   	// seconds	
 	public static final double DEFAULT_END_TYPE_CNT = 0;   							// meters/second
@@ -35,7 +35,7 @@ public class MotionProfile {
     protected double[] endTypeCNT; 
 
     protected double controllerUpdateRateSec = DEFAULT_CONTROLLER_UPDATE_RATE;  // Controller update rate seconds 
-    protected int outputRateMs = 4;   //  Output rate milliseconds
+    protected int outputRateMs = 10;   //  Output rate milliseconds
     protected double serverExponentialFilterDecayTime = controllerUpdateRateSec;   // Servo filter exponential decay
     protected boolean isServerExponentialFilterEnable = false;
     

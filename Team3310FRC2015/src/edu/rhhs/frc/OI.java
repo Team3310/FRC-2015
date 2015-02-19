@@ -115,14 +115,30 @@ public class OI
 		binGrabberPivotUnlock.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
 		SmartDashboard.putData("Bin Grabber Pivot Unlock", binGrabberPivotUnlock);
 		
-    	WaypointList waypoints = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
-    	waypoints.addWaypoint(0, 0, 0, 0);
-    	waypoints.addWaypoint(45, 0, 0, 0);
+    	WaypointList waypoints1 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+    	waypoints1.addWaypoint(0, 0, 0, 0);
+    	waypoints1.addWaypoint(-45, 0, 0, 0);
 
-		InternalButton motionProfileStart = new InternalButton();
-		motionProfileStart.whenPressed(new RobotArmMotionProfileStart(waypoints));
-		SmartDashboard.putData("Motion Profile Start", motionProfileStart);
+		InternalButton motionProfileStart045 = new InternalButton();
+		motionProfileStart045.whenPressed(new RobotArmMotionProfileStart(waypoints1));
+		SmartDashboard.putData("Motion Profile Start 0 to -45", motionProfileStart045);
 		
+    	WaypointList waypoints2 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+    	waypoints2.addWaypoint(-45, 0, 0, 0);
+    	waypoints2.addWaypoint(45, 0, 0, 0);
+
+		InternalButton motionProfileStart4545 = new InternalButton();
+		motionProfileStart4545.whenPressed(new RobotArmMotionProfileStart(waypoints2));
+		SmartDashboard.putData("Motion Profile Start -45 to 45", motionProfileStart4545);
+
+    	WaypointList waypoints3 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+    	waypoints3.addWaypoint(45, 0, 0, 0);
+    	waypoints3.addWaypoint(0, 0, 0, 0);
+
+		InternalButton motionProfileStart450 = new InternalButton();
+		motionProfileStart450.whenPressed(new RobotArmMotionProfileStart(waypoints3));
+		SmartDashboard.putData("Motion Profile Start 45 to 0", motionProfileStart450);
+
 		InternalButton motionProfilePause = new InternalButton();
 		motionProfilePause.whenPressed(new RobotArmMotionProfilePause());
 		SmartDashboard.putData("Motion Profile Pause", motionProfilePause);

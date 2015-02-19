@@ -11,7 +11,7 @@ public class RobotArmMotionProfileStart extends Command
 	
 	public RobotArmMotionProfileStart(WaypointList waypoints) {
 		requires(RobotMain.robotArm);
-		MotionProfile motionProfile = new MotionProfile(waypoints);
+		motionProfile = new MotionProfile(waypoints);
 		motionProfile.calculatePath();
 	}
 	
@@ -26,7 +26,7 @@ public class RobotArmMotionProfileStart extends Command
 
 	@Override
 	protected boolean isFinished() {
-		return RobotMain.robotArm.getPIDController().isEnable();
+		return RobotMain.robotArm.isEnable();
 	}
 
 	@Override
