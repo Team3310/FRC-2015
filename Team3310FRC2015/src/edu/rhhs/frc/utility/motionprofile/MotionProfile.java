@@ -58,6 +58,9 @@ public class MotionProfile {
     		DEFAULT_JOINT_ACCEL2, 
     		DEFAULT_JOINT_ACCEL2};    
     
+    public MotionProfile() {
+    }
+    
     public MotionProfile(WaypointList waypointList) {
     	this.taughtPositions = waypointList.getWaypoints();
     	this.profileMode = waypointList.getProfileMode();
@@ -201,6 +204,19 @@ public class MotionProfile {
 
         return true;
 	} 
+	
+	public double[] calcInverseKinematics(double[] xyzToolPoint) {
+		double[][] inputPoints = { xyzToolPoint };
+		Kinematics kinematics = new Kinematics();
+    	IKINOutput iKINOutput = kinematics.iKIN(inputPoints, inputPoints.length - 1, armLengths, isElbowUp, isFront);
+    	return iKINOutput.userAngles[0];
+	}
+	
+	public double[] calcForwardKinematics(double[] jointAngles) {
+		double[][] inputPoints = { jointAngles };
+    	double[][] output = Kinematics.fKIN(inputPoints, inputPoints.length - 1, armLengths, null);
+    	return output[0];
+	}
 	
 	public void printOutput() {
 		profileOutput.output(outputRateMs);

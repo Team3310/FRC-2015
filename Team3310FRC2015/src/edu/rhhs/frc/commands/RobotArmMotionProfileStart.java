@@ -1,23 +1,24 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
+import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
+import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class RobotArmMotionProfileStart extends Command 
 {
-	private MotionProfile motionProfile;
+	private RobotArmCommandList commandList;
 	
-	public RobotArmMotionProfileStart(WaypointList waypoints) {
+	public RobotArmMotionProfileStart(RobotArmCommandList commandList) {
 		requires(RobotMain.robotArm);
-		motionProfile = new MotionProfile(waypoints);
-		motionProfile.calculatePath();
+		this.commandList = commandList;
 	}
 	
 	@Override
 	protected void initialize() {
-		RobotMain.robotArm.startMotionProfile(motionProfile.getProfile());
+		RobotMain.robotArm.startRobotArmCommandList(commandList);
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class RobotArmMotionProfileStart extends Command
 
 	@Override
 	protected boolean isFinished() {
-		return RobotMain.robotArm.isEnable();
+		return RobotMain.robotArm.isControlLoopEnabled();
 	}
 
 	@Override

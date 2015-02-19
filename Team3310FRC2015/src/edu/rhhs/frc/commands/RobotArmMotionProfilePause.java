@@ -13,7 +13,7 @@ public class RobotArmMotionProfilePause extends Command
 	
 	@Override
 	protected void initialize() {
-		RobotMain.robotArm.disable();
+		RobotMain.robotArm.disableControlLoop();
 	}
 
 	@Override

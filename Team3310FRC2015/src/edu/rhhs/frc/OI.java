@@ -14,6 +14,8 @@ import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.ToteGrabberAutoClose;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
+import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
+import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.RobotArm;
@@ -118,25 +120,31 @@ public class OI
     	WaypointList waypoints1 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypoints1.addWaypoint(0, 0, 0, 0);
     	waypoints1.addWaypoint(-45, 0, 0, 0);
+    	RobotArmCommandList commandList1 = new RobotArmCommandList();
+		commandList1.add(new RobotArmMotionProfilePath(waypoints1));
 
 		InternalButton motionProfileStart045 = new InternalButton();
-		motionProfileStart045.whenPressed(new RobotArmMotionProfileStart(waypoints1));
+		motionProfileStart045.whenPressed(new RobotArmMotionProfileStart(commandList1));
 		SmartDashboard.putData("Motion Profile Start 0 to -45", motionProfileStart045);
 		
     	WaypointList waypoints2 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypoints2.addWaypoint(-45, 0, 0, 0);
     	waypoints2.addWaypoint(45, 0, 0, 0);
+    	RobotArmCommandList commandList2 = new RobotArmCommandList();
+		commandList2.add(new RobotArmMotionProfilePath(waypoints2));
 
 		InternalButton motionProfileStart4545 = new InternalButton();
-		motionProfileStart4545.whenPressed(new RobotArmMotionProfileStart(waypoints2));
+		motionProfileStart4545.whenPressed(new RobotArmMotionProfileStart(commandList2));
 		SmartDashboard.putData("Motion Profile Start -45 to 45", motionProfileStart4545);
 
     	WaypointList waypoints3 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypoints3.addWaypoint(45, 0, 0, 0);
     	waypoints3.addWaypoint(0, 0, 0, 0);
+    	RobotArmCommandList commandList3 = new RobotArmCommandList();
+		commandList3.add(new RobotArmMotionProfilePath(waypoints3));
 
 		InternalButton motionProfileStart450 = new InternalButton();
-		motionProfileStart450.whenPressed(new RobotArmMotionProfileStart(waypoints3));
+		motionProfileStart450.whenPressed(new RobotArmMotionProfileStart(commandList3));
 		SmartDashboard.putData("Motion Profile Start 45 to 0", motionProfileStart450);
 
 		InternalButton motionProfilePause = new InternalButton();

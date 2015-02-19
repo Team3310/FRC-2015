@@ -13,7 +13,7 @@ public class RobotArmMotionProfileResume extends Command
 	
 	@Override
 	protected void initialize() {
-		RobotMain.robotArm.enable();
+		RobotMain.robotArm.enableControlLoop();
 	}
 
 	@Override
