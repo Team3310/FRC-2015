@@ -2,6 +2,7 @@ package edu.rhhs.frc.subsystems;
 
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
+import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
@@ -53,10 +54,8 @@ public class BinGrabber extends Subsystem
 			m_rightMotor.reverseOutput(false);
 			m_rightMotor.reverseSensor(true);
 
-			m_leftMotor.setPIDParams(downPositionPidParams, RobotUtility.DOWN_POSITION_PROFILE);
-			m_leftMotor.setPIDParams(upPositionPidParams, RobotUtility.UP_POSITION_PROFILE);
-			m_rightMotor.setPIDParams(downPositionPidParams, RobotUtility.DOWN_POSITION_PROFILE);
-			m_rightMotor.setPIDParams(upPositionPidParams, RobotUtility.UP_POSITION_PROFILE);
+			m_leftMotor.setPIDParams(downPositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_rightMotor.setPIDParams(downPositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 	
 			// Start with the Talons in throttle mode
 			setTalonControlMode(CANTalon.ControlMode.PercentVbus);
@@ -76,6 +75,11 @@ public class BinGrabber extends Subsystem
 //		setDefaultCommand(new BinGrabberWithJoystick());
 	}
 	
+	public void keepAlive() {
+		m_leftMotor.enableBrakeMode(true);
+		m_rightMotor.enableBrakeMode(true);
+	}
+
 	public void teleopInit() {
 	}
 	
@@ -122,21 +126,9 @@ public class BinGrabber extends Subsystem
 	}
 	
 	public void startPositionPID(double leftTargetDeg, double rightTargetDeg, double errorDeg) {
-		if (leftTargetDeg < m_leftMotor.getPositionDeg()) {
-			m_leftMotor.setProfile(RobotUtility.UP_POSITION_PROFILE);
-		}
-		else {
-			m_leftMotor.setProfile(RobotUtility.DOWN_POSITION_PROFILE);
-		}
-		if (rightTargetDeg < m_rightMotor.getPositionDeg()) {
-			m_rightMotor.setProfile(RobotUtility.UP_POSITION_PROFILE);
-		}
-		else {
-			m_rightMotor.setProfile(RobotUtility.DOWN_POSITION_PROFILE);
-		}
 		setTalonControlMode(CANTalon.ControlMode.Position); 
-		m_leftMotor.setPIDPositionDeg(leftTargetDeg); 
-		m_leftMotor.setPIDPositionDeg(rightTargetDeg);
+		m_leftMotor.setPIDPositiveNegativePositionDeg(leftTargetDeg, downPositionPidParams, upPositionPidParams); 
+		m_leftMotor.setPIDPositiveNegativePositionDeg(rightTargetDeg, downPositionPidParams, upPositionPidParams); 
 		m_error = errorDeg;
 	}
 	

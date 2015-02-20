@@ -19,7 +19,7 @@ public class DriveTrain extends Subsystem
 	private CANTalonEncoderPID m_rearLeftMotor;
 	private CANTalonEncoderPID m_rearRightMotor;
 	
-	private RobotUtility.ControlMode m_controlMode;
+	private CANTalonEncoderPID.ControlMode m_controlMode;
 	
 	private PIDParams positionPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0.0);
 	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0.0);
@@ -79,21 +79,21 @@ public class DriveTrain extends Subsystem
 
 			// The rear motors have encoders attached so they will be used for the main control input
 			m_rearLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearLeftMotor.setPIDParams(positionPidParams, RobotUtility.POSITION_PROFILE);
-			m_rearLeftMotor.setPIDParams(velocityPidParams, RobotUtility.VELOCITY_PROFILE);
+			m_rearLeftMotor.setPIDParams(positionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_rearLeftMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 			m_rearLeftMotor.reverseSensor(true);
 			m_rearLeftMotor.reverseOutput(false);
 			m_rearLeftMotor.setPosition(0);
 
 			m_rearRightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearRightMotor.setPIDParams(positionPidParams, RobotUtility.POSITION_PROFILE);
-			m_rearRightMotor.setPIDParams(velocityPidParams, RobotUtility.VELOCITY_PROFILE);
+			m_rearRightMotor.setPIDParams(positionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_rearRightMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 			m_rearRightMotor.reverseSensor(false);
 			m_rearRightMotor.reverseOutput(true);
 			m_rearRightMotor.setPosition(0);
 
 			// Start with the Talons in throttle mode
-			setControlMode(RobotUtility.ControlMode.PERCENT_VBUS);
+			setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
 			m_rearLeftMotor.set(0);
 			m_rearRightMotor.set(0);
 			
@@ -112,21 +112,28 @@ public class DriveTrain extends Subsystem
 		setDefaultCommand(new DriveWithJoystick()); 
 	}
 	
-	public void setControlMode(RobotUtility.ControlMode controlMode) {
+	public void keepAlive() {
+		m_frontLeftMotor.enableBrakeMode(true);
+		m_frontRightMotor.enableBrakeMode(true);
+		m_rearLeftMotor.enableBrakeMode(true);
+		m_rearRightMotor.enableBrakeMode(true);
+	}
+
+	public void setControlMode(CANTalonEncoderPID.ControlMode controlMode) {
 		m_rearLeftMotor.setControlMode(controlMode);
 		m_rearRightMotor.setControlMode(controlMode);
 		m_controlMode = controlMode;
 	}
 		
 	public void startPIDVelocity(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
-		setControlMode(RobotUtility.ControlMode.VELOCITY);
+		setControlMode(CANTalonEncoderPID.ControlMode.VELOCITY);
 		m_rearLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
 		m_rearRightMotor.setPIDVelocityDegPerSecNoLimits(rightTargetDegPerSec);
 		m_error = errorDegPerSec;
 	}
 	
 	public void startPIDPosition(double leftTargetInches, double rightTargetInches, double errorInches) {
-		setControlMode(RobotUtility.ControlMode.POSITION);
+		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
 		m_rearLeftMotor.setPosition(0);
 		m_rearRightMotor.setPosition(0);
 		m_rearLeftMotor.setPIDPositionInches(leftTargetInches);
@@ -139,7 +146,7 @@ public class DriveTrain extends Subsystem
 	}
 	
 	public void setSpeed(double speed) {
-		setControlMode(RobotUtility.ControlMode.PERCENT_VBUS);
+		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
 		m_rearLeftMotor.set(speed);
 		m_rearRightMotor.set(speed);
 	}
@@ -165,7 +172,7 @@ public class DriveTrain extends Subsystem
 	}
 
 	public void driveWithJoystick() {
-		if (m_drive != null && m_controlMode == RobotUtility.ControlMode.PERCENT_VBUS) {
+		if (m_drive != null && m_controlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
 			switch(m_controllerMode) {
 			case CONTROLLER_JOYSTICK_ARCADE:
 				m_moveInput = OI.getInstance().getJoystick1().getY();

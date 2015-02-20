@@ -10,10 +10,8 @@ import edu.rhhs.frc.commands.robotarm.RobotArmCommand;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
+import edu.rhhs.frc.utility.CANTalonEncoderPID.ControlMode;
 import edu.rhhs.frc.utility.PIDParams;
-import edu.rhhs.frc.utility.RobotUtility;
-import edu.rhhs.frc.utility.RobotUtility.ControlMode;
-import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -82,8 +80,10 @@ public class RobotArm extends Subsystem {
 	private CANTalonAnalogPID  m_j4Motor;
 
 	private PIDParams j1PositionPidParams = new PIDParams(6.0, 0.0, 0.1, 0.0, 50, 0.0);
-	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.005, 0.01, 0.712, 50, 0.0);
-	private PIDParams j3PositionPidParams = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
+	private PIDParams j2PositionPidParamsNegative = new PIDParams(3.5, 0.005, 0.01, 0.712, 50, 0.0);
+	private PIDParams j2PositionPidParamsPositive = new PIDParams(3.5, 0.005, 0.01, 0.712, 50, 0.0);
+	private PIDParams j3PositionPidParamsNegative = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
+	private PIDParams j3PositionPidParamsPositive = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
 	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0.0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0.0);
@@ -94,13 +94,15 @@ public class RobotArm extends Subsystem {
 	private DigitalInput m_toteGrabberSwitch;
 	private DoubleSolenoid m_toteGrabberSolenoid;
 
-	private RobotUtility.ControlMode m_robotArmControlMode = RobotUtility.ControlMode.VELOCITY_POSITION_HOLD;
+	private CANTalonEncoderPID.ControlMode m_robotArmControlMode = CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD;
 
 	// Initialize position commands for proper robot startup
-	private double positionCommandJ1 = J1_MASTER_ANGLE_DEG;
-	private double positionCommandJ2 = J2_MASTER_ANGLE_DEG;
-	private double positionCommandJ3 = J3_MASTER_ANGLE_DEG;
-	private double positionCommandJ4 = J4_MASTER_ANGLE_DEG;
+	private double m_positionCommandJ1 = J1_MASTER_ANGLE_DEG;
+	private double m_positionCommandJ2 = J2_MASTER_ANGLE_DEG;
+	private double m_positionCommandJ3 = J3_MASTER_ANGLE_DEG;
+	private double m_positionCommandJ4 = J4_MASTER_ANGLE_DEG;
+	
+	private double m_j2InputRaw = 0;
 
 	private RobotArmCommandList m_controllerLoopCommandList;
 	private RobotArmCommand m_currentControllerLoopCommand;
@@ -127,7 +129,6 @@ public class RobotArm extends Subsystem {
 	}
 
 	public RobotArm() {
-		//    	super(0.0, 0.0, 0.0, OUTER_LOOP_UPDATE_RATE_SEC);
 		try {
 			m_j1Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J1_CAN_ID, J1_SENSOR_GEAR_RATIO, J1_ENCODER_OFFSET_DEG, J1_MASTER_ANGLE_DEG, J1_MIN_ANGLE_DEG, J1_MAX_ANGLE_DEG);
 			m_j2Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J2_CAN_ID, J2_SENSOR_GEAR_RATIO, J2_ENCODER_OFFSET_DEG, J2_MASTER_ANGLE_DEG, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
@@ -154,30 +155,22 @@ public class RobotArm extends Subsystem {
 			m_j4Motor.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 			m_j4Motor.reverseOutput(true);
 			m_j4Motor.reverseSensor(false);
+			
+			m_j1Motor.setPIDParams(j1PositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_j2Motor.setPIDParams(j2PositionPidParamsPositive, CANTalonEncoderPID.POSITION_PROFILE);
+			m_j3Motor.setPIDParams(j3PositionPidParamsPositive, CANTalonEncoderPID.POSITION_PROFILE);
+			m_j4Motor.setPIDParams(j4PositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 
-			m_j1Motor.setPIDParams(j1PositionPidParams, RobotUtility.POSITION_PROFILE);
-			m_j2Motor.setPIDParams(j2PositionPidParams, RobotUtility.POSITION_PROFILE);
-			m_j3Motor.setPIDParams(j3PositionPidParams, RobotUtility.POSITION_PROFILE);
-			m_j4Motor.setPIDParams(j4PositionPidParams, RobotUtility.POSITION_PROFILE);
-
-			m_j1Motor.setPIDParams(j1VelocityPidParams, RobotUtility.VELOCITY_PROFILE);
-			m_j2Motor.setPIDParams(j2VelocityPidParams, RobotUtility.VELOCITY_PROFILE);
-			m_j3Motor.setPIDParams(j3VelocityPidParams, RobotUtility.VELOCITY_PROFILE);
-			m_j4Motor.setPIDParams(j4VelocityPidParams, RobotUtility.VELOCITY_PROFILE);
+			m_j1Motor.setPIDParams(j1VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
+			m_j2Motor.setPIDParams(j2VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
+			m_j3Motor.setPIDParams(j3VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
+			m_j4Motor.setPIDParams(j4VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 
 			m_j1Motor.inititializeSensorPosition();
 			m_j2Motor.inititializeSensorPosition();
 			m_j3Motor.inititializeSensorPosition();
 
-			m_j1Motor.setControlMode(RobotUtility.ControlMode.POSITION);
-			m_j2Motor.setControlMode(RobotUtility.ControlMode.POSITION);
-			m_j3Motor.setControlMode(RobotUtility.ControlMode.POSITION);
-			m_j4Motor.setControlMode(RobotUtility.ControlMode.POSITION);
-
-			m_j1Motor.setInitPosition();
-			m_j2Motor.setInitPosition();
-			m_j3Motor.setInitPosition();
-			m_j4Motor.setInitPosition();	
+			setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH);	
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
@@ -194,8 +187,15 @@ public class RobotArm extends Subsystem {
 	public void initDefaultCommand() {
 		setDefaultCommand(new RobotArmWithJoystick());
 	}
+	
+	public void keepAlive() {
+		m_j1Motor.enableBrakeMode(true);
+		m_j2Motor.enableBrakeMode(true);
+		m_j3Motor.enableBrakeMode(true);
+		m_j4Motor.enableBrakeMode(true);
+	}
 
-	public void setControlMode(RobotUtility.ControlMode mode) {
+	public void setControlMode(CANTalonEncoderPID.ControlMode mode) {
 		m_robotArmControlMode = mode;
 		m_j1Motor.setControlMode(mode);
 		m_j2Motor.setControlMode(mode);
@@ -203,11 +203,11 @@ public class RobotArm extends Subsystem {
 		m_j4Motor.setControlMode(mode);
 		
 		// If you change mode, need to quickly update the set command
-		if (mode == ControlMode.POSITION) {			
-			positionCommandJ1 = m_j1Motor.setInitPosition();
-			positionCommandJ2 = m_j2Motor.setInitPosition();
-			positionCommandJ3 = m_j3Motor.setInitPosition();
-			positionCommandJ4 = m_j4Motor.setInitPosition();
+		if (mode == ControlMode.POSITION || mode == ControlMode.POSITION_INCREMENTAL) {			
+			m_positionCommandJ1 = m_j1Motor.setInitPosition();
+			m_positionCommandJ2 = m_j2Motor.setInitPosition();
+			m_positionCommandJ3 = m_j3Motor.setInitPosition();
+			m_positionCommandJ4 = m_j4Motor.setInitPosition();
 		}
 		else {
 			m_j1Motor.set(0);
@@ -217,11 +217,11 @@ public class RobotArm extends Subsystem {
 		}
 	}
 
-	public boolean getToteGrabberSwitch() {
+	public synchronized boolean getToteGrabberSwitch() {
 		return !m_toteGrabberSwitch.get();
 	}
 
-	public void setToteGrabberPosition(ToteGrabberPosition position) {
+	public synchronized void setToteGrabberPosition(ToteGrabberPosition position) {
 		if (position == ToteGrabberPosition.OPEN) {
 			m_toteGrabberSolenoid.set(DoubleSolenoid.Value.kForward);
 		}
@@ -230,7 +230,7 @@ public class RobotArm extends Subsystem {
 		}
 	}
 
-	public ToteGrabberPosition getToteGrabberPosition() {
+	public synchronized ToteGrabberPosition getToteGrabberPosition() {
 		if (m_toteGrabberSolenoid.get() == DoubleSolenoid.Value.kForward) {
 			return ToteGrabberPosition.OPEN;
 		}
@@ -249,7 +249,7 @@ public class RobotArm extends Subsystem {
 			SmartDashboard.putNumber("Left X Throttle" , throttleLeftX);
 			SmartDashboard.putNumber("Left Y Throttle" , throttleLeftY);
 
-			if (m_robotArmControlMode == RobotUtility.ControlMode.VELOCITY_POSITION_HOLD) {
+			if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD) {
 				double velocityCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC;
 				double velocityCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC;
 				double velocityCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC;
@@ -265,32 +265,50 @@ public class RobotArm extends Subsystem {
 				m_j3Motor.setStickInputVelocityDegPerSec(velocityCommandJ3);
 				m_j4Motor.setStickInputVelocityDegPerSec(velocityCommandJ4);
 			}
-			else if (m_robotArmControlMode == RobotUtility.ControlMode.POSITION) {
+			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.POSITION) {
+				m_positionCommandJ1 = -throttleRightX * Math.max(J1_MAX_ANGLE_DEG, -J1_MIN_ANGLE_DEG) / 2;
+				m_positionCommandJ2 = -throttleRightY * Math.max(J2_MAX_ANGLE_DEG, -J2_MIN_ANGLE_DEG);
+				m_positionCommandJ3 = -throttleLeftY  * Math.max(J2_MAX_ANGLE_DEG, -J3_MIN_ANGLE_DEG);
+				m_positionCommandJ4 = -throttleLeftX  * Math.max(J2_MAX_ANGLE_DEG, -J4_MIN_ANGLE_DEG);
+				
+				m_positionCommandJ3 = limitJ3(m_positionCommandJ2, m_positionCommandJ3);
+
+				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
+				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
+				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
+				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
+
+				m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
+				m_j2InputRaw = m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
+				m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
+				m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);
+			}
+			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL) {
 				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					positionCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j1Motor.getPositionDeg();
+					m_positionCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j1Motor.getPositionDeg();
 				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					positionCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j2Motor.getPositionDeg();
+					m_positionCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j2Motor.getPositionDeg();
 				}
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					positionCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j3Motor.getPositionDeg();
+					m_positionCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j3Motor.getPositionDeg();
 				}
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j4Motor.getPositionDeg();
+					m_positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j4Motor.getPositionDeg();
 				}
-				positionCommandJ3 = limitJ3(positionCommandJ2, positionCommandJ3);
+				m_positionCommandJ3 = limitJ3(m_positionCommandJ2, m_positionCommandJ3);
 
-				SmartDashboard.putNumber("J1 Stick Command", positionCommandJ1);
-				SmartDashboard.putNumber("J2 Stick Command", positionCommandJ2);
-				SmartDashboard.putNumber("J3 Stick Command", positionCommandJ3);
-				SmartDashboard.putNumber("J4 Stick Command", positionCommandJ4);
+				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
+				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
+				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
+				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
 
-				m_j1Motor.setPIDPositionDeg(positionCommandJ1);
-				m_j2Motor.setPIDPositionDeg(positionCommandJ2);
-				m_j3Motor.setPIDPositionDeg(positionCommandJ3);
-				m_j4Motor.setPIDPositionDeg(positionCommandJ4);
+				m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
+				m_j2InputRaw = m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
+				m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
+				m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);
 			}
-			else if (m_robotArmControlMode == RobotUtility.ControlMode.PERCENT_VBUS) {
+			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
 				SmartDashboard.putNumber("J1 Stick Command", throttleRightX);
 				SmartDashboard.putNumber("J2 Stick Command", throttleRightY);
 				SmartDashboard.putNumber("J3 Stick Command", throttleLeftY);
@@ -316,7 +334,6 @@ public class RobotArm extends Subsystem {
 	}
 
 	protected void controlLoopUpdate() {
-
 		boolean enabled;
         synchronized (this) {
             enabled = m_controlLoopEnabled; // take snapshot of this value
@@ -338,18 +355,18 @@ public class RobotArm extends Subsystem {
 		}
 	}
 	
-	public void setJointAngles(double[] jointAngles) {
-		positionCommandJ1 = jointAngles[0];
-		positionCommandJ2 = jointAngles[1];
-		positionCommandJ3 = limitJ3(jointAngles[1], jointAngles[2]);
-		positionCommandJ4 = jointAngles[3];
-		m_j1Motor.setPIDPositionDeg(positionCommandJ1);
-		m_j2Motor.setPIDPositionDeg(positionCommandJ2);
-		m_j3Motor.setPIDPositionDeg(positionCommandJ3);
-		m_j4Motor.setPIDPositionDeg(positionCommandJ4);	
+	public synchronized void setJointAngles(double[] jointAngles) {
+		m_positionCommandJ1 = jointAngles[0];
+		m_positionCommandJ2 = jointAngles[1];
+		m_positionCommandJ3 = limitJ3(jointAngles[1], jointAngles[2]);
+		m_positionCommandJ4 = jointAngles[3];
+		m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
+		m_j2InputRaw = m_j2Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ2, j2PositionPidParamsNegative, j2PositionPidParamsPositive);
+		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
+		m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);	
 	}
 	
-	public double[] getJointAngles() {
+	public synchronized double[] getJointAngles() {
 		return new double[] {
 				m_j1Motor.getPositionDeg(),
 				m_j2Motor.getPositionDeg(),
@@ -402,13 +419,16 @@ public class RobotArm extends Subsystem {
 	}
 
 	public void updateStatus() {
-		SmartDashboard.putNumber("J1 Profile Command (deg)", positionCommandJ1);
+		SmartDashboard.putNumber("J1 Profile Command (deg)", m_positionCommandJ1);
 		SmartDashboard.putNumber("J1 Profile Actual (deg)", m_j1Motor.getPositionDeg());
 
 		SmartDashboard.putNumber("J1 Position (raw)", 		m_j1Motor.getPosition());
 		SmartDashboard.putNumber("J1 Position (deg)", 		m_j1Motor.getPositionDeg());
 		SmartDashboard.putNumber("J1 Velocity (deg-sec)", 	m_j1Motor.getVelocityDegPerSec());
 
+		SmartDashboard.putNumber("J2 Input (raw)", 			m_j2InputRaw);
+		SmartDashboard.putNumber("J2 Throttle Calc", 		m_j2Motor.getOutputVoltage() / m_j2Motor.getBusVoltage());
+		SmartDashboard.putNumber("J2 Output Voltage", 		m_j2Motor.getOutputVoltage());
 		SmartDashboard.putNumber("J2 Position (raw)", 		m_j2Motor.getPosition());
 		SmartDashboard.putNumber("J2 Position (deg)", 		m_j2Motor.getPositionDeg());
 		SmartDashboard.putNumber("J2 Velocity (deg-sec)", 	m_j2Motor.getVelocityDegPerSec());

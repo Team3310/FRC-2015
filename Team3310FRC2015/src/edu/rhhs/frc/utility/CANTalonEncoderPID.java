@@ -4,12 +4,17 @@ import edu.wpi.first.wpilibj.CANTalon;
 
 public class CANTalonEncoderPID extends CANTalon {
 	
+	public static enum ControlMode {PERCENT_VBUS, VBUS_POSITION_HOLD, POSITION, POSITION_INCREMENTAL, VELOCITY, VELOCITY_POSITION_HOLD};
+
+	public static final int POSITION_PROFILE = 0;
+	public static final int VELOCITY_PROFILE = 1;
+
 	protected double sensorToOutputGearRatio = 1.0;
 	protected double offsetAngleDeg = 0.0;
 	protected double initAngleDeg = 0.0;
 	protected double minAngleDeg;
 	protected double maxAngleDeg;
-	protected RobotUtility.ControlMode controlMode;
+	protected ControlMode controlMode;
 	
 	public CANTalonEncoderPID(int deviceNumber) {
 		super(deviceNumber);
@@ -33,39 +38,32 @@ public class CANTalonEncoderPID extends CANTalon {
 		this.maxAngleDeg = maxAngleDeg;
 	}
 	
-	public void setControlMode(RobotUtility.ControlMode mode) {
+	public void setControlMode(ControlMode mode) {
 		CANTalon.ControlMode talonMode = CANTalon.ControlMode.PercentVbus;
-		if (mode == RobotUtility.ControlMode.POSITION) {
-			this.setProfile(RobotUtility.POSITION_PROFILE);
+		if (mode == ControlMode.POSITION || mode == ControlMode.POSITION_INCREMENTAL) {
+			this.setProfile(POSITION_PROFILE);
 			talonMode = CANTalon.ControlMode.Position;
 		}
-		else if (mode == RobotUtility.ControlMode.VELOCITY_POSITION_HOLD) {
-			this.setProfile(RobotUtility.VELOCITY_PROFILE);
+		else if (mode == ControlMode.VELOCITY || mode == ControlMode.VELOCITY_POSITION_HOLD) {
+			this.setProfile(VELOCITY_PROFILE);
 			talonMode = CANTalon.ControlMode.Speed;
 		}
-		else if (mode == RobotUtility.ControlMode.VELOCITY) {
-			this.setProfile(RobotUtility.VELOCITY_PROFILE);
-			talonMode = CANTalon.ControlMode.Speed;
-		}
-		else if (mode == RobotUtility.ControlMode.PERCENT_VBUS || mode == RobotUtility.ControlMode.VBUS_POSITION_HOLD) {
+		else if (mode == ControlMode.PERCENT_VBUS || mode == ControlMode.VBUS_POSITION_HOLD) {
 			talonMode = CANTalon.ControlMode.PercentVbus;
 		}
 		controlMode = mode;
 		this.changeControlMode(talonMode);
 	}
 
-	public void setControlMode(RobotUtility.ControlMode mode, int profile) {
+	public void setControlMode(ControlMode mode, int profile) {
 		CANTalon.ControlMode talonMode = CANTalon.ControlMode.PercentVbus;
-		if (mode == RobotUtility.ControlMode.POSITION) {
+		if (mode == ControlMode.POSITION || mode == ControlMode.POSITION_INCREMENTAL) {
 			talonMode = CANTalon.ControlMode.Position;
 		}
-		else if (mode == RobotUtility.ControlMode.VELOCITY_POSITION_HOLD) {
+		else if (mode == ControlMode.VELOCITY || mode == ControlMode.VELOCITY_POSITION_HOLD) {
 			talonMode = CANTalon.ControlMode.Speed;
 		}
-		else if (mode == RobotUtility.ControlMode.VELOCITY) {
-			talonMode = CANTalon.ControlMode.Speed;
-		}
-		else if (mode == RobotUtility.ControlMode.PERCENT_VBUS || mode == RobotUtility.ControlMode.VBUS_POSITION_HOLD) {
+		else if (mode == ControlMode.PERCENT_VBUS || mode == ControlMode.VBUS_POSITION_HOLD) {
 			talonMode = CANTalon.ControlMode.PercentVbus;
 		}
 		controlMode = mode;
@@ -97,11 +95,25 @@ public class CANTalonEncoderPID extends CANTalon {
 		return RobotUtility.convertEncoderVelocityToFtPerSec(this.getSpeed(), sensorToOutputGearRatio);
 	}
 	
-	public void setPIDPositionInches(double positionCommandInches) {
-		this.set(RobotUtility.convertInchesToEncoderPosition(positionCommandInches));
+	public double setPIDPositionInches(double positionCommandInches) {
+		double talonInput = RobotUtility.convertInchesToEncoderPosition(positionCommandInches);
+		this.set(talonInput);
+		
+		return talonInput;
 	}
 
-	public void setPIDPositionDeg(double positionCommandDeg) {
+	public double setPIDPositiveNegativePositionDeg(double positionCommandDeg, PIDParams positiveParams, PIDParams negativeParams) {
+		if (positionCommandDeg > getPositionDeg()) {
+			setPIDParams(positiveParams, POSITION_PROFILE);
+		}
+		else {
+			setPIDParams(negativeParams, POSITION_PROFILE);
+		}
+		
+		return setPIDPositionDeg(positionCommandDeg);
+	}
+
+	public double setPIDPositionDeg(double positionCommandDeg) {
 		if (positionCommandDeg > maxAngleDeg) {
 			positionCommandDeg = maxAngleDeg;
 		}
@@ -109,14 +121,17 @@ public class CANTalonEncoderPID extends CANTalon {
 			positionCommandDeg = minAngleDeg;
 		}
 		
-		this.set(RobotUtility.convertDegToEncoderPosition(positionCommandDeg + offsetAngleDeg, sensorToOutputGearRatio));
+		double talonInput = RobotUtility.convertDegToEncoderPosition(positionCommandDeg + offsetAngleDeg, sensorToOutputGearRatio);
+		this.set(talonInput);
+		
+		return talonInput;
 	}
 
 	public void setPIDVelocityDegPerSec(double velocityCommandDegPerSec) {
 		if ((getPositionDeg() > maxAngleDeg && velocityCommandDegPerSec > 0) ||
 			(getPositionDeg() < minAngleDeg && velocityCommandDegPerSec < 0)) {
-			if (controlMode != RobotUtility.ControlMode.POSITION) {
-				setControlMode(RobotUtility.ControlMode.POSITION);
+			if (controlMode != ControlMode.POSITION) {
+				setControlMode(ControlMode.POSITION);
 			}
 			setPIDPositionDeg(getPositionDeg());
 			return;
@@ -131,14 +146,14 @@ public class CANTalonEncoderPID extends CANTalon {
 	
 	public void setStickInputVelocityDegPerSec(double velocityCommandDegPerSec) {
 		if (Math.abs(velocityCommandDegPerSec) < 5) {
-			if (controlMode != RobotUtility.ControlMode.POSITION) {
-				setControlMode(RobotUtility.ControlMode.POSITION);
+			if (controlMode != ControlMode.POSITION) {
+				setControlMode(ControlMode.POSITION);
 			}
 			this.setPIDPositionDeg(getPositionDeg());
 		}
 		else {
-			if (controlMode != RobotUtility.ControlMode.VELOCITY_POSITION_HOLD) {
-				setControlMode(RobotUtility.ControlMode.VELOCITY_POSITION_HOLD);
+			if (controlMode != ControlMode.VELOCITY_POSITION_HOLD) {
+				setControlMode(ControlMode.VELOCITY_POSITION_HOLD);
 			}
 			this.setPIDVelocityDegPerSec(velocityCommandDegPerSec);
 		}
@@ -146,21 +161,20 @@ public class CANTalonEncoderPID extends CANTalon {
 	
 	public void setStickInputVBus(double vBusCommand) {
 		if (Math.abs(vBusCommand) < 0.2) {
-			if (controlMode != RobotUtility.ControlMode.POSITION) {
-				setControlMode(RobotUtility.ControlMode.POSITION);
+			if (controlMode != ControlMode.POSITION) {
+				setControlMode(ControlMode.POSITION);
 			}
 			this.setPIDPositionDeg(getPositionDeg());
 		}
 		else {
-			if (controlMode != RobotUtility.ControlMode.VBUS_POSITION_HOLD) {
-				setControlMode(RobotUtility.ControlMode.VBUS_POSITION_HOLD);
+			if (controlMode != ControlMode.VBUS_POSITION_HOLD) {
+				setControlMode(ControlMode.VBUS_POSITION_HOLD);
 			}
 			this.set(vBusCommand);
 		}
 	}
 	
 	public double setInitPosition() {
-		setControlMode(RobotUtility.ControlMode.POSITION);
 		setPIDPositionDeg(initAngleDeg);
 		return initAngleDeg;
 	}

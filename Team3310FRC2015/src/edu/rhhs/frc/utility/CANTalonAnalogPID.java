@@ -35,7 +35,7 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID {
 	}
 	
 	@Override
-	public void setPIDPositionDeg(double positionCommandDeg) {
+	public double setPIDPositionDeg(double positionCommandDeg) {
 		if (positionCommandDeg > maxAngleDeg) {
 			positionCommandDeg = maxAngleDeg;
 		}
@@ -43,7 +43,10 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID {
 			positionCommandDeg = minAngleDeg;
 		}
 		
-		this.set(RobotUtility.convertDegToAnalogPosition(positionCommandDeg + offsetAngleDeg, zeroPositionRaw, sensorToOutputGearRatio));
+		double talonInput = RobotUtility.convertDegToAnalogPosition(positionCommandDeg + offsetAngleDeg, zeroPositionRaw, sensorToOutputGearRatio);
+		this.set(talonInput);
+
+		return talonInput;
 	}
 
 	@Override
@@ -51,7 +54,7 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID {
 		if ((getPositionDeg() > maxAngleDeg && velocityCommandDegPerSec > 0) ||
 			(getPositionDeg() < minAngleDeg && velocityCommandDegPerSec < 0)) {
 			if (this.getControlMode() == CANTalon.ControlMode.Speed) {
-				setControlMode(RobotUtility.ControlMode.POSITION);
+				setControlMode(CANTalonAnalogPID.ControlMode.POSITION);
 			}
 			setPIDPositionDeg(getPositionDeg());
 			return;

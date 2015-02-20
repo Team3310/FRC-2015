@@ -4,13 +4,6 @@ import edu.rhhs.frc.RobotMap;
 
 public class RobotUtility 
 {
-	public static enum ControlMode {PERCENT_VBUS, VBUS_POSITION_HOLD, POSITION, VELOCITY, VELOCITY_POSITION_HOLD};
-
-	public static final int POSITION_PROFILE = 0;
-	public static final int VELOCITY_PROFILE = 1;
-	public static final int UP_POSITION_PROFILE = 0;
-	public static final int DOWN_POSITION_PROFILE = 1;
-
 	// MA3 Analog Encoder raw output value goes from 0 to 1024.
 	public static double convertAnalogPositionToDeg(double analogValue, double zeroValue) {
 		return (360.0 / 1024.0) * (analogValue - zeroValue);
@@ -128,5 +121,14 @@ public class RobotUtility
  
     	value = convertInchesToEncoderPosition(wheelCircum);
     	System.out.println("convertInchesToEncoderPosition(" + wheelCircum + ") = " + value + " encoder counts");
+    	 
+    	System.out.println(" ");
+
+    	value = convertDegToEncoderPosition(360, -1);
+    	System.out.println("convertDegToEncoderPosition(360) (-1 gear ratio) = " + value + " encoder counts");
+
+    	value = convertEncoderPositionToDeg(value, -1);
+    	System.out.println("convertEncoderPositionToDeg(value) (-1 gear ratio) = " + value + " deg");
+   
    }
 }

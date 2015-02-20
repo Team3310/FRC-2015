@@ -4,7 +4,7 @@ package edu.rhhs.frc;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
-import edu.rhhs.frc.utility.RobotUtility;
+import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -42,19 +42,20 @@ public class RobotMain extends IterativeRobot
         //autonomousCommand = new ExampleCommand(0.5);
         m_loopTime = System.nanoTime();
         m_driveModeChooser = new SendableChooser();
-    	m_driveModeChooser.addObject("XBox Arcade Left", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
-    	m_driveModeChooser.addObject("XBox Arcade Right", new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-    	m_driveModeChooser.addDefault("XBox Cheesy", new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
-    	m_driveModeChooser.addObject("Joystick Arcade", new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
-    	m_driveModeChooser.addObject("Joystick Cheesy", new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
-    	m_driveModeChooser.addObject("Joystick Tank", new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
+    	m_driveModeChooser.addObject ("XBox Arcade Left", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+    	m_driveModeChooser.addObject ("XBox Arcade Right", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
+    	m_driveModeChooser.addDefault("XBox Cheesy",		new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+    	m_driveModeChooser.addObject ("Joystick Arcade", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
+    	m_driveModeChooser.addObject ("Joystick Cheesy", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
+    	m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
         SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
 
         m_robotArmControlModeChooser = new SendableChooser();
-    	m_robotArmControlModeChooser.addObject ("VBu Only", RobotUtility.ControlMode.PERCENT_VBUS);
-    	m_robotArmControlModeChooser.addObject ("VBus- Position Hold", RobotUtility.ControlMode.VBUS_POSITION_HOLD);
-    	m_robotArmControlModeChooser.addDefault("Position", RobotUtility.ControlMode.POSITION);
-    	m_robotArmControlModeChooser.addObject ("Velocity Position Hold", RobotUtility.ControlMode.VELOCITY_POSITION_HOLD);
+    	m_robotArmControlModeChooser.addObject ("VBus Only", 				CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+    	m_robotArmControlModeChooser.addObject ("VBus Position Hold", 		CANTalonEncoderPID.ControlMode.VBUS_POSITION_HOLD);
+    	m_robotArmControlModeChooser.addObject ("Position Absolute", 		CANTalonEncoderPID.ControlMode.POSITION);
+    	m_robotArmControlModeChooser.addDefault("Position Incremental", 	CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);
+    	m_robotArmControlModeChooser.addObject ("Velocity Position Hold", 	CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD);
         SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
    	
         updateStatus();
@@ -62,6 +63,10 @@ public class RobotMain extends IterativeRobot
     }
 	
 	public void disabledPeriodic() {
+		// This is for an issue when the robotRIO boots up sometimes Talons don't get enabled
+		driveTrain.keepAlive();
+		binGrabber.keepAlive();
+		robotArm.keepAlive();
 		Scheduler.getInstance().run();
         updateStatus();
 	}
@@ -91,7 +96,7 @@ public class RobotMain extends IterativeRobot
         	m_autonomousCommand.cancel();
         }
         driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
-        robotArm.setControlMode((RobotUtility.ControlMode)m_robotArmControlModeChooser.getSelected());
+        robotArm.setControlMode((CANTalonEncoderPID.ControlMode)m_robotArmControlModeChooser.getSelected());
         updateStatus();
     }
 
