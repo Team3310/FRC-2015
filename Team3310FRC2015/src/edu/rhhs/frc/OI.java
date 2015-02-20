@@ -119,7 +119,7 @@ public class OI
 		
     	WaypointList waypoints1 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypoints1.addWaypoint(0, 0, 0, 0);
-    	waypoints1.addWaypoint(-45, 0, 0, 0);
+    	waypoints1.addWaypoint(-140, 0, 0, 0);
     	RobotArmCommandList commandList1 = new RobotArmCommandList();
 		commandList1.add(new RobotArmMotionProfilePath(waypoints1));
 
@@ -128,8 +128,8 @@ public class OI
 		SmartDashboard.putData("Motion Profile Start 0 to -45", motionProfileStart045);
 		
     	WaypointList waypoints2 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
-    	waypoints2.addWaypoint(-45, 0, 0, 0);
-    	waypoints2.addWaypoint(45, 0, 0, 0);
+    	waypoints2.addWaypoint(-140, 0, 0, 0);
+    	waypoints2.addWaypoint(40, 0, 0, 0);
     	RobotArmCommandList commandList2 = new RobotArmCommandList();
 		commandList2.add(new RobotArmMotionProfilePath(waypoints2));
 
@@ -138,7 +138,7 @@ public class OI
 		SmartDashboard.putData("Motion Profile Start -45 to 45", motionProfileStart4545);
 
     	WaypointList waypoints3 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
-    	waypoints3.addWaypoint(45, 0, 0, 0);
+    	waypoints3.addWaypoint(40, 0, 0, 0);
     	waypoints3.addWaypoint(0, 0, 0, 0);
     	RobotArmCommandList commandList3 = new RobotArmCommandList();
 		commandList3.add(new RobotArmMotionProfilePath(waypoints3));

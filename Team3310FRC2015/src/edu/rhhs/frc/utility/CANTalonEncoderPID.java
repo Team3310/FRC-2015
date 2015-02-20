@@ -159,8 +159,9 @@ public class CANTalonEncoderPID extends CANTalon {
 		}
 	}
 	
-	public void setInitPosition() {
+	public double setInitPosition() {
 		setControlMode(RobotUtility.ControlMode.POSITION);
 		setPIDPositionDeg(initAngleDeg);
+		return initAngleDeg;
 	}
 }

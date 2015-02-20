@@ -58,6 +58,10 @@ public abstract class RobotArmCommand {
         execute();
         return isFinished();
     }
+    
+    public synchronized void reset() {
+    	m_initialized = false;
+    }
 
     /**
      * Called to indicate that the timer should start.

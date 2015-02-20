@@ -81,8 +81,8 @@ public class RobotArm extends Subsystem {
 	private CANTalonEncoderPID m_j3Motor;
 	private CANTalonAnalogPID  m_j4Motor;
 
-	private PIDParams j1PositionPidParams = new PIDParams(1.4, 0.0, 0.001, 0.0, 50, 0.0);
-	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0, 0.01, 0.167, 50, 0.0);
+	private PIDParams j1PositionPidParams = new PIDParams(6.0, 0.0, 0.1, 0.0, 50, 0.0);
+	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.005, 0.01, 0.712, 50, 0.0);
 	private PIDParams j3PositionPidParams = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
 	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0.0);
 
@@ -104,10 +104,7 @@ public class RobotArm extends Subsystem {
 
 	private RobotArmCommandList m_controllerLoopCommandList;
 	private RobotArmCommand m_currentControllerLoopCommand;
-
-//	private ProfileOutput m_currentMotionProfile;
-//	private int m_currentProfileIndex;
-//	private long m_controllerLoopTime;
+	private int m_currentControllerLoopCommandIndex;
 
 	private Timer m_controlLoop;
 	private boolean m_controlLoopEnabled = false;
@@ -207,10 +204,10 @@ public class RobotArm extends Subsystem {
 		
 		// If you change mode, need to quickly update the set command
 		if (mode == ControlMode.POSITION) {			
-			m_j1Motor.setInitPosition();
-			m_j2Motor.setInitPosition();
-			m_j3Motor.setInitPosition();
-			m_j4Motor.setInitPosition();	
+			positionCommandJ1 = m_j1Motor.setInitPosition();
+			positionCommandJ2 = m_j2Motor.setInitPosition();
+			positionCommandJ3 = m_j3Motor.setInitPosition();
+			positionCommandJ4 = m_j4Motor.setInitPosition();
 		}
 		else {
 			m_j1Motor.set(0);
@@ -281,6 +278,7 @@ public class RobotArm extends Subsystem {
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 					positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j4Motor.getPositionDeg();
 				}
+				positionCommandJ3 = limitJ3(positionCommandJ2, positionCommandJ3);
 
 				SmartDashboard.putNumber("J1 Stick Command", positionCommandJ1);
 				SmartDashboard.putNumber("J2 Stick Command", positionCommandJ2);
@@ -289,7 +287,7 @@ public class RobotArm extends Subsystem {
 
 				m_j1Motor.setPIDPositionDeg(positionCommandJ1);
 				m_j2Motor.setPIDPositionDeg(positionCommandJ2);
-				m_j3Motor.setPIDPositionDeg(limitJ3(positionCommandJ2, positionCommandJ3));
+				m_j3Motor.setPIDPositionDeg(positionCommandJ3);
 				m_j4Motor.setPIDPositionDeg(positionCommandJ4);
 			}
 			else if (m_robotArmControlMode == RobotUtility.ControlMode.PERCENT_VBUS) {
@@ -307,16 +305,12 @@ public class RobotArm extends Subsystem {
 	}
 
 	// Motion profiling
-//	public void startMotionProfile(ProfileOutput profile) {
-//		m_currentProfileIndex = 0;
-//		m_currentMotionProfile = profile;
-//		this.enableControlLoop();
-//	}
-
 	public void startRobotArmCommandList(RobotArmCommandList commandList) {
 		m_controllerLoopCommandList = commandList;
-		if (m_controllerLoopCommandList != null && m_controllerLoopCommandList.listIterator().hasNext()) {
-			m_currentControllerLoopCommand = m_controllerLoopCommandList.listIterator().next();
+		m_currentControllerLoopCommandIndex = 0;
+		if (m_controllerLoopCommandList != null && m_controllerLoopCommandList.size() > 0) {
+			m_currentControllerLoopCommand = m_controllerLoopCommandList.get(m_currentControllerLoopCommandIndex);
+			m_currentControllerLoopCommand.reset();
 			this.enableControlLoop();
 		}
 	}
@@ -329,38 +323,30 @@ public class RobotArm extends Subsystem {
         }
 		
         if (enabled) {
-//			if (m_currentProfileIndex >= m_currentMotionProfile.jointPos.length) {
-//				if (m_currentProfileIndex - m_currentMotionProfile.jointPos.length + 1 < OUTER_LOOP_UPDATE_RATE_MS) {
-//					m_currentProfileIndex = m_currentMotionProfile.jointPos.length - 1;
-//				}
-//				else {
-//					this.disableControlLoop();
-//					return;
-//				}
-//			}
-//
-//			double[] jointAngles = m_currentMotionProfile.jointPos[m_currentProfileIndex];
-//			setJointAngles(jointAngles);	
-//
-//			m_currentProfileIndex += OUTER_LOOP_UPDATE_RATE_MS;
-//
 			boolean isFinished = m_currentControllerLoopCommand.run();
-			if (isFinished && m_controllerLoopCommandList.listIterator().hasNext()) {
-				m_currentControllerLoopCommand = m_controllerLoopCommandList.listIterator().next();
-			}
-			else {
-				disableControlLoop();
-				return;
+			if (isFinished) {
+				if (m_currentControllerLoopCommandIndex < m_controllerLoopCommandList.size() - 1) {
+					m_currentControllerLoopCommandIndex++;
+					m_currentControllerLoopCommand = m_controllerLoopCommandList.get(m_currentControllerLoopCommandIndex);
+					m_currentControllerLoopCommand.reset();
+				}
+				else {
+					disableControlLoop();
+					return;
+				}
 			}
 		}
 	}
 	
 	public void setJointAngles(double[] jointAngles) {
 		positionCommandJ1 = jointAngles[0];
-		m_j1Motor.setPIDPositionDeg(jointAngles[0]);
-		m_j2Motor.setPIDPositionDeg(jointAngles[1]);
-		m_j3Motor.setPIDPositionDeg(limitJ3(jointAngles[1], jointAngles[2]));
-		m_j4Motor.setPIDPositionDeg(jointAngles[3]);	
+		positionCommandJ2 = jointAngles[1];
+		positionCommandJ3 = limitJ3(jointAngles[1], jointAngles[2]);
+		positionCommandJ4 = jointAngles[3];
+		m_j1Motor.setPIDPositionDeg(positionCommandJ1);
+		m_j2Motor.setPIDPositionDeg(positionCommandJ2);
+		m_j3Motor.setPIDPositionDeg(positionCommandJ3);
+		m_j4Motor.setPIDPositionDeg(positionCommandJ4);	
 	}
 	
 	public double[] getJointAngles() {

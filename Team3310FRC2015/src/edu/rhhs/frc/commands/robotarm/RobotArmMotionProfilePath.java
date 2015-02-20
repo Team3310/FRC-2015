@@ -15,7 +15,7 @@ public class RobotArmMotionProfilePath extends RobotArmCommand {
 	private ProfileOutput profileOutput;
 	private int currentProfileIndex;
 	private boolean isFinished;
-	private double[] goFromCurrentToThisPoint;
+	private double[] goFromCurrentToThisPoint = null;
 	private MotionProfile.ProfileMode profileMode;
 	
     public RobotArmMotionProfilePath(WaypointList waypoints) {
