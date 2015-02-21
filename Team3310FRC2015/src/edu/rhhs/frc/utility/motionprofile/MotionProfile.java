@@ -18,8 +18,11 @@ public class MotionProfile {
 
 	public static final double INNER_ARM_LENGTH = 0.7112;  // meters
 	public static final double OUTER_ARM_LENGTH = 0.7620;  // meters	
+	public static final double GROUNDING_LINK_LENGTH = 0.104775;  // meters	
+	public static final double TOOL_LENGTH = 0.123825;  // meters	
 
-	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, 0};   // arm lengths in meters
+	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, GROUNDING_LINK_LENGTH, 0, TOOL_LENGTH};   // arm lengths in meters
+	protected double[] dHLengths = {0.98679, 0, 0, 0, 0, 0.0467106};   // DH lengths in meters
 
     protected boolean isElbowUp = true; 
     protected boolean isFront = true; 
@@ -115,7 +118,7 @@ public class MotionProfile {
     	    	
 		// Convert input xyz taught point coordinates into joint angles
     	if (profileMode == ProfileMode.CartesianInputJointMotion) { 
-        	iKINOutput = kinematics.iKIN(taughtPositions, taughtPositions.length - 1, armLengths, isElbowUp, isFront);
+        	iKINOutput = kinematics.iKIN(taughtPositions, taughtPositions.length - 1, armLengths, dHLengths, isElbowUp, isFront);
                                 
             if (iKINOutput.errorFlag == true) { 
                 System.out.println("XYZ Taught Point Unreachable. Reteach!");
@@ -156,7 +159,7 @@ public class MotionProfile {
         // This portion calculates Inverse Kinematics for a linear move.
         // Modified by PDC on 12/5/00
     	if (profileMode == ProfileMode.CartesianInputLinearMotion) { 
-        	iKINOutput = kinematics.iKIN(coMotionFilterOutput.PosFilter, coMotionFilterOutput.NumITPs, armLengths, isElbowUp, isFront);
+        	iKINOutput = kinematics.iKIN(coMotionFilterOutput.PosFilter, coMotionFilterOutput.NumITPs, armLengths, dHLengths, isElbowUp, isFront);
                                 
             if (iKINOutput.errorFlag == true) { 
                 System.out.println("Point Unreachable. Reteach!");
@@ -197,7 +200,7 @@ public class MotionProfile {
         
         // CALL Kinematic routine to calculate X,Y,Z position
         // The Filter only outputs DeltaPosition in Joint Space.
-        double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, armLengths, iKINOutput.userAngles);
+        double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, armLengths, dHLengths);
         
         // Call procedure to calculate velocity and acceleration
         profileOutput = Physics.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos);
@@ -208,13 +211,13 @@ public class MotionProfile {
 	public double[] calcInverseKinematics(double[] xyzToolPoint) {
 		double[][] inputPoints = { xyzToolPoint };
 		Kinematics kinematics = new Kinematics();
-    	IKINOutput iKINOutput = kinematics.iKIN(inputPoints, inputPoints.length - 1, armLengths, isElbowUp, isFront);
+    	IKINOutput iKINOutput = kinematics.iKIN(inputPoints, inputPoints.length - 1, armLengths, dHLengths, isElbowUp, isFront);
     	return iKINOutput.userAngles[0];
 	}
 	
 	public double[] calcForwardKinematics(double[] jointAngles) {
 		double[][] inputPoints = { jointAngles };
-    	double[][] output = Kinematics.fKIN(inputPoints, inputPoints.length - 1, armLengths, null);
+    	double[][] output = Kinematics.fKIN(inputPoints, inputPoints.length - 1, armLengths, dHLengths);
     	return output[0];
 	}
 	

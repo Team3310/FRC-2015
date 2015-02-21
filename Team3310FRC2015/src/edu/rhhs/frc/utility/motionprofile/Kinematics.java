@@ -31,24 +31,25 @@ public class Kinematics {
 		return new IKINOutput(NumPoints);
 	}
 	
-	public IKINOutput iKIN(double[][] Pos, int NumPoints, double[] L, boolean ElbowUp, boolean Front) {
+	public IKINOutput iKIN(double[][] Pos, int NumPoints, double[] L, double[] D, boolean ElbowUp, boolean Front) {
 	                       	    
 		IKINOutput out = new IKINOutput(NumPoints);
 		
-		double Kappa;
-	    double C1, C2, C3, S1, S2, S3;
-	    double Den, C2Num, S2Num;
+		double Kappa, px1, py1, px1py1sqrd, gamma;
+	    double C1, S1;
+	    double Den, ThetaT, T2Num;
 	    double[] Theta = new double[4];    
 	    
 	    // Loop through each ITP and calculate the IKIN
 	    for (int i = 0; i < NumPoints + 1; i++) {
 	    
+	    	gamma = Pos[i][3];
 	        if (Front == true) { // Front reach solution
 	            if (isZero(Pos[i][0]) && isZero(Pos[i][1])) {
 	                Theta[0] = 0;
 	            } 
 	            else {
-	                Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]);
+	                Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma));
 	            }
 	            
 	        } 
@@ -57,12 +58,20 @@ public class Kinematics {
 	                Theta[0] = Math.PI;
 	            } 
 	            else {
-	                Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]) + Math.PI;
+	                Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma)) + Math.PI;
 	            }
 	        }
 	    
+	        // --Define cos and sin of theta1 
+	        C1 = Math.cos(Theta[0]);
+	        S1 = Math.sin(Theta[0]);
+
 	        // Where Theta[2]=asin(Kappa)
-	        Kappa = (Math.pow(Pos[i][0], 2) + Math.pow(Pos[i][1], 2) + Math.pow(Pos[i][2], 2) - Math.pow(L[1], 2) - Math.pow(L[2], 2)) / (2 * L[1] * L[2]);
+	        Theta[3] = Pos[i][3] - Theta[0];
+	        px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5] * Math.cos(Theta[3]);
+	        py1 = D[0] - Pos[i][2] + D[3];
+	        px1py1sqrd = px1*px1 + py1*py1;
+	        Kappa = (px1py1sqrd - L[1]*L[1] - L[2]*L[2]) / (2 * L[1] * L[2]);
 	                
 	        // Check to see if position is reachable & Calculate Theta3
 	        if (Math.abs(Kappa) > 1 ) {
@@ -71,35 +80,19 @@ public class Kinematics {
 	            return out;
 	        } 
 	        else if (Math.abs(Kappa) == 1) {
-	            Theta[2] = Math.asin(Kappa);
+	            Theta[2] = Math.acos(Kappa);
 	        } 
 	    	else if (ElbowUp == true) {
-	            Theta[2] = Math.asin(Kappa);
+	            Theta[2] = Math.acos(Kappa);
 	        } 
 	    	else {
-	            Theta[2] = Math.PI - Math.asin(Kappa);
+	            Theta[2] = Math.PI - Math.acos(Kappa);
 	        }
 	        
-	        // Calculate Theta2
-	        // --Define cos and sin of theta1 and theta3
-	        C1 = Math.cos(Theta[0]);
-	        C3 = Math.cos(Theta[2]);
-	        S1 = Math.sin(Theta[0]);
-	        S3 = Math.sin(Theta[2]);
-	        
-	        // --Calcultae the denominator in the S2 and C2 equations
-	        Den = Math.pow(L[2], 2) + 2 * L[1] * L[2] * S3 + Math.pow(L[1], 2);
-	        
-	        // --Calculate the numerators in the C2 and S2 equations
-	        C2Num = Pos[i][0] * (L[1] * C1 + L[2] * C1 * S3) + 
-	                Pos[i][1] * (L[1] * S1 + L[2] * S1 * S3) - 
-	                Pos[i][2] * L[2] * C3;
-	        
-	        
-	        S2Num = Pos[i][0] * L[2] * C1 * C3 + 
-	                Pos[i][1] * L[2] * S1 * C3 + 
-	                Pos[i][2] * (L[1] + L[2] * S3);
-	                
+	        // Calculate Theta2	        
+	        // --Calculate the denominator in the S2 and C2 equations
+	        Den = 2.0 * L[1] * Math.sqrt(px1py1sqrd); 
+	        	                
 	        // --Determine if in Singularity
 	        if (isZero(Den)) {
 	        	System.out.println("Position at time = " + NumPoints * 0.001 + " seconds causes singularity");
@@ -107,23 +100,18 @@ public class Kinematics {
 	            return null;
 	        } 
 	        else {
-	            // --Calculate the sin and cos of theta2
-	            C2 = C2Num / Den;
-	            S2 = S2Num / Den;
+	            ThetaT = Math.atan2(-py1, px1);
+	            T2Num = L[1]*L[1] - L[2]*L[2] + px1py1sqrd;
 	        }
 	        
 	        // --Calculate Theta2
-	        if (isZero(C2) && isZero(S2)) {
-	            Theta[1] = 0;
-	        } else {
-	            Theta[1] = Math.atan2(S2, C2);
-	        }
+	        Theta[1] = -ThetaT - Math.acos(T2Num/Den);
 	        
 	        // Calculate User Angles and reallocate them to pos(i,?)
 	        out.userAngles[i][0] = Theta[0];
-	        out.userAngles[i][1]  = Math.PI / 2 - Theta[1];
-	        out.userAngles[i][2] = Theta[1] + Theta[2] - Math.PI / 2;
-	        out.userAngles[i][3] = Pos[i][3] - Theta[0];
+	        out.userAngles[i][1]  = Math.PI / 2 + Theta[1];
+	        out.userAngles[i][2] = Theta[2] -Theta[1];
+	        out.userAngles[i][3] = Theta[3];
 	    }
 	       
 	    out.errorFlag = false;
@@ -191,7 +179,7 @@ public class Kinematics {
 	//    [0] Pos() is enters as servo output, but exits as actual joint
 	// ----------------------------------------------------------------------------
 
-	public static double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[][] InputPos) {
+	public static double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[] D) {
 	        
 	    double[][] CartPos = new double[NumPoints + 1][4];
 	    
@@ -216,16 +204,29 @@ public class Kinematics {
 	        // user angles, not kinematic angles.
 	        // Start forward Kinematics
 	        // X position
-	        CartPos[i][0] = Math.cos(Pos[i][0]) * (Math.cos(Pos[i][2]) * L[2] + 
-	                        L[1] * Math.sin(Pos[i][1]));
+	    	
+//	        CartPos[i][0] = Math.cos(Pos[i][0]) * (Math.cos(Pos[i][2]) * L[2] + 
+//	                        L[1] * Math.sin(Pos[i][1]));
+//	        
+//	        // Y position
+//	        CartPos[i][1] = Math.sin(Pos[i][0]) * (Math.cos(Pos[i][2]) * L[2] + 
+//	                        L[1] * Math.sin(Pos[i][1]));
+//	                        
+//	        // Z position
+//	        CartPos[i][2] = L[2] * Math.sin(Pos[i][2]) + L[1] * Math.cos(Pos[i][1]);
+//	        CartPos[i][3] = Pos[i][0] + Pos[i][3];
+	    	
+
+	    	double gamma = Pos[i][0] + Pos[i][3];
+	    	double j2j3Term = L[3] + L[2] * Math.cos(Pos[i][2]) + L[1] * Math.sin(Pos[i][1]);
+	        CartPos[i][0] = Math.cos(gamma) * L[5] + Math.cos(Pos[i][0]) * j2j3Term;
 	        
 	        // Y position
-	        CartPos[i][1] = Math.sin(Pos[i][0]) * (Math.cos(Pos[i][2]) * L[2] + 
-	                        L[1] * Math.sin(Pos[i][1]));
+	        CartPos[i][1] = Math.sin(gamma) * L[5] + Math.sin(Pos[i][0]) * j2j3Term;
 	                        
 	        // Z position
-	        CartPos[i][2] = L[2] * Math.sin(Pos[i][2]) + L[1] * Math.cos(Pos[i][1]);
-	        CartPos[i][3] = Pos[i][0] + Pos[i][3];
+	        CartPos[i][2] = D[0] + D[4] + L[1] * Math.cos(Pos[i][1]) + L[2] * Math.sin(Pos[i][2]);
+	        CartPos[i][3] = gamma;
 	    }  
 	    
 	    return CartPos;
