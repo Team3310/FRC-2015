@@ -4,9 +4,9 @@ import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.PIDParams;
-import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -18,7 +18,7 @@ public class BinGrabber extends Subsystem
 	public static enum BinGrabberState {EXTENDED, RETRACTED};
 	
 	private static final int LEFT_ANALOG_ZERO_PRACTICE = 362;
-	private static final int RIGHT_ANALOG_ZERO_PRACTICE = -590;
+	private static final int RIGHT_ANALOG_ZERO_PRACTICE = 580;
 	
 	public static final double DEPLOYED_POSITION_DEG = 70;
 	public static final double DEPLOYED_POSITION_TIMED_DEG = DEPLOYED_POSITION_DEG - 10;
@@ -31,8 +31,6 @@ public class BinGrabber extends Subsystem
 	private CANTalonAnalogPID m_rightMotor;
 	private CANTalonAnalogPID m_leftMotor;
 
-	private CANTalon.ControlMode m_controlMode;
-
     private PIDParams downPositionPidParams = new PIDParams(10.0, 0.001, 0.0, 0.0, 50, 0.0);
     private PIDParams upPositionPidParams = new PIDParams(2.0, 0.004, 0.0, 0.0, 50, 0.0);
 
@@ -41,7 +39,7 @@ public class BinGrabber extends Subsystem
 	public BinGrabber() {
 		try {
 			m_leftMotor = new CANTalonAnalogPID(RobotMap.BIN_GRABBER_LEFT_CAN_ID, 1.0, 0.0, STOWED_POSITION_DEG, STOWED_POSITION_DEG, DEPLOYED_POSITION_DEG, LEFT_ANALOG_ZERO_PRACTICE);
-			m_rightMotor = new CANTalonAnalogPID(RobotMap.BIN_GRABBER_RIGHT_CAN_ID, 1.0, 0.0, STOWED_POSITION_DEG, STOWED_POSITION_DEG, DEPLOYED_POSITION_DEG, RIGHT_ANALOG_ZERO_PRACTICE);
+			m_rightMotor = new CANTalonAnalogPID(RobotMap.BIN_GRABBER_RIGHT_CAN_ID, -1.0, 0.0, STOWED_POSITION_DEG, STOWED_POSITION_DEG, DEPLOYED_POSITION_DEG, RIGHT_ANALOG_ZERO_PRACTICE);
 			
 			m_leftMotor.setSafetyEnabled(false);
 			m_rightMotor.setSafetyEnabled(false);
@@ -56,7 +54,7 @@ public class BinGrabber extends Subsystem
 
 			m_leftMotor.setPIDParams(downPositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 			m_rightMotor.setPIDParams(downPositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
-	
+			
 			// Start with the Talons in throttle mode
 			setTalonControlMode(CANTalon.ControlMode.PercentVbus);
 			m_leftMotor.set(0);
@@ -102,7 +100,6 @@ public class BinGrabber extends Subsystem
 	}
 
 	private void setTalonControlMode(CANTalon.ControlMode mode) {
-		m_controlMode = mode;
 		m_leftMotor.changeControlMode(mode);
 		m_rightMotor.changeControlMode(mode);
 	}
@@ -123,6 +120,11 @@ public class BinGrabber extends Subsystem
 	
 	public void setRightSpeed(double rightSpeed) {
 		m_rightMotor.set(rightSpeed);
+	}
+	
+	public void setStatusFrameRate(StatusFrameRate rate, int periodMs) {
+		m_leftMotor.setStatusFrameRateMs(rate, periodMs);
+		m_rightMotor.setStatusFrameRateMs(rate, periodMs);
 	}
 	
 	public void startPositionPID(double leftTargetDeg, double rightTargetDeg, double errorDeg) {

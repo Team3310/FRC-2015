@@ -1,6 +1,7 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
+import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class BinGrabberDeployTimed extends Command 
@@ -18,6 +19,7 @@ public class BinGrabberDeployTimed extends Command
 	protected void initialize() {
 		RobotMain.binGrabber.setSpeed(speed, speed);
 		this.setTimeout((double) (timeoutMs / 1000.0));
+		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 	}
 
 	@Override
@@ -33,6 +35,7 @@ public class BinGrabberDeployTimed extends Command
 	@Override
 	protected void end() {
 		RobotMain.binGrabber.setSpeed(0.0, 0.0);
+		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 100);
 	}
 
 	@Override

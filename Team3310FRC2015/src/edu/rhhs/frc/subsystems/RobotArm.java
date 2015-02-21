@@ -285,16 +285,16 @@ public class RobotArm extends Subsystem {
 			}
 			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL) {
 				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j1Motor.getPositionDeg();
+					m_positionCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ1;
 				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j2Motor.getPositionDeg();
+					m_positionCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ2; 
 				}
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j3Motor.getPositionDeg();
+					m_positionCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ3;
 				}
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + m_j4Motor.getPositionDeg();
+					m_positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ4;
 				}
 				m_positionCommandJ3 = limitJ3(m_positionCommandJ2, m_positionCommandJ3);
 

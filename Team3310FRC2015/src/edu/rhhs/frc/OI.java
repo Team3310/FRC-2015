@@ -1,12 +1,14 @@
 package edu.rhhs.frc;
 
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
+import edu.rhhs.frc.commands.BinGrabberDeployAndDrive;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGo;
 import edu.rhhs.frc.commands.BinGrabberDeployAngle;
 import edu.rhhs.frc.commands.BinGrabberDeployTimed;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
 import edu.rhhs.frc.commands.BinGrabberPositionPID;
 import edu.rhhs.frc.commands.BinGrabberSetSpeed;
+import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainSpeedTimeout;
 import edu.rhhs.frc.commands.DriveTrainVelocityControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
@@ -76,6 +78,10 @@ public class OI
 		InternalButton binGrabberDeployAndGo = new InternalButton();
 		binGrabberDeployAndGo.whenReleased(new BinGrabberDeployAndGo());
 		SmartDashboard.putData("Bin Grabber Deploy and Go", binGrabberDeployAndGo);
+		
+		InternalButton binGrabberDeployAndDrive = new InternalButton();
+		binGrabberDeployAndDrive.whenReleased(new BinGrabberDeployAndDrive(60, 60, 200, 2));
+		SmartDashboard.putData("Bin Grabber Deploy and Drive", binGrabberDeployAndDrive);
 
 		InternalButton drivetrainTestSpeed = new InternalButton();
 		drivetrainTestSpeed.whenReleased(new DriveTrainSpeedTimeout(1, 3));
@@ -86,7 +92,7 @@ public class OI
 		SmartDashboard.putData("DriveTrain Test Velocity PID", drivetrainTestVel);		
 
 		InternalButton drivetrainTestPosition = new InternalButton();
-		drivetrainTestPosition.whenReleased(new DriveTrainVelocityControl(60, 60, 1, 4));
+		drivetrainTestPosition.whenReleased(new DriveTrainPositionControl(60, 60, 1, 4));
 		SmartDashboard.putData("DriveTrain Test Position PID", drivetrainTestPosition);		
 
 		InternalButton toteGrabberOpen = new InternalButton();
