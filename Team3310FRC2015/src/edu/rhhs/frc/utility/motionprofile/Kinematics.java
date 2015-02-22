@@ -69,7 +69,7 @@ public class Kinematics {
 	        // Where Theta[2]=asin(Kappa)
 	        Theta[3] = Pos[i][3] - Theta[0];
 	        px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5] * Math.cos(Theta[3]);
-	        py1 = D[0] - Pos[i][2] + D[3];
+	        py1 = D[0] - Pos[i][2] + D[4];
 	        px1py1sqrd = px1*px1 + py1*py1;
 	        Kappa = (px1py1sqrd - L[1]*L[1] - L[2]*L[2]) / (2 * L[1] * L[2]);
 	                
@@ -80,13 +80,13 @@ public class Kinematics {
 	            return out;
 	        } 
 	        else if (Math.abs(Kappa) == 1) {
-	            Theta[2] = Math.acos(Kappa);
+	            Theta[2] = -Math.acos(Kappa);
 	        } 
 	    	else if (ElbowUp == true) {
-	            Theta[2] = Math.acos(Kappa);
+	            Theta[2] = -Math.acos(Kappa);
 	        } 
 	    	else {
-	            Theta[2] = Math.PI - Math.acos(Kappa);
+	            Theta[2] = Math.PI + Math.acos(Kappa);
 	        }
 	        
 	        // Calculate Theta2	        

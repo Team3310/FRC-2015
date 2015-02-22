@@ -13,6 +13,7 @@ import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID.ControlMode;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -35,10 +36,10 @@ public class RobotArm extends Subsystem {
 	private static final double J4_ENCODER_OFFSET_DEG = 0.0;
 
 	// Robot arm joint angles when system is powered on (or new code is downloaded)
-	private static final double J1_MASTER_ANGLE_DEG = 0.0;
-	private static final double J2_MASTER_ANGLE_DEG = 0.0; // 92.36;
-	private static final double J3_MASTER_ANGLE_DEG = 0.0; // -109.88;
-	private static final double J4_MASTER_ANGLE_DEG = 0.0;
+	public static final double J1_MASTER_ANGLE_DEG = 0.0;
+	public static final double J2_MASTER_ANGLE_DEG = 97.36;
+	public static final double J3_MASTER_ANGLE_DEG = -109.88;
+	public static final double J4_MASTER_ANGLE_DEG = 0.0;
  
 	// J4 raw analog value when J4 is set to 0 deg 
 	private static final int 	J4_ANALOG_ZERO_PRACTICE = 512;
@@ -49,12 +50,12 @@ public class RobotArm extends Subsystem {
 	private static final double J3_SENSOR_GEAR_RATIO = 84.0/18.0;
 	private static final double J4_SENSOR_GEAR_RATIO = 60.0/30.0;
 
-	private static final double J1_MAX_ANGLE_DEG = 140.0;
-	private static final double J1_MIN_ANGLE_DEG = -140.0;
-	private static final double J2_MAX_ANGLE_DEG = 90.0;
+	private static final double J1_MAX_ANGLE_DEG = 170.0;
+	private static final double J1_MIN_ANGLE_DEG = -170.0;
+	private static final double J2_MAX_ANGLE_DEG = 100.0;
 	private static final double J2_MIN_ANGLE_DEG = -30.0;
 	private static final double J3_MAX_ANGLE_DEG = 27.0;
-	private static final double J3_MIN_ANGLE_DEG = -100.0;
+	private static final double J3_MIN_ANGLE_DEG = -110.0;
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
@@ -79,11 +80,10 @@ public class RobotArm extends Subsystem {
 	private CANTalonEncoderPID m_j3Motor;
 	private CANTalonAnalogPID  m_j4Motor;
 
-	private PIDParams j1PositionPidParams = new PIDParams(6.0, 0.0, 0.1, 0.0, 50, 0.0);
-	private PIDParams j2PositionPidParamsNegative = new PIDParams(3.5, 0.005, 0.01, 0.712, 50, 0.0);
-	private PIDParams j2PositionPidParamsPositive = new PIDParams(3.5, 0.005, 0.01, 0.712, 50, 0.0);
-	private PIDParams j3PositionPidParamsNegative = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
-	private PIDParams j3PositionPidParamsPositive = new PIDParams(4.5, 0.005, 0.01, 0.167, 100, 0.0);
+	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.1, 0.0, 50, 0.0);
+//	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.005, 0.01, -0.426, 50, 0.0);
+	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0, 0.15, -0.426, 50, 0.0);
+	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0, 0.15, 0.270, 100, 0.0);
 	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0.0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0.0);
@@ -101,6 +101,8 @@ public class RobotArm extends Subsystem {
 	private double m_positionCommandJ2 = J2_MASTER_ANGLE_DEG;
 	private double m_positionCommandJ3 = J3_MASTER_ANGLE_DEG;
 	private double m_positionCommandJ4 = J4_MASTER_ANGLE_DEG;
+	private double m_limitJ3Deg;
+	private boolean isJ3Limited = false;
 	
 	private double m_j2InputRaw = 0;
 
@@ -110,6 +112,8 @@ public class RobotArm extends Subsystem {
 
 	private Timer m_controlLoop;
 	private boolean m_controlLoopEnabled = false;
+	private long m_controlLoopStartTime = 0;
+	private long m_controlLoopDeltaTime = 0;
 
 	private class ControlLoopTask extends TimerTask {
 
@@ -135,6 +139,8 @@ public class RobotArm extends Subsystem {
 			m_j3Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J3_CAN_ID, J3_SENSOR_GEAR_RATIO, J3_ENCODER_OFFSET_DEG, J3_MASTER_ANGLE_DEG, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
 			m_j4Motor = new CANTalonAnalogPID (RobotMap.ROBOT_ARM_J4_CAN_ID, J4_SENSOR_GEAR_RATIO, J4_ENCODER_OFFSET_DEG, J4_MASTER_ANGLE_DEG, J4_MIN_ANGLE_DEG, J4_MAX_ANGLE_DEG, J4_ANALOG_ZERO_PRACTICE);
 
+//			m_j1Motor.setStatusFrameRateMs(StatusFrameRate.General, 5);
+			
 			m_j1Motor.setSafetyEnabled(false);
 			m_j2Motor.setSafetyEnabled(false);
 			m_j3Motor.setSafetyEnabled(false);
@@ -157,8 +163,8 @@ public class RobotArm extends Subsystem {
 			m_j4Motor.reverseSensor(false);
 			
 			m_j1Motor.setPIDParams(j1PositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
-			m_j2Motor.setPIDParams(j2PositionPidParamsPositive, CANTalonEncoderPID.POSITION_PROFILE);
-			m_j3Motor.setPIDParams(j3PositionPidParamsPositive, CANTalonEncoderPID.POSITION_PROFILE);
+			m_j2Motor.setPIDParams(j2PositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_j3Motor.setPIDParams(j3PositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 			m_j4Motor.setPIDParams(j4PositionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 
 			m_j1Motor.setPIDParams(j1VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
@@ -296,17 +302,13 @@ public class RobotArm extends Subsystem {
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 					m_positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ4;
 				}
-				m_positionCommandJ3 = limitJ3(m_positionCommandJ2, m_positionCommandJ3);
 
 				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
 				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
 				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
 				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
 
-				m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
-				m_j2InputRaw = m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
-				m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
-				m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);
+				setPIDPosition(m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4);
 			}
 			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
 				SmartDashboard.putNumber("J1 Stick Command", throttleRightX);
@@ -353,16 +355,29 @@ public class RobotArm extends Subsystem {
 				}
 			}
 		}
+        
+        long currentTime = System.nanoTime();
+        setControlLoopDeltaTime(currentTime - getControlLoopStartTime());
+        setControlLoopStartTime(currentTime);
 	}
 	
 	public synchronized void setJointAngles(double[] jointAngles) {
-		m_positionCommandJ1 = jointAngles[0];
-		m_positionCommandJ2 = jointAngles[1];
-		m_positionCommandJ3 = limitJ3(jointAngles[1], jointAngles[2]);
-		m_positionCommandJ4 = jointAngles[3];
+		setPIDPosition(jointAngles[0], jointAngles[1], jointAngles[2], jointAngles[3]);
+	}
+	
+	public synchronized void setPIDPosition(double j1PositionDeg, double j2PositionDeg, double j3PositionDeg, double j4PositionDeg) {
+		m_limitJ3Deg = limitJ3(j2PositionDeg, j3PositionDeg);
+		
+		m_positionCommandJ1 = j1PositionDeg;
+		m_positionCommandJ2 = j2PositionDeg;
+		m_positionCommandJ3 = m_limitJ3Deg;
+		m_positionCommandJ4 = j4PositionDeg;
+		
 		m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
-		m_j2InputRaw = m_j2Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ2, j2PositionPidParamsNegative, j2PositionPidParamsPositive);
-		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
+		m_j2InputRaw = m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
+		m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
+//		m_j2InputRaw = m_j2Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ2, j2PositionPidParamsNegative, j2PositionPidParamsPositive);
+//		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
 		m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);	
 	}
 	
@@ -376,24 +391,29 @@ public class RobotArm extends Subsystem {
 	}
 	
 	private double limitJ3(double j2AngleDeg, double j3AngleDeg) {
-
+		isJ3Limited = false;
+		
 		// Interference checks
 		if ((j2AngleDeg + j3AngleDeg) > J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG) {
 			j3AngleDeg = J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG - j2AngleDeg;
+			isJ3Limited = true;
 		}
 		else if ((j2AngleDeg + j3AngleDeg) < J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG) {
 			j3AngleDeg = J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG - j2AngleDeg;
+			isJ3Limited = true;
 		}
 
 		// Height limit check
 		if (j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG) {
 			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg) {
 				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg;
+				isJ3Limited = true;
 			}
 		}
 		if (j2AngleDeg >= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG && j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG) {
 			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg) {
 				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg;
+				isJ3Limited = true;
 			}			
 		}
 		
@@ -402,6 +422,22 @@ public class RobotArm extends Subsystem {
 
 	public synchronized void enableControlLoop() {
 		m_controlLoopEnabled = true;
+	}
+
+	public synchronized void setControlLoopStartTime(long time) {
+		m_controlLoopStartTime = time;
+	}
+
+	public synchronized long getControlLoopStartTime() {
+		return m_controlLoopStartTime;
+	}
+
+	public synchronized void setControlLoopDeltaTime(long time) {
+		m_controlLoopDeltaTime = time;
+	}
+
+	public synchronized long getControlLoopDeltaTime() {
+		return m_controlLoopDeltaTime;
 	}
 
 	/**
@@ -419,6 +455,7 @@ public class RobotArm extends Subsystem {
 	}
 
 	public void updateStatus() {
+		SmartDashboard.putNumber("J1 Throttle Calc", 		m_j1Motor.getOutputVoltage() / m_j1Motor.getBusVoltage());
 		SmartDashboard.putNumber("J1 Profile Command (deg)", m_positionCommandJ1);
 		SmartDashboard.putNumber("J1 Profile Actual (deg)", m_j1Motor.getPositionDeg());
 
@@ -433,10 +470,14 @@ public class RobotArm extends Subsystem {
 		SmartDashboard.putNumber("J2 Position (deg)", 		m_j2Motor.getPositionDeg());
 		SmartDashboard.putNumber("J2 Velocity (deg-sec)", 	m_j2Motor.getVelocityDegPerSec());
 
+		SmartDashboard.putNumber("J3 Limit (deg)", 			m_limitJ3Deg);
+		SmartDashboard.putBoolean("J3 isLimited", 			isJ3Limited);
+		SmartDashboard.putNumber("J3 Throttle Calc", 		m_j3Motor.getOutputVoltage() / m_j3Motor.getBusVoltage());
 		SmartDashboard.putNumber("J3 Position (raw)", 		m_j3Motor.getPosition());
 		SmartDashboard.putNumber("J3 Position (deg)", 		m_j3Motor.getPositionDeg());
 		SmartDashboard.putNumber("J3 Velocity (deg-sec)", 	m_j3Motor.getVelocityDegPerSec());
 
+		SmartDashboard.putNumber("J4 Throttle Calc", 		m_j4Motor.getOutputVoltage() / m_j4Motor.getBusVoltage());
 		SmartDashboard.putNumber("J4 Position (raw)", 		m_j4Motor.getPosition());
 		SmartDashboard.putNumber("J4 Position (deg)", 		m_j4Motor.getPositionDeg());
 		SmartDashboard.putNumber("J4 Velocity (deg-sec)", 	m_j4Motor.getVelocityDegPerSec());
@@ -445,6 +486,7 @@ public class RobotArm extends Subsystem {
 		SmartDashboard.putString("Tote Grabber Position", 	getToteGrabberPosition().toString());
 
 		SmartDashboard.putBoolean("RobotArm Controller", 	m_controlLoopEnabled);
+		SmartDashboard.putNumber("RobotArm Control loop time (ms)", 	getControlLoopDeltaTime() / 1000000);
 	}
 }
 

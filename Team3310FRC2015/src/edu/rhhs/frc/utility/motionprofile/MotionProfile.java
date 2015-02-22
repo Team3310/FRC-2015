@@ -8,21 +8,24 @@ public class MotionProfile {
 	public enum ProfileMode {CartesianInputLinearMotion, JointInputJointMotion, CartesianInputJointMotion};
 	
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
-	public static final double DEFAULT_PATH_VELOCITY = 1.5;   						// meters/second
-	public static final double DEFAULT_JOINT_VELOCITY = 320;   						// deg/second
+	public static final double DEFAULT_PATH_VELOCITY = 40;   						// inches/second
+	public static final double J1_JOINT_VELOCITY = 120;   						// deg/second
+	public static final double J2_JOINT_VELOCITY = 120;   						// deg/second
+	public static final double J3_JOINT_VELOCITY = 120;   						// deg/second
+	public static final double J4_JOINT_VELOCITY = 320;   						// deg/second
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
 	public static final double DEFAULT_JOINT_ACCEL1 = DEFAULT_CARTESIAN_ACCEL1;   	// seconds
 	public static final double DEFAULT_JOINT_ACCEL2 = DEFAULT_CARTESIAN_ACCEL2;   	// seconds	
 	public static final double DEFAULT_END_TYPE_CNT = 0;   							// meters/second
 
-	public static final double INNER_ARM_LENGTH = 0.7112;  // meters
-	public static final double OUTER_ARM_LENGTH = 0.7620;  // meters	
-	public static final double GROUNDING_LINK_LENGTH = 0.104775;  // meters	
-	public static final double TOOL_LENGTH = 0.123825;  // meters	
+	public static final double INNER_ARM_LENGTH = 28.0; 		// inches 
+	public static final double OUTER_ARM_LENGTH = 30.0; 		// inches	
+	public static final double GROUNDING_LINK_LENGTH = 4.125; 	// inches 	
+	public static final double TOOL_LENGTH = 4.875; 			// inches 	
 
-	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, GROUNDING_LINK_LENGTH, 0, TOOL_LENGTH};   // arm lengths in meters
-	protected double[] dHLengths = {0.98679, 0, 0, 0, 0, 0.0467106};   // DH lengths in meters
+	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, GROUNDING_LINK_LENGTH, 0, TOOL_LENGTH};   // arm lengths in inches
+	protected double[] dHLengths = {38.85, 0, 0, 0, 1.839, 0};   // DH lengths in inches
 
     protected boolean isElbowUp = true; 
     protected boolean isFront = true; 
@@ -38,7 +41,7 @@ public class MotionProfile {
     protected double[] endTypeCNT; 
 
     protected double controllerUpdateRateSec = DEFAULT_CONTROLLER_UPDATE_RATE;  // Controller update rate seconds 
-    protected int outputRateMs = 10;   //  Output rate milliseconds
+    protected int outputRateMs = 1;   //  Output rate milliseconds
     protected double serverExponentialFilterDecayTime = controllerUpdateRateSec;   // Servo filter exponential decay
     protected boolean isServerExponentialFilterEnable = false;
     
@@ -46,10 +49,10 @@ public class MotionProfile {
 
     protected double[] jointPercentVelocity = {100, 100, 100, 100};   
     protected double[] jointVelocities = {
-    		Math.toRadians(DEFAULT_JOINT_VELOCITY), 
-    		Math.toRadians(DEFAULT_JOINT_VELOCITY), 
-    		Math.toRadians(DEFAULT_JOINT_VELOCITY), 
-    		Math.toRadians(DEFAULT_JOINT_VELOCITY)};   
+    		Math.toRadians(J1_JOINT_VELOCITY), 
+    		Math.toRadians(J2_JOINT_VELOCITY), 
+    		Math.toRadians(J3_JOINT_VELOCITY), 
+    		Math.toRadians(J4_JOINT_VELOCITY)};   
    protected double[] jointAccels1 = {
     		DEFAULT_JOINT_ACCEL1, 
     		DEFAULT_JOINT_ACCEL1, 
@@ -208,17 +211,44 @@ public class MotionProfile {
         return true;
 	} 
 	
-	public double[] calcInverseKinematics(double[] xyzToolPoint) {
-		double[][] inputPoints = { xyzToolPoint };
+	public double[] calcInverseKinematicsRad(double[] xyzToolPointRad) {
+		double[][] inputPoints = { xyzToolPointRad };
 		Kinematics kinematics = new Kinematics();
     	IKINOutput iKINOutput = kinematics.iKIN(inputPoints, inputPoints.length - 1, armLengths, dHLengths, isElbowUp, isFront);
     	return iKINOutput.userAngles[0];
 	}
 	
-	public double[] calcForwardKinematics(double[] jointAngles) {
-		double[][] inputPoints = { jointAngles };
+	public double[] calcInverseKinematicsDeg(double[] xyzToolPointDeg) {
+    	// Convert output tool angle to radians
+		xyzToolPointDeg[3] = Math.toRadians(xyzToolPointDeg[3]);
+		
+		double[] jointAngleRad = calcInverseKinematicsRad(xyzToolPointDeg);
+		
+		// Convert output joint angles to degrees
+		for (int i = 0; i < 4; i++) {
+			jointAngleRad[i] = Math.toDegrees(jointAngleRad[i]);
+		}
+		return jointAngleRad;
+	}
+	
+	public double[] calcForwardKinematicsRad(double[] jointAnglesRad) {
+		double[][] inputPoints = { jointAnglesRad };
     	double[][] output = Kinematics.fKIN(inputPoints, inputPoints.length - 1, armLengths, dHLengths);
     	return output[0];
+	}
+	
+	public double[] calcForwardKinematicsDeg(double[] jointAnglesDeg) {
+		// Convert input angles to radians
+		for (int i = 0; i < 4; i++) {
+			jointAnglesDeg[i] = Math.toRadians(jointAnglesDeg[i]);
+		}
+		
+    	double[] xyzToolRad = calcForwardKinematicsRad(jointAnglesDeg);
+    	
+    	// Convert output tool angle to degrees
+    	xyzToolRad[3] = Math.toDegrees(xyzToolRad[3]);
+    	
+    	return xyzToolRad;
 	}
 	
 	public void printOutput() {
@@ -343,8 +373,8 @@ public class MotionProfile {
 //    	MotionProfile profile = new MotionProfile(waypoints);
 
     	WaypointList waypoints = new WaypointList(ProfileMode.JointInputJointMotion);
-    	waypoints.addWaypoint(0, 0, 0, 0);
-    	waypoints.addWaypoint(45, 0, 0, 0);
+    	waypoints.addWaypoint(0, 0, -60, 0);
+    	waypoints.addWaypoint(-140, 0, -60, 0);
     	MotionProfile profile = new MotionProfile(waypoints);
    	
 //    	WaypointList waypoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
@@ -355,5 +385,25 @@ public class MotionProfile {
     	profile.calculatePath();
     	profile.printOutput();
     	System.out.println("Total time = " + (System.nanoTime() - startTime) / 1000000000.0);
+    	
+    	// Radians check
+    	double[] jointAngleInputRad = new double[] {Math.PI/4,Math.PI/4,-Math.PI/4,Math.PI/4};
+    	System.out.println("Forward KIN joint angle input radians = " + jointAngleInputRad[0] + "," + jointAngleInputRad[1] + "," + jointAngleInputRad[2] + "," + jointAngleInputRad[3]);
+    	
+    	double[] xyzToolOutputRad = profile.calcForwardKinematicsRad(jointAngleInputRad);
+    	System.out.println("Forward KIN xyzTool output radian = " + xyzToolOutputRad[0] + "," + xyzToolOutputRad[1] + "," + xyzToolOutputRad[2] + "," + xyzToolOutputRad[3]);
+    	
+    	double[] jointAngleOutputRad = profile.calcInverseKinematicsRad(xyzToolOutputRad);
+    	System.out.println("Inverse KIN joint angle output radians = " + jointAngleOutputRad[0] + "," + jointAngleOutputRad[1] + "," + jointAngleOutputRad[2] + "," + jointAngleOutputRad[3]);
+ 
+    	// Degrees check
+    	double[] jointAngleInputDeg = new double[] {45, 45, -45, 45};
+    	System.out.println("Forward KIN joint angle input radians = " + jointAngleInputDeg[0] + "," + jointAngleInputDeg[1] + "," + jointAngleInputDeg[2] + "," + jointAngleInputDeg[3]);
+    	
+    	double[] xyzToolOutputDeg = profile.calcForwardKinematicsDeg(jointAngleInputDeg);
+    	System.out.println("Forward KIN xyzTool output deg = " + xyzToolOutputDeg[0] + "," + xyzToolOutputDeg[1] + "," + xyzToolOutputDeg[2] + "," + xyzToolOutputDeg[3]);
+    	
+    	double[] jointAngleOutputDeg = profile.calcInverseKinematicsDeg(xyzToolOutputDeg);
+    	System.out.println("Inverse KIN joint angle output radians = " + jointAngleOutputDeg[0] + "," + jointAngleOutputDeg[1] + "," + jointAngleOutputDeg[2] + "," + jointAngleOutputDeg[3]);
     }
 }

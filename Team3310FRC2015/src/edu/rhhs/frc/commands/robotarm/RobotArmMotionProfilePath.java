@@ -32,7 +32,7 @@ public class RobotArmMotionProfilePath extends RobotArmCommand {
     protected void initialize() {
     	if (goFromCurrentToThisPoint != null) {
         	MotionProfile motionProfile = new MotionProfile();
-        	double[] currentXYZTool = motionProfile.calcForwardKinematics(RobotMain.robotArm.getJointAngles());
+        	double[] currentXYZTool = motionProfile.calcForwardKinematicsRad(RobotMain.robotArm.getJointAngles());
 
         	WaypointList waypoints = new WaypointList(profileMode);
         	waypoints.addWaypoint(currentXYZTool);
