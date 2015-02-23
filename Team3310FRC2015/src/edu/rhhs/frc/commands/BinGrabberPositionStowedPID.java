@@ -1,17 +1,21 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
+import edu.rhhs.frc.subsystems.BinGrabber;
+import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
+import edu.wpi.first.wpilibj.command.Command;
 
-public class DriveTrainPositionHoldOff extends ExtraTimeoutCommand 
+public class BinGrabberPositionStowedPID extends Command 
 {
-    public DriveTrainPositionHoldOff() {
+
+    public BinGrabberPositionStowedPID() {
         // Use requires() here to declare subsystem dependencies
-        requires(RobotMain.driveTrain);
+        requires(RobotMain.binGrabber);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	RobotMain.driveTrain.stopPID();
+    	RobotMain.binGrabber.startPositionUpPID(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1);
     }
 
     // Called repeatedly when this Command is scheduled to run

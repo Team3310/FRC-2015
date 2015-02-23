@@ -22,7 +22,7 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID {
 	
 	@Override
 	public double getPositionDeg() {
-		return RobotUtility.convertAnalogPositionToDeg(this.getAnalogInRaw(), zeroPositionRaw, sensorToOutputGearRatio) - offsetAngleDeg;
+		return RobotUtility.convertAnalogPositionToDeg(this.getPosition(), zeroPositionRaw, sensorToOutputGearRatio) - offsetAngleDeg;
 	}
 	
 	public double getErrorDeg() {
@@ -36,6 +36,22 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID {
 	
 	@Override
 	public double setPIDPositionDeg(double positionCommandDeg) {
+		if (positionCommandDeg > maxAngleDeg) {
+			positionCommandDeg = maxAngleDeg;
+		}
+		if (positionCommandDeg < minAngleDeg) {
+			positionCommandDeg = minAngleDeg;
+		}
+		
+		double talonInput = RobotUtility.convertDegToAnalogPosition(positionCommandDeg + offsetAngleDeg, zeroPositionRaw, sensorToOutputGearRatio);
+		this.set(talonInput);
+
+		return talonInput;
+	}
+
+	@Override
+	public double setPIDPositionDeg(double positionCommandDeg, int profile) {
+		this.setProfile(profile);
 		if (positionCommandDeg > maxAngleDeg) {
 			positionCommandDeg = maxAngleDeg;
 		}

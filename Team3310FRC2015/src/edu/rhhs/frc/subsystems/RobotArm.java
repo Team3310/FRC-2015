@@ -12,8 +12,9 @@ import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID.ControlMode;
 import edu.rhhs.frc.utility.PIDParams;
+import edu.rhhs.frc.utility.motionprofile.Kinematics;
+import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -80,16 +81,16 @@ public class RobotArm extends Subsystem {
 	private CANTalonEncoderPID m_j3Motor;
 	private CANTalonAnalogPID  m_j4Motor;
 
-	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.1, 0.0, 50, 0.0);
+	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.1, 0.0, 50, 0);
 //	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.005, 0.01, -0.426, 50, 0.0);
-	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0, 0.15, -0.426, 50, 0.0);
-	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0, 0.15, 0.270, 100, 0.0);
-	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0.0);
+	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
+	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
+	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0);
 
-	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0.0);
-	private PIDParams j2VelocityPidParams = new PIDParams(0.5, 0.02, 0.0, 0.0, 0, 0.0);
-	private PIDParams j3VelocityPidParams = new PIDParams(0.5, 0.008, 0.0, 0.0, 0, 0.0);
-	private PIDParams j4VelocityPidParams = new PIDParams(1.0, 0.027, 0.0, 0.0, 0, 0.0);
+	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0);
+	private PIDParams j2VelocityPidParams = new PIDParams(0.5, 0.02, 0.0, 0.0, 0, 0);
+	private PIDParams j3VelocityPidParams = new PIDParams(0.5, 0.008, 0.0, 0.0, 0, 0);
+	private PIDParams j4VelocityPidParams = new PIDParams(1.0, 0.027, 0.0, 0.0, 0, 0);
 
 	private DigitalInput m_toteGrabberSwitch;
 	private DoubleSolenoid m_toteGrabberSolenoid;
@@ -114,6 +115,8 @@ public class RobotArm extends Subsystem {
 	private boolean m_controlLoopEnabled = false;
 	private long m_controlLoopStartTime = 0;
 	private long m_controlLoopDeltaTime = 0;
+	
+	private MotionProfile motionProfileForOutput = new MotionProfile();
 
 	private class ControlLoopTask extends TimerTask {
 
@@ -487,6 +490,14 @@ public class RobotArm extends Subsystem {
 
 		SmartDashboard.putBoolean("RobotArm Controller", 	m_controlLoopEnabled);
 		SmartDashboard.putNumber("RobotArm Control loop time (ms)", 	getControlLoopDeltaTime() / 1000000);
+		
+		double[] jointAnglesDeg = new double[] {m_j1Motor.getPositionDeg(), m_j2Motor.getPositionDeg(), m_j3Motor.getPositionDeg(), m_j4Motor.getPositionDeg()};
+		double[] xyzToolDeg = motionProfileForOutput.calcForwardKinematicsDeg(jointAnglesDeg);
+		
+		SmartDashboard.putNumber("X Robot (in)", xyzToolDeg[0]);
+		SmartDashboard.putNumber("Y Robot (in)", xyzToolDeg[1]);
+		SmartDashboard.putNumber("Z Robot (in)", xyzToolDeg[2]);
+		SmartDashboard.putNumber("Tool angle (deg)", xyzToolDeg[3]);
 	}
 }
 

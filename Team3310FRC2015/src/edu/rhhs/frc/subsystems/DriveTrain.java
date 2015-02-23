@@ -20,8 +20,8 @@ public class DriveTrain extends Subsystem
 	
 	private CANTalonEncoderPID.ControlMode m_controlMode;
 	
-	private PIDParams positionPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0.0);
-	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0.0);
+	private PIDParams positionPidParams = new PIDParams(0.4, 0, 0.0, 0, 50, 3);
+	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 5);
 
 	private double m_error;
 	 
@@ -111,6 +111,12 @@ public class DriveTrain extends Subsystem
 		setDefaultCommand(new DriveWithJoystick()); 
 	}
 	
+	public void teleopInit() {
+		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+		m_rearLeftMotor.set(0);
+		m_rearRightMotor.set(0);
+	}
+
 	public void keepAlive() {
 		m_frontLeftMotor.enableBrakeMode(true);
 		m_frontRightMotor.enableBrakeMode(true);
@@ -158,6 +164,14 @@ public class DriveTrain extends Subsystem
 		return Math.abs(m_rearRightMotor.getClosedLoopError()) < m_error;
 	}
 	
+	public double getLeftDistanceInches() {
+		return m_rearLeftMotor.getPositionInches();
+	}
+	
+	public double getRightDistanceInches() {
+		return m_rearRightMotor.getPositionInches();
+	}
+	
 	public double getLeftError() {
 		return m_rearLeftMotor.getClosedLoopError();
 	}
@@ -165,7 +179,7 @@ public class DriveTrain extends Subsystem
 	public double getRightError() {
 		return m_rearRightMotor.getClosedLoopError();
 	}
-	
+
 	public void setJoystickControllerMode(int driveMode) {
 		m_controllerMode = driveMode;
 	}
@@ -259,5 +273,7 @@ public class DriveTrain extends Subsystem
 		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", m_rearRightMotor.getVelocityDegPerSec());
 		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", m_rearLeftMotor.getVelocityFtPerSec());
 		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_rearRightMotor.getVelocityFtPerSec());		
+		SmartDashboard.putNumber("Rear Left Distance (Inches)", m_rearLeftMotor.getPositionInches());
+		SmartDashboard.putNumber("Rear Right Distance (Inches)", m_rearRightMotor.getPositionInches());
 	}
 }

@@ -7,7 +7,7 @@ public class PIDParams {
     public double kD = 0;
     public double kF = 0; 
     public int iZone = 0;
-    public double rampRatePID = 0.0;
+    public double rampRatePID = 0;
 
     public PIDParams() {	
     }

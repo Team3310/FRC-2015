@@ -1,51 +1,50 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
+import edu.wpi.first.wpilibj.command.Command;
 
-public class DriveTrainPositionControl extends ExtraTimeoutCommand 
+public class DriveTrainPositionControl extends Command 
 {
 	private double leftTargetInches;
 	private double rightTargetInches;
-	private double errorInches;
-	private double timeoutSeconds;
+	private double avgFinishedInches;
+	private boolean isFinishedByInches;
 
-    public DriveTrainPositionControl(double leftPositionInches, double rightPositionInches, double errorInches, double timeoutSeconds) {
+    public DriveTrainPositionControl(double leftPositionInches, double rightPositionInches, boolean isFinishedByInches, double avgFinishedInches) {
         // Use requires() here to declare subsystem dependencies
     	this.leftTargetInches = leftPositionInches;
     	this.rightTargetInches = rightPositionInches;
-    	this.errorInches = errorInches;
-    	this.timeoutSeconds = timeoutSeconds;
+    	this.avgFinishedInches = avgFinishedInches;
+    	this.isFinishedByInches = isFinishedByInches;
         requires(RobotMain.driveTrain);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	setTimeout(.2);
-    	startExtraTimeout(timeoutSeconds);
-    	RobotMain.driveTrain.startPIDPosition(leftTargetInches, rightTargetInches, errorInches);
-    	//setTimeout(timeoutSeconds);
+    	RobotMain.driveTrain.startPIDPosition(leftTargetInches, rightTargetInches, avgFinishedInches);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if(isTimedOut()) {
-    		RobotMain.driveTrain.startPIDPosition(leftTargetInches, rightTargetInches, errorInches);
-    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return isExtraTimedOut() || RobotMain.driveTrain.isAtLeftTarget() || RobotMain.driveTrain.isAtRightTarget();
+    	if (isFinishedByInches) {
+    		if ((RobotMain.driveTrain.getLeftDistanceInches() + RobotMain.driveTrain.getRightDistanceInches()) / 2 > avgFinishedInches) {
+    			return true;
+    		}
+    		return false;
+    	}
+    	return true; 
     }
 
     // Called once after isFinished returns true
     protected void end() {
-    	RobotMain.driveTrain.stopPID();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	end();
     }
 }

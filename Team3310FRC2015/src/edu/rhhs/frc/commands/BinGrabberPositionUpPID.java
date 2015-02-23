@@ -4,14 +4,14 @@ import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class BinGrabberPositionPID extends Command 
+public class BinGrabberPositionUpPID extends Command 
 {
 	private double leftTargetDeg;
 	private double rightTargetDeg;
 	private double errorDeg;
 	private double timeoutMs;
 
-    public BinGrabberPositionPID(double leftPositionDeg, double rightPositionDeg, double errorDeg, double timeoutMs) {
+    public BinGrabberPositionUpPID(double leftPositionDeg, double rightPositionDeg, double errorDeg, double timeoutMs) {
         // Use requires() here to declare subsystem dependencies
     	this.leftTargetDeg = leftPositionDeg;
     	this.rightTargetDeg = rightPositionDeg;
@@ -22,7 +22,7 @@ public class BinGrabberPositionPID extends Command
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	RobotMain.binGrabber.startPositionPID(leftTargetDeg, rightTargetDeg, errorDeg);
+    	RobotMain.binGrabber.startPositionUpPID(leftTargetDeg, rightTargetDeg, errorDeg);
     	setTimeout(timeoutMs/1000.0);
     	RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
     }

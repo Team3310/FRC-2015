@@ -33,10 +33,10 @@ public class BinGrabberDeployAndDrive extends ExtraTimeoutCommand
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_TIMED_DEG) {
+    	if (RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG) {
 			RobotMain.binGrabber.setLeftSpeed(0.0);
 		}
-		if (RobotMain.binGrabber.getRightPositionDeg() > BinGrabber.DEPLOYED_POSITION_TIMED_DEG) {
+		if (RobotMain.binGrabber.getRightPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG) {
 			RobotMain.binGrabber.setRightSpeed(0.0);
 		}
     	if(isTimedOut()) {

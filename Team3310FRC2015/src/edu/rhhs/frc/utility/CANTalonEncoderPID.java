@@ -8,6 +8,8 @@ public class CANTalonEncoderPID extends CANTalon {
 
 	public static final int POSITION_PROFILE = 0;
 	public static final int VELOCITY_PROFILE = 1;
+	public static final int POSITION_PROFILE_DOWN = 0;
+	public static final int POSITION_PROFILE_UP = 1;
 
 	protected double sensorToOutputGearRatio = 1.0;
 	protected double offsetAngleDeg = 0.0;
@@ -111,6 +113,21 @@ public class CANTalonEncoderPID extends CANTalon {
 		}
 		
 		return setPIDPositionDeg(positionCommandDeg);
+	}
+
+	public double setPIDPositionDeg(double positionCommandDeg, int profile) {
+		this.setProfile(profile);
+		if (positionCommandDeg > maxAngleDeg) {
+			positionCommandDeg = maxAngleDeg;
+		}
+		if (positionCommandDeg < minAngleDeg) {
+			positionCommandDeg = minAngleDeg;
+		}
+		
+		double talonInput = RobotUtility.convertDegToEncoderPosition(positionCommandDeg + offsetAngleDeg, sensorToOutputGearRatio);
+		this.set(talonInput);
+		
+		return talonInput;
 	}
 
 	public double setPIDPositionDeg(double positionCommandDeg) {

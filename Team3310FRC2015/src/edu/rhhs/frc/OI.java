@@ -3,15 +3,18 @@ package edu.rhhs.frc;
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndDrive;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGo;
+import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberDeployAngle;
 import edu.rhhs.frc.commands.BinGrabberDeployTimed;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
-import edu.rhhs.frc.commands.BinGrabberPositionPID;
+import edu.rhhs.frc.commands.BinGrabberPositionDownPID;
+import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
 import edu.rhhs.frc.commands.BinGrabberSetSpeed;
+import edu.rhhs.frc.commands.BinGrabberStopPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
-import edu.rhhs.frc.commands.DriveTrainPositionHoldOff;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
 import edu.rhhs.frc.commands.DriveTrainSpeedTimeout;
+import edu.rhhs.frc.commands.DriveTrainStopPID;
 import edu.rhhs.frc.commands.DriveTrainVelocityControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
 import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
@@ -62,27 +65,34 @@ public class OI
 		SmartDashboard.putData("Bin Grabber Deploy Timed", binGrabberDeployTimed);
 		
         InternalButton binGrabberDeployAngle = new InternalButton();
-        binGrabberDeployAngle.whenReleased(new BinGrabberDeployAngle(1.0, BinGrabber.DEPLOYED_POSITION_TIMED_DEG, 300));
+        binGrabberDeployAngle.whenReleased(new BinGrabberDeployAngle(1.0, BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG, 300));
 		SmartDashboard.putData("Bin Grabber Deploy Angle Limit", binGrabberDeployAngle);
 		
 		InternalButton binGrabberDeployPID = new InternalButton();
-        binGrabberDeployPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 1, 1000));
+        binGrabberDeployPID.whenReleased(new BinGrabberPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG));
 		SmartDashboard.putData("Bin Grabber Deploy Position PID", binGrabberDeployPID);
 		
 		InternalButton binGrabberStowedPID = new InternalButton();
-        binGrabberStowedPID.whenReleased(new BinGrabberPositionPID(BinGrabber.STOWED_POSITION_DEG, BinGrabber.STOWED_POSITION_DEG, 1, 1000));
+        binGrabberStowedPID.whenReleased(new BinGrabberPositionStowedPID());
 		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPID);
 		
+		InternalButton binGrabberStopPID = new InternalButton();
+		binGrabberStopPID.whenReleased(new BinGrabberStopPID());
+		SmartDashboard.putData("Bin Grabber Cancel PID", binGrabberStopPID);
+		
 		InternalButton binGrabberDragPID = new InternalButton();
-        binGrabberDragPID.whenReleased(new BinGrabberPositionPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG, 1, 1000));
 		SmartDashboard.putData("Bin Grabber Drag Position PID", binGrabberDragPID);
 
 		InternalButton binGrabberDeployAndGo = new InternalButton();
 		binGrabberDeployAndGo.whenReleased(new BinGrabberDeployAndGo());
 		SmartDashboard.putData("Bin Grabber Deploy and Go", binGrabberDeployAndGo);
 		
+		InternalButton binGrabberDeployAndGoPID = new InternalButton();
+		binGrabberDeployAndGoPID.whenReleased(new BinGrabberDeployAndGoPID());
+		SmartDashboard.putData("Bin Grabber Deploy and Go PID", binGrabberDeployAndGoPID);
+		
 		InternalButton binGrabberDeployAndDrive = new InternalButton();
-		binGrabberDeployAndDrive.whenReleased(new BinGrabberDeployAndDrive(60, 60, 200, 2));
+		binGrabberDeployAndDrive.whenReleased(new BinGrabberDeployAndDrive(60, 60, 10, 1));
 		SmartDashboard.putData("Bin Grabber Deploy and Drive", binGrabberDeployAndDrive);
 
 		InternalButton drivetrainTestSpeed = new InternalButton();
@@ -94,7 +104,7 @@ public class OI
 		SmartDashboard.putData("DriveTrain Test Velocity PID", drivetrainTestVel);		
 
 		InternalButton drivetrainTestPosition = new InternalButton();
-		drivetrainTestPosition.whenReleased(new DriveTrainPositionControl(60, 60, 1, 4));
+		drivetrainTestPosition.whenReleased(new DriveTrainPositionControl(60, 60, true, 60));
 		SmartDashboard.putData("DriveTrain Test Position PID", drivetrainTestPosition);		
 
 		InternalButton toteGrabberOpen = new InternalButton();
@@ -169,7 +179,7 @@ public class OI
 		// J2 motion Profile
     	WaypointList waypointsJ2A = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypointsJ2A.addWaypoint(RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG);
-    	waypointsJ2A.addWaypoint(0, 80, -80, 0);
+    	waypointsJ2A.addWaypoint(0, 42, -28, 0);
     	RobotArmCommandList commandListJ2A = new RobotArmCommandList();
 		commandListJ2A.add(new RobotArmMotionProfilePath(waypointsJ2A));
 
@@ -178,7 +188,7 @@ public class OI
 		SmartDashboard.putData("Motion Profile Start J2 A", motionProfileJ2A);
 		
     	WaypointList waypointsJ2B = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
-    	waypointsJ2B.addWaypoint(0, 80, -80, 0);
+    	waypointsJ2B.addWaypoint(0, 42, -28, 0);
     	waypointsJ2B.addWaypoint(0, 0, 0, 0);
     	RobotArmCommandList commandListJ2B = new RobotArmCommandList();
 		commandListJ2B.add(new RobotArmMotionProfilePath(waypointsJ2B));
@@ -189,7 +199,7 @@ public class OI
 
     	WaypointList waypointsJ2C = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypointsJ2C.addWaypoint(0, 0, 0, 0);
-    	waypointsJ2C.addWaypoint(0, 80, -80, 0);
+    	waypointsJ2C.addWaypoint(0, 42, -28, 0);
     	RobotArmCommandList commandListJ2C = new RobotArmCommandList();
 		commandListJ2C.add(new RobotArmMotionProfilePath(waypointsJ2C));
 
@@ -232,8 +242,8 @@ public class OI
     	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypointsM2H.addWaypoint(RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG);
     	waypointsM2H.addWaypoint(0, 89,  -101.7,   0);
-    	waypointsM2H.addWaypoint(-127, 89,  -101.7,   0);
-    	waypointsM2H.addWaypoint(-127, 79.8, -42.69, 0);
+    	waypointsM2H.addWaypoint(-129, 89,  -101.7,   0);
+    	waypointsM2H.addWaypoint(-129, 73, -42.69, 0);
     	RobotArmCommandList commandListM2H = new RobotArmCommandList();
     	commandListM2H.add(new RobotArmMotionProfilePath(waypointsM2H));
 
@@ -243,9 +253,8 @@ public class OI
 		
 		// Human station to stack Profile
     	WaypointList waypointsH2S = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
-    	waypointsH2S.addWaypoint(-127, 79.8, -42.69, 0);
-    	waypointsH2S.addWaypoint(-127, 68,  -101.7,   0);
-    	waypointsH2S.addWaypoint(  55, 68,  -101.7, -55);
+    	waypointsH2S.addWaypoint(-129, 73, -42.69, 0);
+    	waypointsH2S.addWaypoint(-129, 68,  -101.7,   0);
     	waypointsH2S.addWaypoint(  55, 94.7, -65.6, -55);
     	RobotArmCommandList commandListH2S = new RobotArmCommandList();
     	commandListH2S.add(new RobotArmMotionProfilePath(waypointsH2S));
@@ -253,6 +262,31 @@ public class OI
 		InternalButton motionProfileH2S = new InternalButton();
 		motionProfileH2S.whenPressed(new RobotArmMotionProfileStart(commandListH2S));
 		SmartDashboard.putData("Motion Profile Human To Stack", motionProfileH2S);
+		
+		// Stack 1 To Human Profile
+    	WaypointList waypointsS1ToH = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+    	waypointsS1ToH.addWaypoint(  55, 94.7, -65.6, -55);
+    	waypointsS1ToH.addWaypoint(  70, 72.6, -73, -55);
+    	waypointsS1ToH.addWaypoint(-129, 89,  -101.7,   0);
+    	waypointsS1ToH.addWaypoint(-129, 73, -42.69, 0);
+    	RobotArmCommandList commandListS1ToH = new RobotArmCommandList();
+    	commandListS1ToH.add(new RobotArmMotionProfilePath(waypointsS1ToH));
+
+		InternalButton motionProfileS1ToH = new InternalButton();
+		motionProfileS1ToH.whenPressed(new RobotArmMotionProfileStart(commandListS1ToH));
+		SmartDashboard.putData("Motion Profile Stack 1 To Human", motionProfileS1ToH);
+		
+		// Human station to stack Profile
+    	WaypointList waypointsH2S2 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+    	waypointsH2S2.addWaypoint(-129, 73, -42.69, 0);
+    	waypointsH2S2.addWaypoint(-129, 68,  -101.7,   0);
+    	waypointsH2S2.addWaypoint(  58, 51, -55.0, -58);
+    	RobotArmCommandList commandListH2S2 = new RobotArmCommandList();
+    	commandListH2S2.add(new RobotArmMotionProfilePath(waypointsH2S2));
+
+		InternalButton motionProfileH2S2 = new InternalButton();
+		motionProfileH2S2.whenPressed(new RobotArmMotionProfileStart(commandListH2S2));
+		SmartDashboard.putData("Motion Profile Human To Stack 2", motionProfileH2S2);
 		
 		// Pause resume
 		InternalButton motionProfilePause = new InternalButton();
@@ -268,7 +302,7 @@ public class OI
 		SmartDashboard.putData("Drivetrain Hold On", driveTrainHoldOn);
 		
 		InternalButton driveTrainHoldOff = new InternalButton();
-		driveTrainHoldOff.whenPressed(new DriveTrainPositionHoldOff());
+		driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
 		SmartDashboard.putData("Drivetrain Hold Off", driveTrainHoldOff);
 	}
 	
