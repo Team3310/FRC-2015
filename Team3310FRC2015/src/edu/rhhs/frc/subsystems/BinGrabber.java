@@ -1,14 +1,15 @@
 package edu.rhhs.frc.subsystems;
 
-import edu.rhhs.frc.RobotMain;
+import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
+import edu.rhhs.frc.commands.BinGrabberWithJoystick;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.RobotUtility;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -186,7 +187,7 @@ public class BinGrabber extends Subsystem
 	}
 	
 	public void controlWithJoystick() {
-//		setTalonInput(0, -OI.getInstance().getXBoxController().getRightYAxis());
+		setSpeed(-OI.getInstance().getDrivetrainController().getRightYAxis(), -OI.getInstance().getDrivetrainController().getLeftYAxis());
 	}
 
 	public void updateStatus() {

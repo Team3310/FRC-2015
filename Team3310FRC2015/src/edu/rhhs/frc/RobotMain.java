@@ -1,16 +1,16 @@
 
 package edu.rhhs.frc;
 
-import com.kauailabs.nav6.frc.IMUAdvanced;
 import com.kauailabs.navx_mxp.AHRS;
 
 import edu.rhhs.frc.commands.BinGrabberDeployAndGo;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
-import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
@@ -32,10 +32,11 @@ public class RobotMain extends IterativeRobot
 	public static final BinGrabber binGrabber = new BinGrabber();
 	public static final DriveTrain driveTrain = new DriveTrain();
 	public static final RobotArm robotArm = new RobotArm();
+	public static final HumanLoadCommandListGenerator commandListGenerator = new HumanLoadCommandListGenerator();
 
     private Command m_autonomousCommand;
     private SendableChooser m_autonomousChooser;
-    private SendableChooser m_driveModeChooser;
+//    private SendableChooser m_driveModeChooser;
     private SendableChooser m_robotArmControlModeChooser;
 
     private long m_loopTime;
@@ -52,15 +53,19 @@ public class RobotMain extends IterativeRobot
     	 
         try {
         	m_loopTime = System.nanoTime();
+        	
+        	commandListGenerator.setStackPriority(StackPriority.VERTICAL);
+        	commandListGenerator.setNumStacks(1);
+        	commandListGenerator.setNumTotesPerStack(6);
 
-        	m_driveModeChooser = new SendableChooser();
-        	m_driveModeChooser.addObject ("XBox Arcade Left", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
-        	m_driveModeChooser.addObject ("XBox Arcade Right", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-        	m_driveModeChooser.addDefault("XBox Cheesy",		new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
-        	m_driveModeChooser.addObject ("Joystick Arcade", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
-        	m_driveModeChooser.addObject ("Joystick Cheesy", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
-        	m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
-        	SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
+//        	m_driveModeChooser = new SendableChooser();
+//        	m_driveModeChooser.addObject ("XBox Arcade Left", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+//        	m_driveModeChooser.addObject ("XBox Arcade Right", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
+//        	m_driveModeChooser.addDefault("XBox Cheesy",		new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+//        	m_driveModeChooser.addObject ("Joystick Arcade", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
+//        	m_driveModeChooser.addObject ("Joystick Cheesy", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
+//        	m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
+//        	SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
 
         	m_robotArmControlModeChooser = new SendableChooser();
         	m_robotArmControlModeChooser.addObject ("VBus Only", 				CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
@@ -113,6 +118,8 @@ public class RobotMain extends IterativeRobot
             Timer.delay( 0.3 );
             m_imu.zeroYaw();
             m_imuFirstIteration = false;
+            
+            commandListGenerator.calculate();
         }
 
         // Get the command used for the autonomous period
@@ -144,7 +151,8 @@ public class RobotMain extends IterativeRobot
         }
         binGrabber.teleopInit();
         driveTrain.teleopInit();
-        driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
+//        driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
+        driveTrain.setJoystickControllerMode(DriveTrain.CONTROLLER_JOYSTICK_CHEESY);
         robotArm.setControlMode((CANTalonEncoderPID.ControlMode)m_robotArmControlModeChooser.getSelected());
         updateStatus();
     }

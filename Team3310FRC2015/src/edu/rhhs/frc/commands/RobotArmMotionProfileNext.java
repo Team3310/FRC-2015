@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class RobotArmMotionProfileNext extends Command 
 {
-	public RobotArmMotionProfileNext(RobotArmCommandList commandList) {
+	public RobotArmMotionProfileNext() {
 		requires(RobotMain.robotArm);
 	}
 	

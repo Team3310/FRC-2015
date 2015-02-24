@@ -1,5 +1,6 @@
 package edu.rhhs.frc;
 
+import edu.rhhs.frc.buttons.XBoxDPadTriggerButton;
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndDrive;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGo;
@@ -9,26 +10,28 @@ import edu.rhhs.frc.commands.BinGrabberDeployTimed;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
 import edu.rhhs.frc.commands.BinGrabberPositionDownPID;
 import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
-import edu.rhhs.frc.commands.BinGrabberSetSpeed;
 import edu.rhhs.frc.commands.BinGrabberStopPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
 import edu.rhhs.frc.commands.DriveTrainSpeedTimeout;
 import edu.rhhs.frc.commands.DriveTrainStopPID;
 import edu.rhhs.frc.commands.DriveTrainVelocityControl;
+import edu.rhhs.frc.commands.RobotArmMotionProfileNext;
 import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
 import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.ToteGrabberAutoClose;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
+import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,99 +44,148 @@ public class OI
 {	
 	private static OI instance;
 
-	private XboxController m_xboxController1;
-	private XboxController m_xboxController2;
-	private Joystick m_joystick1;
-    private Joystick m_joystick2;
+	private XboxController m_drivetrainController;
+	private XboxController m_robotArmController;
+//	private Joystick m_joystick1;
+//  private Joystick m_joystick2;
 	
 	private OI() {
-		m_xboxController1 = new XboxController(RobotMap.XBOX_1_USB_ID);
-		m_xboxController2 = new XboxController(RobotMap.XBOX_2_USB_ID);
-        m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
-        m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
+		m_drivetrainController = new XboxController(RobotMap.XBOX_1_USB_ID);
+		m_robotArmController = new XboxController(RobotMap.XBOX_2_USB_ID);
+//      m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
+//      m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
 	    
-        JoystickButton moveBinGrabberUp = new JoystickButton(m_xboxController1.getJoyStick(), XboxController.A_BUTTON);
-        moveBinGrabberUp.whenPressed(new BinGrabberSetSpeed(0.3));
-        moveBinGrabberUp.whenReleased(new BinGrabberSetSpeed(0));
+		// Drivetrain controller
+        JoystickButton binGrabberStowPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
+        binGrabberStowPID.whenPressed(new BinGrabberPositionStowedPID());
         
-        JoystickButton moveBinGrabberDown = new JoystickButton(m_xboxController1.getJoyStick(), XboxController.Y_BUTTON);
-        moveBinGrabberDown.whenPressed(new BinGrabberSetSpeed(-0.3));
-        moveBinGrabberDown.whenReleased(new BinGrabberSetSpeed(0));
+        JoystickButton binGrabberCancelPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.X_BUTTON);
+        binGrabberCancelPID.whenPressed(new BinGrabberStopPID());
 	    
-        InternalButton binGrabberDeployTimed = new InternalButton();
-        binGrabberDeployTimed.whenReleased(new BinGrabberDeployTimed(1.0, 300));
-		SmartDashboard.putData("Bin Grabber Deploy Timed", binGrabberDeployTimed);
-		
-        InternalButton binGrabberDeployAngle = new InternalButton();
-        binGrabberDeployAngle.whenReleased(new BinGrabberDeployAngle(1.0, BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG, 300));
-		SmartDashboard.putData("Bin Grabber Deploy Angle Limit", binGrabberDeployAngle);
-		
-		InternalButton binGrabberDeployPID = new InternalButton();
-        binGrabberDeployPID.whenReleased(new BinGrabberPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG));
-		SmartDashboard.putData("Bin Grabber Deploy Position PID", binGrabberDeployPID);
-		
-		InternalButton binGrabberStowedPID = new InternalButton();
-        binGrabberStowedPID.whenReleased(new BinGrabberPositionStowedPID());
-		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPID);
-		
-		InternalButton binGrabberStopPID = new InternalButton();
-		binGrabberStopPID.whenReleased(new BinGrabberStopPID());
-		SmartDashboard.putData("Bin Grabber Cancel PID", binGrabberStopPID);
-		
-		InternalButton binGrabberDragPID = new InternalButton();
-		SmartDashboard.putData("Bin Grabber Drag Position PID", binGrabberDragPID);
+        JoystickButton binGrabberDragPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.B_BUTTON);
+        binGrabberDragPID.whenPressed(new BinGrabberPositionDownPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG));
 
-		InternalButton binGrabberDeployAndGo = new InternalButton();
-		binGrabberDeployAndGo.whenReleased(new BinGrabberDeployAndGo());
-		SmartDashboard.putData("Bin Grabber Deploy and Go", binGrabberDeployAndGo);
-		
-		InternalButton binGrabberDeployAndGoPID = new InternalButton();
-		binGrabberDeployAndGoPID.whenReleased(new BinGrabberDeployAndGoPID());
-		SmartDashboard.putData("Bin Grabber Deploy and Go PID", binGrabberDeployAndGoPID);
-		
-		InternalButton binGrabberDeployAndDrive = new InternalButton();
-		binGrabberDeployAndDrive.whenReleased(new BinGrabberDeployAndDrive(60, 60, 10, 1));
-		SmartDashboard.putData("Bin Grabber Deploy and Drive", binGrabberDeployAndDrive);
+        JoystickButton binGrabberPivotLockExtend = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.START_BUTTON);
+        binGrabberPivotLockExtend.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.EXTENDED));
 
-		InternalButton drivetrainTestSpeed = new InternalButton();
-		drivetrainTestSpeed.whenReleased(new DriveTrainSpeedTimeout(1, 3));
-		SmartDashboard.putData("DriveTrain Test Speed", drivetrainTestSpeed);		
+        JoystickButton binGrabberPivotLockRelease = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.BACK_BUTTON);
+        binGrabberPivotLockRelease.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
 
-		InternalButton drivetrainTestVel = new InternalButton();
-		drivetrainTestVel.whenReleased(new DriveTrainVelocityControl(1500, 1500, 1, 2));
-		SmartDashboard.putData("DriveTrain Test Velocity PID", drivetrainTestVel);		
+        JoystickButton binGrabberClawOpen = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.RIGHT_JOYSTICK_BUTTON);
+        binGrabberClawOpen.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.EXTENDED));
 
-		InternalButton drivetrainTestPosition = new InternalButton();
-		drivetrainTestPosition.whenReleased(new DriveTrainPositionControl(60, 60, true, 60));
-		SmartDashboard.putData("DriveTrain Test Position PID", drivetrainTestPosition);		
+        JoystickButton binGrabberClawClose = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
+        binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
+        
+        XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT_TRIGGER);
+        driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
 
-		InternalButton toteGrabberOpen = new InternalButton();
-		toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
-		SmartDashboard.putData("Tote Grabber Open", toteGrabberOpen);
+        XBoxDPadTriggerButton driveTrainHoldOff = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT_TRIGGER);
+        driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
+        
+        // Robot arm controller
+        JoystickButton motionProfilePause = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.Y_BUTTON);
+        motionProfilePause.whenPressed(new RobotArmMotionProfilePause());
 
-		InternalButton toteGrabberClosed = new InternalButton();
-		toteGrabberClosed.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSED));
-		SmartDashboard.putData("Tote Grabber Closed", toteGrabberClosed);
+        JoystickButton motionProfileResume = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.A_BUTTON);
+        motionProfileResume.whenPressed(new RobotArmMotionProfileResume());
+ 
+        JoystickButton motionProfileNext = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.B_BUTTON);
+        motionProfileNext.whenPressed(new RobotArmMotionProfileNext());
 
-		InternalButton toteGrabberAuto = new InternalButton();
-		toteGrabberAuto.whenReleased(new ToteGrabberAutoClose());
-		SmartDashboard.putData("Tote Grabber Auto Close", toteGrabberAuto);
+        JoystickButton motionProfileStart = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.X_BUTTON);
+        motionProfileStart.whenPressed(new RobotArmMotionProfileStart(RobotMain.commandListGenerator.getCommandList()));
+
+    	WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+    	waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_START_COORD);
+    	RobotArmCommandList commandListCurrentToHome = new RobotArmCommandList();
+    	commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
+
+        JoystickButton motionProfileGoHome = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.START_BUTTON);
+        motionProfileGoHome.whenPressed(new RobotArmMotionProfileStart(commandListCurrentToHome));
+
+        JoystickButton toteGrabberOpen = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.LEFT_BUMPER_BUTTON);
+        toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
+
+        JoystickButton toteGrabberClose = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.RIGHT_BUMPER_BUTTON);
+        toteGrabberClose.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
+
+        // Testing
+        InternalButton binGrabberDeployTimedTest = new InternalButton();
+        binGrabberDeployTimedTest.whenReleased(new BinGrabberDeployTimed(1.0, 300));
+		SmartDashboard.putData("Bin Grabber Deploy Timed", binGrabberDeployTimedTest);
 		
-		InternalButton binGrabberClawOpen = new InternalButton();
-		binGrabberClawOpen.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.EXTENDED));
-		SmartDashboard.putData("Bin Grabber Claw Open", binGrabberClawOpen);
+        InternalButton binGrabberDeployAngleTest = new InternalButton();
+        binGrabberDeployAngleTest.whenReleased(new BinGrabberDeployAngle(1.0, BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG, 300));
+		SmartDashboard.putData("Bin Grabber Deploy Angle Limit", binGrabberDeployAngleTest);
 		
-		InternalButton binGrabberClawClosed = new InternalButton();
-		binGrabberClawClosed.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
-		SmartDashboard.putData("Bin Grabber Claw Closed", binGrabberClawClosed);
+		InternalButton binGrabberDeployPIDTest = new InternalButton();
+        binGrabberDeployPIDTest.whenReleased(new BinGrabberPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG));
+		SmartDashboard.putData("Bin Grabber Deploy Position PID", binGrabberDeployPIDTest);
 		
-		InternalButton binGrabberPivotLock = new InternalButton();
-		binGrabberPivotLock.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.EXTENDED));
-		SmartDashboard.putData("Bin Grabber Pivot Lock", binGrabberPivotLock);
+		InternalButton binGrabberStowedPIDTest = new InternalButton();
+        binGrabberStowedPIDTest.whenReleased(new BinGrabberPositionStowedPID());
+		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPIDTest);
 		
-		InternalButton binGrabberPivotUnlock = new InternalButton();
-		binGrabberPivotUnlock.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
-		SmartDashboard.putData("Bin Grabber Pivot Unlock", binGrabberPivotUnlock);
+		InternalButton binGrabberStopPIDTest = new InternalButton();
+		binGrabberStopPIDTest.whenReleased(new BinGrabberStopPID());
+		SmartDashboard.putData("Bin Grabber Cancel PID", binGrabberStopPIDTest);
+		
+		InternalButton binGrabberDragPIDTest = new InternalButton();
+        binGrabberDragPIDTest.whenReleased(new BinGrabberPositionDownPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG));
+		SmartDashboard.putData("Bin Grabber Drag Position PID", binGrabberDragPIDTest);
+
+		InternalButton binGrabberDeployAndGoTest = new InternalButton();
+		binGrabberDeployAndGoTest.whenReleased(new BinGrabberDeployAndGo());
+		SmartDashboard.putData("Bin Grabber Deploy and Go", binGrabberDeployAndGoTest);
+		
+		InternalButton binGrabberDeployAndGoPIDTest = new InternalButton();
+		binGrabberDeployAndGoPIDTest.whenReleased(new BinGrabberDeployAndGoPID());
+		SmartDashboard.putData("Bin Grabber Deploy and Go PID", binGrabberDeployAndGoPIDTest);
+		
+		InternalButton binGrabberDeployAndDriveTest = new InternalButton();
+		binGrabberDeployAndDriveTest.whenReleased(new BinGrabberDeployAndDrive(60, 60, 10, 1));
+		SmartDashboard.putData("Bin Grabber Deploy and Drive", binGrabberDeployAndDriveTest);
+
+		InternalButton drivetrainTestSpeedTest = new InternalButton();
+		drivetrainTestSpeedTest.whenReleased(new DriveTrainSpeedTimeout(1, 3));
+		SmartDashboard.putData("DriveTrain Test Speed", drivetrainTestSpeedTest);		
+
+		InternalButton drivetrainTestVelTest = new InternalButton();
+		drivetrainTestVelTest.whenReleased(new DriveTrainVelocityControl(1500, 1500, 1, 2));
+		SmartDashboard.putData("DriveTrain Test Velocity PID", drivetrainTestVelTest);		
+
+		InternalButton drivetrainTestPositionTest = new InternalButton();
+		drivetrainTestPositionTest.whenReleased(new DriveTrainPositionControl(60, 60, true, 60));
+		SmartDashboard.putData("DriveTrain Test Position PID", drivetrainTestPositionTest);		
+
+		InternalButton toteGrabberOpenTest = new InternalButton();
+		toteGrabberOpenTest.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
+		SmartDashboard.putData("Tote Grabber Open", toteGrabberOpenTest);
+
+		InternalButton toteGrabberClosedTest = new InternalButton();
+		toteGrabberClosedTest.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
+		SmartDashboard.putData("Tote Grabber Closed", toteGrabberClosedTest);
+
+		InternalButton toteGrabberAutoTest = new InternalButton();
+		toteGrabberAutoTest.whenReleased(new ToteGrabberAutoClose());
+		SmartDashboard.putData("Tote Grabber Auto Close", toteGrabberAutoTest);
+		
+		InternalButton binGrabberClawOpenTest = new InternalButton();
+		binGrabberClawOpenTest.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.EXTENDED));
+		SmartDashboard.putData("Bin Grabber Claw Open", binGrabberClawOpenTest);
+		
+		InternalButton binGrabberClawClosedTest = new InternalButton();
+		binGrabberClawClosedTest.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
+		SmartDashboard.putData("Bin Grabber Claw Closed", binGrabberClawClosedTest);
+		
+		InternalButton binGrabberPivotLockTest = new InternalButton();
+		binGrabberPivotLockTest.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.EXTENDED));
+		SmartDashboard.putData("Bin Grabber Pivot Lock", binGrabberPivotLockTest);
+		
+		InternalButton binGrabberPivotUnlockTest = new InternalButton();
+		binGrabberPivotUnlockTest.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
+		SmartDashboard.putData("Bin Grabber Pivot Unlock", binGrabberPivotUnlockTest);
 		
     	WaypointList waypoints0 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypoints0.addWaypoint(RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG);
@@ -289,21 +341,21 @@ public class OI
 		SmartDashboard.putData("Motion Profile Human To Stack 2", motionProfileH2S2);
 		
 		// Pause resume
-		InternalButton motionProfilePause = new InternalButton();
-		motionProfilePause.whenPressed(new RobotArmMotionProfilePause());
-		SmartDashboard.putData("Motion Profile Pause", motionProfilePause);
+		InternalButton motionProfilePauseTest = new InternalButton();
+		motionProfilePauseTest.whenPressed(new RobotArmMotionProfilePause());
+		SmartDashboard.putData("Motion Profile Pause", motionProfilePauseTest);
 		
-		InternalButton motionProfileResume = new InternalButton();
-		motionProfileResume.whenPressed(new RobotArmMotionProfileResume());
-		SmartDashboard.putData("Motion Profile Resume", motionProfileResume);
+		InternalButton motionProfileResumeTest = new InternalButton();
+		motionProfileResumeTest.whenPressed(new RobotArmMotionProfileResume());
+		SmartDashboard.putData("Motion Profile Resume", motionProfileResumeTest);
 		
-		InternalButton driveTrainHoldOn = new InternalButton();
-		driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
-		SmartDashboard.putData("Drivetrain Hold On", driveTrainHoldOn);
+		InternalButton driveTrainHoldOnTest = new InternalButton();
+		driveTrainHoldOnTest.whenPressed(new DriveTrainPositionHoldOn());
+		SmartDashboard.putData("Drivetrain Hold On", driveTrainHoldOnTest);
 		
-		InternalButton driveTrainHoldOff = new InternalButton();
-		driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
-		SmartDashboard.putData("Drivetrain Hold Off", driveTrainHoldOff);
+		InternalButton driveTrainHoldOffTest = new InternalButton();
+		driveTrainHoldOffTest.whenPressed(new DriveTrainStopPID());
+		SmartDashboard.putData("Drivetrain Hold Off", driveTrainHoldOffTest);
 	}
 	
 	public static OI getInstance() {
@@ -313,20 +365,20 @@ public class OI
 		return instance;
 	}
 	
-    public Joystick getJoystick1() {
-        return m_joystick1;
-    }
-    
-    public Joystick getJoystick2() {
-        return m_joystick2;
-    }
-    
-	public XboxController getXBoxController1() {
-        return m_xboxController1;
+//    public Joystick getJoystick1() {
+//        return m_joystick1;
+//    }
+//    
+//    public Joystick getJoystick2() {
+//        return m_joystick2;
+//    }
+   
+	public XboxController getDrivetrainController() {
+        return m_drivetrainController;
     }
 
-	public XboxController getXBoxController2() {
-        return m_xboxController2;
+	public XboxController getRobotArmController() {
+        return m_robotArmController;
     }
 }
 

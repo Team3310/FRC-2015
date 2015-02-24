@@ -24,7 +24,7 @@ public abstract class RobotArmCommandListGenerator {
 	}
 
 	protected void addToteGrabberCloseCommand() {
-		commandList.add(new RobotArmToteGrabberSetPosition(ToteGrabberPosition.CLOSED));
+		commandList.add(new RobotArmToteGrabberSetPosition(ToteGrabberPosition.CLOSE));
 	}
 
 	protected void addToteGrabberOpenCommand() {

@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RobotArm extends Subsystem {
 
-	public static enum ToteGrabberPosition {OPEN, CLOSED};
+	public static enum ToteGrabberPosition {OPEN, CLOSE};
 
 	public static final long OUTER_LOOP_UPDATE_RATE_MS = 10;
 
@@ -247,7 +247,7 @@ public class RobotArm extends Subsystem {
 		if (m_toteGrabberSolenoid.get() == DoubleSolenoid.Value.kForward) {
 			return ToteGrabberPosition.OPEN;
 		}
-		return ToteGrabberPosition.CLOSED;
+		return ToteGrabberPosition.CLOSE;
 	}
 
 	public synchronized boolean isWaitForNext() {
@@ -260,10 +260,10 @@ public class RobotArm extends Subsystem {
 
 	public void controlWithJoystick() {
 		if (!m_controlLoopEnabled) {
-			double throttleRightX = OI.getInstance().getXBoxController2().getRightXAxis();
-			double throttleRightY = OI.getInstance().getXBoxController2().getRightYAxis();
-			double throttleLeftX = OI.getInstance().getXBoxController2().getLeftXAxis();
-			double throttleLeftY = OI.getInstance().getXBoxController2().getLeftYAxis();
+			double throttleRightX = OI.getInstance().getRobotArmController().getRightXAxis();
+			double throttleRightY = OI.getInstance().getRobotArmController().getRightYAxis();
+			double throttleLeftX = OI.getInstance().getRobotArmController().getLeftXAxis();
+			double throttleLeftY = OI.getInstance().getRobotArmController().getLeftYAxis();
 
 			SmartDashboard.putNumber("Right X Throttle", throttleRightX);
 			SmartDashboard.putNumber("Right Y Throttle", throttleRightY);

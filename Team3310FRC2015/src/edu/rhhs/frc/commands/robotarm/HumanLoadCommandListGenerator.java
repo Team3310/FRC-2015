@@ -7,16 +7,16 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 
-	public static final double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
-	public static final double[] HUMAN_LOAD_FINISH_COORD = {-19.5, -24.0, 11.8, -129.0}; 
-	public static final double[] LEFT_STACK_UNLOAD_COORD =  { 30.4, 34.4, 11.1,    0.0};
+	public static final double[] HUMAN_LOAD_START_COORD =  {-39.577, -39.187, 22.961, -143.5}; 
+	public static final double[] HUMAN_LOAD_FINISH_COORD = {-29.556, -25.889, 16.0, -143.5}; 
+	public static final double[] LEFT_STACK_UNLOAD_COORD = { 29, -18, 11, 0.0};
 	
-	public static final double STACK_DELTA_Y_SPACING = -17; 
-	public static final double STACK_DELTA_Z_SPACING = 13.66; 
+	public static final double STACK_DELTA_Y_SPACING = -17.0; 
+	public static final double STACK_DELTA_Z_SPACING = 12.0; 
 	
 	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 2; 
+	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 4; 
 	
 	public static final double STACK_X_POST_UNLOAD_OFFSET = 6;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
@@ -25,7 +25,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	public boolean debug = false;
 	
 	private StackPriority stackPriority = StackPriority.VERTICAL;
-	private int numStacks = 5;
+	private int numStacks = 1;
 	private int numTotesPerStack = 6;
 	
 	public HumanLoadCommandListGenerator() {		
@@ -145,7 +145,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	}
 	
     public static void main(String[] args) {
-    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 5, 6);
+    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 1, 6);
     	humanLoad.debug = true;
     	humanLoad.calculate();
     }

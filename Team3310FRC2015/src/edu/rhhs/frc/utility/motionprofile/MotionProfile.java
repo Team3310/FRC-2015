@@ -511,9 +511,10 @@ public class MotionProfile {
 //    	profile.calculatePath();
 //    	profile.printOutput();
     	
-		WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
-    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_START_COORD);
-    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_FINISH_COORD);
+		WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.JointInputJointMotion);	
+    	waypointsHumanToStack.addWaypoint(new double[] {0,0,0,0});
+    	waypointsHumanToStack.addWaypoint(new double[] {50,0,0,0});
+    	waypointsHumanToStack.addWaypoint(new double[] {100,0,0,0});
     	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
     	profile.calculatePath();
     	profile.printOutput();

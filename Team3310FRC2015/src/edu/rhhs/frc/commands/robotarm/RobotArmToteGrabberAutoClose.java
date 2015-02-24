@@ -24,7 +24,7 @@ public class RobotArmToteGrabberAutoClose extends RobotArmCommand {
 
     protected boolean isFinished() {
     	if (RobotMain.robotArm.getToteGrabberSwitch() == false) {
-    		RobotMain.robotArm.setToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSED);
+    		RobotMain.robotArm.setToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE);
             return true;
     	}
     	return false;
