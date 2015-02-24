@@ -28,6 +28,41 @@ import com.kauailabs.nav6.IMUProtocol;
 
 public class AHRSProtocol extends IMUProtocol {
 
+	/* NAVX_CAL_STATUS */
+
+	static final byte NAVX_CAL_STATUS_IMU_CAL_STATE_MASK       	= 0x03;
+	static final byte NAVX_CAL_STATUS_IMU_CAL_INPROGRESS		= 0x00;
+	static final byte NAVX_CAL_STATUS_IMU_CAL_ACCUMULATE		= 0x01;
+	static final byte NAVX_CAL_STATUS_IMU_CAL_COMPLETE			= 0x02;
+
+	static final byte NAVX_CAL_STATUS_MAG_CAL_COMPLETE			= 0x04;
+	static final byte NAVX_CAL_STATUS_BARO_CAL_COMPLETE			= 0x08;
+
+	/* NAVX_SELFTEST_STATUS */
+
+	static final byte NAVX_SELFTEST_STATUS_COMPLETE				= (byte) 0x80;
+
+	static final byte NAVX_SELFTEST_RESULT_GYRO_PASSED			= 0x01;
+	static final byte NAVX_SELFTEST_RESULT_ACCEL_PASSED			= 0x02;
+	static final byte NAVX_SELFTEST_RESULT_MAG_PASSED			= 0x04;
+	static final byte NAVX_SELFTEST_RESULT_BARO_PASSED			= 0x08;
+
+	/* NAVX_OP_STATUS */
+
+	static final byte NAVX_OP_STATUS_INITIALIZING				= 0x00;
+	static final byte NAVX_OP_STATUS_SELFTEST_IN_PROGRESS       = 0x01;
+	static final byte NAVX_OP_STATUS_ERROR						= 0x02;
+	static final byte NAVX_OP_STATUS_IMU_AUTOCAL_IN_PROGRESS	= 0x03;
+	static final byte NAVX_OP_STATUS_NORMAL					 	= 0x04;
+
+	/* NAVX_SENSOR_STATUS */
+	static final byte NAVX_SENSOR_STATUS_MOVING 				= 0x01;
+	static final byte NAVX_SENSOR_STATUS_YAW_STABLE 			= 0x02;
+	static final byte NAVX_SENSOR_STATUS_MAG_DISTURBANCE 		= 0x04;
+	static final byte NAVX_SENSOR_STATUS_ALTITUDE_VALID			= 0x08;
+	static final byte NAVX_SENSOR_STATUS_SEALEVEL_PRESS_SET		= 0x10;
+	static final byte NAVX_SENSOR_STATUS_FUSED_HEADING_VALID 	= 0x20;
+	
     public class AHRS_TUNING_VAR_ID
     {
         public static final byte UNSPECIFIED = 0;

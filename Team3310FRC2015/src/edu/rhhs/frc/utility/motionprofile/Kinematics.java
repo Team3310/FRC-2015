@@ -75,7 +75,7 @@ public class Kinematics {
 	                
 	        // Check to see if position is reachable & Calculate Theta3
 	        if (Math.abs(Kappa) > 1 ) {
-	            System.out.println("Position at time = " + NumPoints * 0.001 + " seconds is unreachable");
+	            System.out.println("Position = " +  Pos[i][0] + ", " +  Pos[i][1]  + ", " +  Pos[i][2]+ " at time = " + i * 0.001 + " seconds is unreachable");
 	            out.errorFlag = true;
 	            return out;
 	        } 

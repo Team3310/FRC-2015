@@ -19,6 +19,10 @@ public abstract class RobotArmCommandListGenerator {
 		commandList.add(new RobotArmToteGrabberAutoClose());
 	}
 
+	protected void addWaitForNextCommand() {
+		commandList.add(new RobotArmWaitForNext());
+	}
+
 	protected void addToteGrabberCloseCommand() {
 		commandList.add(new RobotArmToteGrabberSetPosition(ToteGrabberPosition.CLOSED));
 	}

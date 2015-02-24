@@ -86,7 +86,6 @@ public class BinGrabber extends Subsystem
 		setTalonControlMode(CANTalon.ControlMode.PercentVbus);
 		m_leftMotor.set(0);
 		m_rightMotor.set(0);
-    	RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 	}
 	
 	public void setClawPosition(BinGrabberState position) {

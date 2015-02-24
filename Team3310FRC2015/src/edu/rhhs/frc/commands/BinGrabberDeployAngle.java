@@ -20,9 +20,9 @@ public class BinGrabberDeployAngle extends Command
 	
 	@Override
 	protected void initialize() {
+		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 		RobotMain.binGrabber.setSpeed(speed, speed);
 		this.setTimeout(timeoutMs/1000.0);
-		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 	}
 
 	@Override

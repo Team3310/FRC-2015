@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class RobotArmMotionProfileStart extends Command 
 {
-	private RobotArmCommandList commandList;
+	protected RobotArmCommandList commandList;
 	
 	public RobotArmMotionProfileStart(RobotArmCommandList commandList) {
 		requires(RobotMain.robotArm);

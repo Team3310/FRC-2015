@@ -41,6 +41,11 @@ public class RobotArm extends Subsystem {
 	public static final double J2_MASTER_ANGLE_DEG = 97.36;
 	public static final double J3_MASTER_ANGLE_DEG = -109.88;
 	public static final double J4_MASTER_ANGLE_DEG = 0.0;
+	
+	public static final double X_MASTER_POSITION_IN = 26.567764225774383;
+	public static final double Y_MASTER_POSITION_IN = 0.0;
+	public static final double Z_MASTER_POSITION_IN = 8.889902513201704;
+	public static final double GAMMA_MASTER_ANGLE_DEG = 0.0;
  
 	// J4 raw analog value when J4 is set to 0 deg 
 	private static final int 	J4_ANALOG_ZERO_PRACTICE = 512;
@@ -74,6 +79,9 @@ public class RobotArm extends Subsystem {
 	private static final double J3_MAX_SPEED_DEG_PER_SEC = 180.0;
 	private static final double J4_MAX_SPEED_DEG_PER_SEC = 200.0;
 
+	// Jog speed
+	private static final double JOG_SPEED_INCHES_PER_SEC = 40.0;
+
 	private static final double JOYSTICK_DEADBAND_THROTTLE_POSITION = 0.2;
 
 	private CANTalonEncoderPID m_j1Motor;
@@ -82,7 +90,6 @@ public class RobotArm extends Subsystem {
 	private CANTalonAnalogPID  m_j4Motor;
 
 	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.1, 0.0, 50, 0);
-//	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.005, 0.01, -0.426, 50, 0.0);
 	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
 	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
 	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0);
@@ -105,8 +112,6 @@ public class RobotArm extends Subsystem {
 	private double m_limitJ3Deg;
 	private boolean isJ3Limited = false;
 	
-	private double m_j2InputRaw = 0;
-
 	private RobotArmCommandList m_controllerLoopCommandList;
 	private RobotArmCommand m_currentControllerLoopCommand;
 	private int m_currentControllerLoopCommandIndex;
@@ -115,6 +120,7 @@ public class RobotArm extends Subsystem {
 	private boolean m_controlLoopEnabled = false;
 	private long m_controlLoopStartTime = 0;
 	private long m_controlLoopDeltaTime = 0;
+	private boolean m_waitForNext;
 	
 	private MotionProfile motionProfileForOutput = new MotionProfile();
 
@@ -142,8 +148,6 @@ public class RobotArm extends Subsystem {
 			m_j3Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J3_CAN_ID, J3_SENSOR_GEAR_RATIO, J3_ENCODER_OFFSET_DEG, J3_MASTER_ANGLE_DEG, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
 			m_j4Motor = new CANTalonAnalogPID (RobotMap.ROBOT_ARM_J4_CAN_ID, J4_SENSOR_GEAR_RATIO, J4_ENCODER_OFFSET_DEG, J4_MASTER_ANGLE_DEG, J4_MIN_ANGLE_DEG, J4_MAX_ANGLE_DEG, J4_ANALOG_ZERO_PRACTICE);
 
-//			m_j1Motor.setStatusFrameRateMs(StatusFrameRate.General, 5);
-			
 			m_j1Motor.setSafetyEnabled(false);
 			m_j2Motor.setSafetyEnabled(false);
 			m_j3Motor.setSafetyEnabled(false);
@@ -211,7 +215,7 @@ public class RobotArm extends Subsystem {
 		m_j3Motor.setControlMode(mode);
 		m_j4Motor.setControlMode(mode);
 		
-		// If you change mode, need to quickly update the set command
+		// If you change mode, need to update the set command
 		if (mode == ControlMode.POSITION || mode == ControlMode.POSITION_INCREMENTAL) {			
 			m_positionCommandJ1 = m_j1Motor.setInitPosition();
 			m_positionCommandJ2 = m_j2Motor.setInitPosition();
@@ -244,6 +248,14 @@ public class RobotArm extends Subsystem {
 			return ToteGrabberPosition.OPEN;
 		}
 		return ToteGrabberPosition.CLOSED;
+	}
+
+	public synchronized boolean isWaitForNext() {
+		return m_waitForNext;
+	}
+
+	public synchronized void setWaitForNext(boolean waitForNext) {
+		this.m_waitForNext = waitForNext;
 	}
 
 	public void controlWithJoystick() {
@@ -288,24 +300,61 @@ public class RobotArm extends Subsystem {
 				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
 
 				m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
-				m_j2InputRaw = m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
+				m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
 				m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
 				m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);
 			}
+			
+			// Incremental joint angle position control
+//			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL) {
+//				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					m_positionCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ1;
+//				}
+//				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					m_positionCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ2; 
+//				}
+//				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					m_positionCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ3;
+//				}
+//				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					m_positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ4;
+//				}
+//
+//				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
+//				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
+//				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
+//				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
+//
+//				setPIDPosition(m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4);
+//			}
+
+			// Incremental robot cartesian position control
 			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL) {
+				
+				// First calculate the current XYZ coordinate
+				double[] xyzToolDeg = motionProfileForOutput.calcForwardKinematicsDeg(new double[] {m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4});
+
+				// Add delta stick command to XYZ coordinate
 				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ1;
+					xyzToolDeg[0] = -throttleRightX * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[0];
 				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ2 = -throttleRightY * J2_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ2; 
+					xyzToolDeg[1] = -throttleRightY * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[1]; 
 				}
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ3 = -throttleLeftY  * J3_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ3;
+					xyzToolDeg[2] = -throttleLeftY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
 				}
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					m_positionCommandJ4 = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.01 + m_positionCommandJ4;
+					xyzToolDeg[3] = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
 				}
 
+				// Calculate joint angles from adjusted XYZ coordinate
+				double[] jointAngles = motionProfileForOutput.calcInverseKinematicsDeg(xyzToolDeg);
+				m_positionCommandJ1 = jointAngles[0];
+				m_positionCommandJ2 = jointAngles[1];
+				m_positionCommandJ3 = jointAngles[2];
+				m_positionCommandJ4 = jointAngles[3];
+				
 				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
 				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
 				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
@@ -313,6 +362,51 @@ public class RobotArm extends Subsystem {
 
 				setPIDPosition(m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4);
 			}
+
+			// Incremental robot tool coordinate position control
+//			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL) {
+//				
+//				// First calculate the current XYZ coordinate
+//				double[] xyzToolDeg = motionProfileForOutput.calcForwardKinematicsDeg(new double[] {m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4});
+//
+//				// Get stick command in tool coordinates
+//				double deltaToolX = 0;
+//				double deltaToolY = 0;
+//				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					deltaToolX = -throttleRightX * JOG_SPEED_INCHES_PER_SEC * 0.05;
+//				}
+//				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					deltaToolY = -throttleRightY * JOG_SPEED_INCHES_PER_SEC * 0.05; 
+//				}
+//				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					xyzToolDeg[2] = -throttleLeftY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
+//				}
+//				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					xyzToolDeg[3] = -throttleLeftX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
+//				}
+//
+//				// Convert delta tool coordinate to world coordinate (use new gamma value?)
+//				double cosGamma = Math.cos(Math.toRadians(xyzToolDeg[3]));
+//				double sinGamma = Math.sin(Math.toRadians(xyzToolDeg[3]));
+//				xyzToolDeg[0] = deltaToolX * cosGamma - deltaToolY * sinGamma + xyzToolDeg[0];
+//				xyzToolDeg[1] = deltaToolX * sinGamma + deltaToolY * cosGamma + xyzToolDeg[1];
+//				
+//				// Calculate joint angles from adjusted XYZ coordinate
+//				double[] jointAngles = motionProfileForOutput.calcInverseKinematicsDeg(xyzToolDeg);
+//
+//				m_positionCommandJ1 = jointAngles[0];
+//				m_positionCommandJ2 = jointAngles[1];
+//				m_positionCommandJ3 = jointAngles[2];
+//				m_positionCommandJ4 = jointAngles[3];
+//				
+//				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
+//				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
+//				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
+//				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
+//
+//				setPIDPosition(m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4);
+//			}
+
 			else if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
 				SmartDashboard.putNumber("J1 Stick Command", throttleRightX);
 				SmartDashboard.putNumber("J2 Stick Command", throttleRightY);
@@ -377,11 +471,14 @@ public class RobotArm extends Subsystem {
 		m_positionCommandJ4 = j4PositionDeg;
 		
 		m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
-		m_j2InputRaw = m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
+		m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
 		m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
-//		m_j2InputRaw = m_j2Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ2, j2PositionPidParamsNegative, j2PositionPidParamsPositive);
-//		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
 		m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);	
+		
+		// Setting the PID coefficients each pass causes a 30-40 ms delay. This killed the 10 ms control loop.
+		// If you must schedule the gains, much better to switch between the 2 profiles stored in the Talon.
+//		m_j2Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ2, j2PositionPidParamsNegative, j2PositionPidParamsPositive);
+//		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
 	}
 	
 	public synchronized double[] getJointAngles() {
@@ -466,7 +563,6 @@ public class RobotArm extends Subsystem {
 		SmartDashboard.putNumber("J1 Position (deg)", 		m_j1Motor.getPositionDeg());
 		SmartDashboard.putNumber("J1 Velocity (deg-sec)", 	m_j1Motor.getVelocityDegPerSec());
 
-		SmartDashboard.putNumber("J2 Input (raw)", 			m_j2InputRaw);
 		SmartDashboard.putNumber("J2 Throttle Calc", 		m_j2Motor.getOutputVoltage() / m_j2Motor.getBusVoltage());
 		SmartDashboard.putNumber("J2 Output Voltage", 		m_j2Motor.getOutputVoltage());
 		SmartDashboard.putNumber("J2 Position (raw)", 		m_j2Motor.getPosition());

@@ -107,9 +107,9 @@ public class Physics {
 		  // Convert all joint angles to degrees and all distances to mm.
 		  for (int i = 0; i < Npts + 1; i++) {
 		      for (int j = 0; j < 4; j++) {
-		          CartPos[i][j] = CartPos[i][j] * 1000.0;           				// mm
-		          out.cartVel[i][j] = out.cartVel[i][j] * 1000.0;           		// mm/s
-		          out.cartAccel[i][j] = out.cartAccel[i][j] * 1000.0;      		 	// mm/s^2
+//		          CartPos[i][j] = CartPos[i][j] * 1000.0;           				// mm
+//		          out.cartVel[i][j] = out.cartVel[i][j] * 1000.0;           		// mm/s
+//		          out.cartAccel[i][j] = out.cartAccel[i][j] * 1000.0;      		 	// mm/s^2
 		          JointPos[i][j] = JointPos[i][j] * 180.0 / Math.PI;     			// deg
 		          out.jointVel[i][j] = out.jointVel[i][j] * 180.0 / Math.PI;     	// deg/s
 		          out.jointAccel[i][j] = out.jointAccel[i][j] * 180.0 / Math.PI; 	// deg/s^2
@@ -122,9 +122,9 @@ public class Physics {
 		      out.minJVel[j] = out.minJVel[j] * 180.0 / Math.PI;                  	// deg/s
 		  }
 		  
-		  out.maxPathVel = out.maxPathVel * 1000.0;                         		// mm/s
-		  out.minPathVel = out.minPathVel * 1000.0;                         		// mm/s
-		  out.avePathVel = out.avePathVel * 1000.0;                         		// mm/s
+//		  out.maxPathVel = out.maxPathVel * 1000.0;                         		// mm/s
+//		  out.minPathVel = out.minPathVel * 1000.0;                         		// mm/s
+//		  out.avePathVel = out.avePathVel * 1000.0;                         		// mm/s
 		  
 		  // Save the positions for convenience
 		  out.jointPos = JointPos;

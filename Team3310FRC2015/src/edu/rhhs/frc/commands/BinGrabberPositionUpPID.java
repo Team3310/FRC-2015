@@ -24,7 +24,6 @@ public class BinGrabberPositionUpPID extends Command
     protected void initialize() {
     	RobotMain.binGrabber.startPositionUpPID(leftTargetDeg, rightTargetDeg, errorDeg);
     	setTimeout(timeoutMs/1000.0);
-    	RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -39,7 +38,6 @@ public class BinGrabberPositionUpPID extends Command
     // Called once after isFinished returns true
     protected void end() {
     	RobotMain.binGrabber.stopPID();
-    	RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 100);
     }
 
     // Called when another command which requires one or more of the same

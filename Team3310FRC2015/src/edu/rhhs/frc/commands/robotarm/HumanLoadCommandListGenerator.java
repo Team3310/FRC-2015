@@ -7,13 +7,21 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 
-	public static final double[] HUMAN_LOAD_START_COORD =  {-1.182, -0.756, -0.203,0}; 
-	public static final double[] HUMAN_LOAD_FINISH_COORD = {-0.748, -0.168, -0.203,0}; 
-	public static final double[] LEFT_STACK_START_COORD =  { 0.775,  1.007, -0.625,0}; 
-	public static final double STACK_Y_SPACING = -0.483; 
-	public static final double STACK_Z_SPACING = 0.317; 
-	public static final double STACK_Z_RELEASE_OFFSET = 0.050; 
+	public static final double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
+	public static final double[] HUMAN_LOAD_FINISH_COORD = {-19.5, -24.0, 11.8, -129.0}; 
+	public static final double[] LEFT_STACK_UNLOAD_COORD =  { 30.4, 34.4, 11.1,    0.0};
 	
+	public static final double STACK_DELTA_Y_SPACING = -17; 
+	public static final double STACK_DELTA_Z_SPACING = 13.66; 
+	
+	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;   
+	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
+	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 2; 
+	
+	public static final double STACK_X_POST_UNLOAD_OFFSET = 6;   
+	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
+	public static final double STACK_Z_POST_UNLOAD_OFFSET = 0; 
+
 	public boolean debug = false;
 	
 	private StackPriority stackPriority = StackPriority.VERTICAL;
@@ -42,39 +50,45 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 		}
 		
 		// Initialize to position of first tote
-    	double[] toteReleasePosition = LEFT_STACK_START_COORD;   	
+    	double[] toteReleasePosition = LEFT_STACK_UNLOAD_COORD;   	
 		
 		for (int j = 0; j < secondaryCount; j++) {
 			
 			for (int i = 0; i < primaryCount; i++) {
 				if (debug) {
-					System.out.println("Tote position (mm) = " + toteReleasePosition[0] * 1000 + ", " + toteReleasePosition[1] * 1000 + ", " + toteReleasePosition[2] * 1000);
+					System.out.println("Tote position, primary = " + i + ", secondary = " + j + " (in) = " + toteReleasePosition[0] + ", " + toteReleasePosition[1] + ", " + toteReleasePosition[2]);
 				}
 				
 				// Wait for tote detection
-				addToteGrabberAutoCloseCommand();
+//				addToteGrabberAutoCloseCommand();
+				addWaitForNextCommand();
 				
 				// Pull away from human load station
-				WaypointList waypoints = new WaypointList(ProfileMode.CartesianInputJointMotion);	
-		    	waypoints.addWaypoint(HUMAN_LOAD_START_COORD);
-		    	waypoints.addWaypoint(HUMAN_LOAD_FINISH_COORD);
+				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
+		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_START_COORD);
+		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_FINISH_COORD);
 
-				// Move above tote unload position
-		    	double[] toteAboveReleasePosition = addPositionOffset(toteReleasePosition, 0, 0, STACK_Z_RELEASE_OFFSET, 0);
-		    	waypoints.addWaypoint(toteAboveReleasePosition);
+				// Move to the pre-unload position
+		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
+		    	waypointsHumanToStack.addWaypoint(totePreUnloadPosition);
 				
-				// Move down to place tote on stack
-		    	waypoints.addWaypoint(toteReleasePosition);
-		    	addMotionProfileCommand(waypoints);
+				// Move to the final unload position
+		    	waypointsHumanToStack.addWaypoint(toteReleasePosition);
+		    	addMotionProfileCommand(waypointsHumanToStack);
 				
 				// Release tote
 				addToteGrabberOpenCommand();
 				
 				// Joint motion back to human load station
-				WaypointList waypointsReturn = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-				waypointsReturn.addWaypoint(toteReleasePosition);
-				waypointsReturn.addWaypoint(HUMAN_LOAD_START_COORD);
-		    	addMotionProfileCommand(waypointsReturn);
+				WaypointList waypointsReturnToHuman = new WaypointList(ProfileMode.CartesianInputJointMotion);				
+				waypointsReturnToHuman.addWaypoint(toteReleasePosition);
+
+				// Move to post-unload position
+				double[] totePostUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_POST_UNLOAD_OFFSET, STACK_Y_POST_UNLOAD_OFFSET, STACK_Z_POST_UNLOAD_OFFSET, 0);
+				waypointsReturnToHuman.addWaypoint(totePostUnloadPosition);
+				
+				waypointsReturnToHuman.addWaypoint(HUMAN_LOAD_START_COORD);
+		    	addMotionProfileCommand(waypointsReturnToHuman);
 				
 		    	toteReleasePosition = incrementPrimaryTotePosition(toteReleasePosition);
 			}
@@ -85,10 +99,10 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	private double[] incrementPrimaryTotePosition(double[] waypoint) {
 		double[] output;
 		if (stackPriority == StackPriority.VERTICAL) {
-			output = addPositionOffset(waypoint, 0, 0, STACK_Z_SPACING, 0);
+			output = addPositionOffset(waypoint, 0, 0, STACK_DELTA_Z_SPACING, 0);
 		}
 		else {
-			output = addPositionOffset(waypoint, 0, STACK_Y_SPACING, 0, 0);
+			output = addPositionOffset(waypoint, 0, STACK_DELTA_Y_SPACING, 0, 0);
 		}
 		return output;
 	}
@@ -96,12 +110,12 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	private double[] incrementSecondaryTotePosition(double[] waypoint) {
 		double[] output;
 		if (stackPriority == StackPriority.VERTICAL) {
-			waypoint[2] = LEFT_STACK_START_COORD[2];  // Reset Z
-			output = addPositionOffset(waypoint, 0, STACK_Y_SPACING, 0, 0);
+			waypoint[2] = LEFT_STACK_UNLOAD_COORD[2];  // Reset Z
+			output = addPositionOffset(waypoint, 0, STACK_DELTA_Y_SPACING, 0, 0);
 		}
 		else {
-			waypoint[1] = LEFT_STACK_START_COORD[1];  // Reset Y
-			output = addPositionOffset(waypoint, 0, 0, STACK_Z_SPACING, 0);
+			waypoint[1] = LEFT_STACK_UNLOAD_COORD[1];  // Reset Y
+			output = addPositionOffset(waypoint, 0, 0, STACK_DELTA_Z_SPACING, 0);
 		}
 		return output;
 	}
@@ -131,7 +145,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	}
 	
     public static void main(String[] args) {
-    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.HORIZONTAL, 5, 6);
+    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 5, 6);
     	humanLoad.debug = true;
     	humanLoad.calculate();
     }

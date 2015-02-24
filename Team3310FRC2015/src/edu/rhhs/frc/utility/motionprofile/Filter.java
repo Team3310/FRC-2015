@@ -97,6 +97,15 @@ public class Filter {
 		
 		public ServoFilterOutput() {
 		}
+		
+		public void output(int outPts) {
+			System.out.println("Time (sec), J1 (deg), J2 (deg), J3 (deg), J4 (deg)");
+			for (int i = 0; i < ServoOut.length; i+=outPts) {
+				System.out.println(i/1000.0 + "," + 
+						ServoOut[i][0] + "," + ServoOut[i][1] + "," + ServoOut[i][2]  + "," + ServoOut[i][3] );
+			}
+		}		
+
 	}
 	
 	public ServoFilterOutput servoFilter(double itp, double Ted, double[][] ControlOut, int TotalPts, boolean ExpEnable) {

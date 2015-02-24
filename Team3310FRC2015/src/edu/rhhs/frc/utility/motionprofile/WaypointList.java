@@ -19,6 +19,18 @@ public class WaypointList {
 		coordinates.add(xyztool);
 	}
 	
+	public void insertWaypoint(double[] xyztool, int index) {
+		ArrayList<double[]> coordinatesTemp = new ArrayList<double[]>();
+		
+		for (int i = 0; i < coordinates.size(); i++) {
+			if (i == index) {
+				coordinatesTemp.add(xyztool);
+			}
+			coordinatesTemp.add(coordinates.get(i));
+		}
+		coordinates = coordinatesTemp;
+	}
+	
 	public double[][] getWaypoints() {
 		double[][] output = new double[coordinates.size()][3];
 		for (int i = 0; i < coordinates.size(); i++) {

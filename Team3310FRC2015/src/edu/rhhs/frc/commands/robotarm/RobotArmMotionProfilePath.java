@@ -12,37 +12,19 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class RobotArmMotionProfilePath extends RobotArmCommand {
 
-	private ProfileOutput profileOutput;
-	private int currentProfileIndex;
-	private boolean isFinished;
-	private double[] goFromCurrentToThisPoint = null;
-	private MotionProfile.ProfileMode profileMode;
+	protected ProfileOutput profileOutput;
+	protected int currentProfileIndex;
+	protected boolean isFinished;
 	
     public RobotArmMotionProfilePath(WaypointList waypoints) {
-    	MotionProfile motionProfile = new MotionProfile(waypoints);
-		motionProfile.calculatePath();
-		profileOutput = motionProfile.getProfile();
-    }
-
-    public RobotArmMotionProfilePath(double[] goFromCurrentToThisPoint, MotionProfile.ProfileMode profileMode) {
-    	this.goFromCurrentToThisPoint = goFromCurrentToThisPoint;
-    	this.profileMode = profileMode;
-    }
-
-    protected void initialize() {
-    	if (goFromCurrentToThisPoint != null) {
-        	MotionProfile motionProfile = new MotionProfile();
-        	double[] currentXYZTool = motionProfile.calcForwardKinematicsRad(RobotMain.robotArm.getJointAngles());
-
-        	WaypointList waypoints = new WaypointList(profileMode);
-        	waypoints.addWaypoint(currentXYZTool);
-        	waypoints.addWaypoint(goFromCurrentToThisPoint);
-    		
-        	motionProfile = new MotionProfile(waypoints);
-    		motionProfile.calculatePath();
-    		profileOutput = motionProfile.getProfile();
+    	if (waypoints != null) {
+	    	MotionProfile motionProfile = new MotionProfile(waypoints);
+			motionProfile.calculatePath();
+			profileOutput = motionProfile.getProfile();
     	}
-    	
+    }
+
+    protected void initialize() {    	
     	currentProfileIndex = 0;
     	isFinished = false;
     }
