@@ -20,8 +20,8 @@ public class DriveTrain extends Subsystem
 	
 	private CANTalonEncoderPID.ControlMode m_controlMode;
 	
-//	private PIDParams positionPidParams = new PIDParams(0.4, 0, 0.0, 0, 50, 0);  // drivetrain
-	private PIDParams positionPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0);   //hold
+	private PIDParams positionMovePidParams = new PIDParams(0.4, 0, 0.0, 0, 50, 0);  // drivetrain
+	private PIDParams positionHoldPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0);   //hold
 	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0);
 
 	private double m_error;
@@ -79,14 +79,14 @@ public class DriveTrain extends Subsystem
 
 			// The rear motors have encoders attached so they will be used for the main control input
 			m_rearLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearLeftMotor.setPIDParams(positionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_rearLeftMotor.setPIDParams(positionMovePidParams, CANTalonEncoderPID.POSITION_PROFILE);
 			m_rearLeftMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 			m_rearLeftMotor.reverseSensor(true);
 			m_rearLeftMotor.reverseOutput(false);
 			m_rearLeftMotor.setPosition(0);
 
 			m_rearRightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearRightMotor.setPIDParams(positionPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_rearRightMotor.setPIDParams(positionMovePidParams, CANTalonEncoderPID.POSITION_PROFILE);
 			m_rearRightMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 			m_rearRightMotor.reverseSensor(false);
 			m_rearRightMotor.reverseOutput(true);
@@ -136,6 +136,12 @@ public class DriveTrain extends Subsystem
 		m_rearLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
 		m_rearRightMotor.setPIDVelocityDegPerSecNoLimits(rightTargetDegPerSec);
 		m_error = errorDegPerSec;
+	}
+	
+	public void startPIDPositionHold() {
+		m_rearLeftMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_rearRightMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		startPIDPosition(0, 0, 1);
 	}
 	
 	public void startPIDPosition(double leftTargetInches, double rightTargetInches, double errorInches) {

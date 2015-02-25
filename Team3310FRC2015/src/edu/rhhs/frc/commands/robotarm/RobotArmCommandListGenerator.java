@@ -15,6 +15,11 @@ public abstract class RobotArmCommandListGenerator {
 		commandList.add(motionProfile);
 	}
 	
+	protected void addMotionProfileCurrentToPathCommand(WaypointList waypoints) {
+    	RobotArmMotionProfileCurrentToPath motionProfile = new RobotArmMotionProfileCurrentToPath(waypoints);
+		commandList.add(motionProfile);
+	}
+	
 	protected void addToteGrabberAutoCloseCommand() {
 		commandList.add(new RobotArmToteGrabberAutoClose());
 	}
@@ -31,12 +36,21 @@ public abstract class RobotArmCommandListGenerator {
 		commandList.add(new RobotArmToteGrabberSetPosition(ToteGrabberPosition.OPEN));
 	}
 
-	protected double[] addPositionOffset(double[] waypoint, double deltaX, double deltaY, double deltaZ, double deltaToolAngle) {
+	public static double[] addPositionOffset(double[] waypoint, double deltaX, double deltaY, double deltaZ, double deltaToolAngle) {
 		double[] position = new double[4];
 		position[0] = waypoint[0] + deltaX;
 		position[1] = waypoint[1] + deltaY;
 		position[2] = waypoint[2] + deltaZ;
 		position[3] = waypoint[3] + deltaToolAngle;
+		return position;
+	}
+
+	public static double[] calcPositionOffset(double[] waypointToSubtractFrom, double[] waypointToSubtract) {
+		double[] position = new double[4];
+		position[0] = waypointToSubtractFrom[0] - waypointToSubtract[0];
+		position[1] = waypointToSubtractFrom[1] - waypointToSubtract[1];
+		position[2] = waypointToSubtractFrom[2] - waypointToSubtract[2];
+		position[3] = waypointToSubtractFrom[3] - waypointToSubtract[3];
 		return position;
 	}
 

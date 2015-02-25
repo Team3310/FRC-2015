@@ -108,12 +108,16 @@ public class Filter {
 
 	}
 	
-	public ServoFilterOutput servoFilter(double itp, double Ted, double[][] ControlOut, int TotalPts, boolean ExpEnable) {
+	public ServoFilterOutput servoFilter(double servoFilterOutputSec, double itp, double Ted, double[][] ControlOut, int TotalPts, boolean ExpEnable) {
 	    
 		ServoFilterOutput out = new ServoFilterOutput();
 		
-	    int SFL1 = (int)Math.round(itp * 1000);
-	    int SFL2 = (int)Math.round(Ted * 1000);
+//	    int SFL1 = (int)Math.round(itp * 1000);
+//	    int SFL2 = (int)Math.round(Ted * 1000);
+//	    int SFL1 = (int)Math.round(itp * 100);
+//	    int SFL1 = 1;
+	    int SFL1 = (int)Math.round(itp / servoFilterOutputSec);
+	    int SFL2 = (int)Math.round(Ted / servoFilterOutputSec);
 	    double[] SFIL1 = new double[SFL1];
 	    double[] SFIL2 = new double[SFL2];
 	    double[] Weight = new double[SFL2];
@@ -180,7 +184,8 @@ public class Filter {
 	                // Must go backwards to catch the right input
 	                for (int M = TotalPts - 1; M >= 0; M--) {
 	                    if (i / SFL1 < (M + 1)) {
-	                        SFIL1[0] = ControlOut[M][k] / (itp * 1000);
+//	                        SFIL1[0] = ControlOut[M][k] / (itp * 1000);
+	                        SFIL1[0] = ControlOut[M][k] / (itp / servoFilterOutputSec);
 	                    }
 	                }
 	            }

@@ -1,6 +1,5 @@
 package edu.rhhs.frc.utility.motionprofile;
 
-import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -42,7 +41,7 @@ public class MotionProfile {
     protected double[] endTypeCNT; 
 
     protected double controllerUpdateRateSec = DEFAULT_CONTROLLER_UPDATE_RATE;  // Controller update rate seconds 
-    protected int outputRateMs = 10;   //  Output rate milliseconds
+    protected int outputRateMs = 1;   //  Output rate milliseconds
     protected double serverExponentialFilterDecayTime = controllerUpdateRateSec;   // Servo filter exponential decay
     protected boolean isServerExponentialFilterEnable = false;
     
@@ -99,7 +98,7 @@ public class MotionProfile {
     }
 
     // Perform profile calculations.  Return success/failure.
-	public boolean calculatePath() {
+	public boolean calculatePath(boolean calcVelocitiesAccels, double servoFilterOutputMs) {
         
     	IKINOutput iKINOutput = null;
     	Kinematics kinematics = new Kinematics();
@@ -185,7 +184,7 @@ public class MotionProfile {
  
         // Input code to call the Servo filters
         Filter filter = new Filter();
-        ServoFilterOutput serverFilterOutput = filter.servoFilter(controllerUpdateRateSec, serverExponentialFilterDecayTime, Out2, coMotionFilterOutput.NumITPs, isServerExponentialFilterEnable);
+        ServoFilterOutput serverFilterOutput = filter.servoFilter(servoFilterOutputMs/1000.0, controllerUpdateRateSec, serverExponentialFilterDecayTime, Out2, coMotionFilterOutput.NumITPs, isServerExponentialFilterEnable);
         
         // Servo position [ServoOut()] is actually deltaPos, so we take the
         // joint position of the 1st taught point [PosFilterIn(0,J)] to
@@ -206,100 +205,22 @@ public class MotionProfile {
        
         // ServoOut is now an array containing User Angles [radians]
         
-        // CALL Kinematic routine to calculate X,Y,Z position
-        // The Filter only outputs DeltaPosition in Joint Space.
-        double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, armLengths, dHLengths);
+        if (calcVelocitiesAccels) {
+	        // CALL Kinematic routine to calculate X,Y,Z position
+	        // The Filter only outputs DeltaPosition in Joint Space.
+	        double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, armLengths, dHLengths);
+	        
+	        // Call procedure to calculate velocity and acceleration
+	        profileOutput = Physics.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos);
+        }
+        else {
+	        profileOutput = new ProfileOutput(serverFilterOutput.pointCount, false);
+	        profileOutput.setJointAngles(serverFilterOutput.ServoOut);
+        }
         
-        // Call procedure to calculate velocity and acceleration
-        profileOutput = Physics.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos);
-
         return true;
 	} 
 	
-    // Perform profile calculations for linear drivetrain motion.  Total hack... just using joint angle motion to represent
-	// the cartesian motion.   Return success/failure.
-	public boolean calculateLinearPath() {
-            	    			
-    	double[][] taughtPositionsConverted = new double[taughtPositions.length][4];
-    	if (profileMode == ProfileMode.JointInputJointMotion) { 
-            for (int i = 0; i < taughtPositions.length; i++) {
-                for (int j = 0; j < 4; j++) {
-                	taughtPositionsConverted[i][j] = Math.toRadians(taughtPositions[i][j]);
-                }
-            }
-    	}
-    	else { 
-            for (int i = 0; i < taughtPositions.length; i++) {
-                for (int j = 0; j < 4; j++) {
-                	taughtPositionsConverted[i][j] = taughtPositions[i][j];
-                }
-            }
-    	}
-
-    	// Calculate the x(J1), y(J2), & z(J3) distance for each path.
-    	double[][] dDis = new double[numPaths][4];
-        for (int i = 0; i < numPaths; i++) {
-            for (int j = 0; j < 4; j++) {
-                dDis[i][j] = taughtPositionsConverted[i+1][j] - taughtPositionsConverted[i][j];
-            }
-        }
-                		
-	    // Convert cartesian acceleration filters to integration points
-	    for (int j = 0; j < 4; j++) {
-	    	jointAccels1[j] = Math.ceil(jointAccels1[j] / controllerUpdateRateSec);
-	    	jointAccels2[j] = Math.ceil(jointAccels2[j] / controllerUpdateRateSec);
-	    }
-	    
-	    cartesianAccel1 = Math.ceil(cartesianAccel1 / controllerUpdateRateSec);
-	    cartesianAccel2 = Math.ceil(cartesianAccel2 / controllerUpdateRateSec);
-
-	    // Call procedure to determine coordinated motion.
-	    CoordinatedMotion coordinatedMotion = new CoordinatedMotion();
-        CoordinatedMotion.CoMotionOutput coMotionOutput = coordinatedMotion.coMotion(	
-        		numPaths, dDis, pathVelocities, jointPercentVelocity, jointVelocities, jointAccels1, jointAccels2, profileMode, endTypeCNT, 
-                cartesianAccel1, cartesianAccel2, controllerUpdateRateSec);
-
-        // Procedure calculates all the input positions to the filter or Inverse Kin
-        CoMotionFilterOutput coMotionFilterOutput = coordinatedMotion.filterInput(
-        		dDis, coMotionOutput.Tseg, coMotionOutput.Tcnt, taughtPositionsConverted, numPaths);
-                                                        
-        // Runs the RJ-3 joint filter
-        double[][] Out2 = Filter.filter(profileMode, jointAccels1, jointAccels2, cartesianAccel1, cartesianAccel2, 
-        		coMotionFilterOutput.NumITPs, coMotionFilterOutput.PosFilter);
- 
-        // Input code to call the Servo filters
-        Filter filter = new Filter();
-        ServoFilterOutput serverFilterOutput = filter.servoFilter(controllerUpdateRateSec, serverExponentialFilterDecayTime, Out2, coMotionFilterOutput.NumITPs, isServerExponentialFilterEnable);
-        
-        // Servo position [ServoOut()] is actually deltaPos, so we take the
-        // joint position of the 1st taught point [PosFilterIn(0,J)] to
-        // use as a starting point.
-
-        for (int i = 0; i < serverFilterOutput.pointCount + 1; i++) {
-            if (i == 0) {
-                for (int j = 0; j < 4; j++) {
-                	serverFilterOutput.ServoOut[i][j] = coMotionFilterOutput.PosFilter[i][j];
-                }
-        	}                
-            else {
-                for (int j = 0; j < 4; j++) {
-                	serverFilterOutput.ServoOut[i][j] = serverFilterOutput.ServoOut[i-1][j] + serverFilterOutput.ServoOut[i][j];
-                }
-        	}
-        }
-        
-        for (int i = 0; i < serverFilterOutput.pointCount + 1; i++) {
-            for (int j = 0; j < 4; j++) {
-                serverFilterOutput.ServoOut[i][j] = Math.toDegrees(serverFilterOutput.ServoOut[i][j]);
-        	}
-        }
-
-        profileOutput = new ProfileOutput(serverFilterOutput.pointCount);
-        profileOutput.cartPos = serverFilterOutput.ServoOut;
-
-        return true;
-	} 
-
 	public double[] calcInverseKinematicsRad(double[] xyzToolPointRad) {
 		double[][] inputPoints = { xyzToolPointRad };
 		Kinematics kinematics = new Kinematics();
@@ -340,8 +261,8 @@ public class MotionProfile {
     	return xyzToolRad;
 	}
 	
-	public void printOutput() {
-		profileOutput.output(outputRateMs);
+	public void printOutput(double serverOutputRateMs) {
+		profileOutput.output(outputRateMs, serverOutputRateMs);
 	}
     
     // Getters and setters
@@ -513,11 +434,11 @@ public class MotionProfile {
     	
 		WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.JointInputJointMotion);	
     	waypointsHumanToStack.addWaypoint(new double[] {0,0,0,0});
-    	waypointsHumanToStack.addWaypoint(new double[] {50,0,0,0});
-    	waypointsHumanToStack.addWaypoint(new double[] {100,0,0,0});
+    	waypointsHumanToStack.addWaypoint(new double[] {50,40,30,30});
+    	waypointsHumanToStack.addWaypoint(new double[] {100,80,60,60});
     	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
-    	profile.calculatePath();
-    	profile.printOutput();
+    	profile.calculatePath(false, 10);
+    	profile.printOutput(10);
 
 //    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 //    	waypointsM2H.addWaypoint(RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG);
@@ -527,7 +448,7 @@ public class MotionProfile {
 //    	profile.calculatePath();
 //    	profile.printOutput();
 
-    	//    	System.out.println("Total time = " + (System.nanoTime() - startTime) / 1000000000.0);
+    	System.out.println("Total time = " + (System.nanoTime() - startTime) / 1000000000.0);
     	
 //    	WaypointList waypointsLinear = new WaypointList(ProfileMode.JointInputJointMotion);
 //    	waypointsLinear.addWaypoint(0, 0, 0, 0);
@@ -578,7 +499,7 @@ public class MotionProfile {
     	System.out.println("Forward KIN joint angle input deg = " + jointAngleInputDeg[0] + "," + jointAngleInputDeg[1] + "," + jointAngleInputDeg[2] + "," + jointAngleInputDeg[3]);
     	
     	double[] xyzToolOutputDeg = profile.calcForwardKinematicsDeg(jointAngleInputDeg);
-    	System.out.println("Forward KIN xyzTool output deg = " + xyzToolOutputDeg[0] + "," + xyzToolOutputDeg[1] + "," + xyzToolOutputDeg[2] + "," + xyzToolOutputDeg[3]);
+    	System.out.println("Forward KIN xyzTool output inches and deg = " + xyzToolOutputDeg[0] + "," + xyzToolOutputDeg[1] + "," + xyzToolOutputDeg[2] + "," + xyzToolOutputDeg[3]);
     	
     	double[] jointAngleOutputDeg = profile.calcInverseKinematicsDeg(xyzToolOutputDeg);
     	System.out.println("Inverse KIN joint angle output deg = " + jointAngleOutputDeg[0] + "," + jointAngleOutputDeg[1] + "," + jointAngleOutputDeg[2] + "," + jointAngleOutputDeg[3]);

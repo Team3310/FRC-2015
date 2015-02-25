@@ -18,27 +18,42 @@ public class ProfileOutput {
 	public double maxPathVel;
 	public double minPathVel;
 	
-	public ProfileOutput(int Npts) {
+	public ProfileOutput(int Npts, boolean allocateArrays) {
 		this.numPoints = Npts;
-		jointVel = new double[Npts+1][4];
-		jointAccel = new double[Npts+1][4];
-		cartVel = new double[Npts+1][4];
-		cartAccel = new double[Npts+1][4];
+		if (allocateArrays) {
+			jointVel = new double[Npts+1][4];
+			jointAccel = new double[Npts+1][4];
+			cartVel = new double[Npts+1][4];
+			cartAccel = new double[Npts+1][4];
+		}
 	}
 	
-	public void output(int outPts) {
-		System.out.println("Time (sec), J1 (deg), J2 (deg), J3 (deg), J4 (deg), J1 Speed (deg/sec), J2 Speed (deg/sec), J3 Speed (deg/sec), J4 Speed (deg/sec), X (in), Y (in), Z (in), Path Speed (in/s) ");
-		for (int i = 0; i < numPoints; i+=outPts) {
-			System.out.println(i/1000.0 + "," + 
-					jointPos[i][0] + "," + jointPos[i][1] + "," + jointPos[i][2]  + "," + jointPos[i][3] + "," + 
-					jointVel[i][0] + "," + jointVel[i][1] + "," + jointVel[i][2]  + "," + jointVel[i][3] + "," + 
-					cartPos[i][0]  + "," + cartPos[i][1]  + "," + cartPos[i][2]   + "," + cartVel[i][3]);
+	public void output(int outPts, double serverOutputRateMs) {
+		if (jointVel != null) {
+			System.out.println("Time (sec), J1 (deg), J2 (deg), J3 (deg), J4 (deg), J1 Speed (deg/sec), J2 Speed (deg/sec), J3 Speed (deg/sec), J4 Speed (deg/sec), X (in), Y (in), Z (in), Path Speed (in/s) ");
+			for (int i = 0; i < numPoints; i+=outPts) {
+				System.out.println(i * serverOutputRateMs / 1000.0 + "," + 
+						jointPos[i][0] + "," + jointPos[i][1] + "," + jointPos[i][2]  + "," + jointPos[i][3] + "," + 
+						jointVel[i][0] + "," + jointVel[i][1] + "," + jointVel[i][2]  + "," + jointVel[i][3] + "," + 
+						cartPos[i][0]  + "," + cartPos[i][1]  + "," + cartPos[i][2]   + "," + cartVel[i][3]);
+			}
+		}
+		else {
+			System.out.println("Time (sec), J1 (deg), J2 (deg), J3 (deg), J4 (deg)");
+			for (int i = 0; i < numPoints; i+=outPts) {
+				System.out.println(i * serverOutputRateMs / 1000.0 + "," + 
+						jointPos[i][0] + "," + jointPos[i][1] + "," + jointPos[i][2]  + "," + jointPos[i][3]);
+
+			}
 		}
 	}		
-	public void outputLinear(int outPts) {
-		System.out.println("Time (sec), X ");
-		for (int i = 0; i < numPoints; i+=outPts) {
-			System.out.println(i/1000.0 + "," + cartPos[i][0]);
-		}
-	}		
+		
+	public void setJointAngles(double[][] jointAnglesRad) {
+		  for (int i = 0; i < jointAnglesRad.length; i++) {
+		      for (int j = 0; j < 4; j++) {
+		    	  jointAnglesRad[i][j] = Math.toDegrees(jointAnglesRad[i][j]);     			// deg
+		      }		      
+		  }
+		  jointPos = jointAnglesRad;
+	}
 }

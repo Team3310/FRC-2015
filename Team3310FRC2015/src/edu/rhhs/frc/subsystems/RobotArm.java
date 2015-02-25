@@ -178,10 +178,7 @@ public class RobotArm extends Subsystem {
 			m_j3Motor.setPIDParams(j3VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 			m_j4Motor.setPIDParams(j4VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 
-			m_j1Motor.inititializeSensorPosition();
-			m_j2Motor.inititializeSensorPosition();
-			m_j3Motor.inititializeSensorPosition();
-
+			resetMasterPosition();
 			setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH);	
@@ -205,6 +202,12 @@ public class RobotArm extends Subsystem {
 		m_j2Motor.enableBrakeMode(true);
 		m_j3Motor.enableBrakeMode(true);
 		m_j4Motor.enableBrakeMode(true);
+	}
+	
+	public void resetMasterPosition() {
+		m_j1Motor.inititializeSensorPosition();
+		m_j2Motor.inititializeSensorPosition();
+		m_j3Motor.inititializeSensorPosition();
 	}
 
 	public void setControlMode(CANTalonEncoderPID.ControlMode mode) {
@@ -263,6 +266,9 @@ public class RobotArm extends Subsystem {
 			double throttleRightY = OI.getInstance().getRobotArmController().getRightYAxis();
 			double throttleLeftX = OI.getInstance().getRobotArmController().getLeftXAxis();
 			double throttleLeftY = OI.getInstance().getRobotArmController().getLeftYAxis();
+
+			double triggerRight = OI.getInstance().getRobotArmController().getRightTriggerAxis();
+			double triggerLeft = OI.getInstance().getRobotArmController().getLeftTriggerAxis();
 
 			SmartDashboard.putNumber("Right X Throttle", throttleRightX);
 			SmartDashboard.putNumber("Right Y Throttle", throttleRightY);
@@ -335,16 +341,16 @@ public class RobotArm extends Subsystem {
 //
 //				// Add delta stick command to XYZ coordinate
 //				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					xyzToolDeg[0] = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.01 + xyzToolDeg[0];
+//					xyzToolDeg[0] = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[0];
 //				}
 //				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					xyzToolDeg[1] = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.01 + xyzToolDeg[1]; 
+//					xyzToolDeg[1] = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[1]; 
 //				}
 //				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.01 + xyzToolDeg[2];
+//					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
 //				}
 //				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.01 + xyzToolDeg[3];
+//					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
 //				}
 //
 //				// Calculate joint angles from adjusted XYZ coordinate
@@ -372,16 +378,16 @@ public class RobotArm extends Subsystem {
 				double deltaToolX = 0;
 				double deltaToolY = 0;
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.01;
+					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05;
 				}
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					deltaToolY = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.01; 
+					deltaToolY = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05; 
 				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.01 + xyzToolDeg[2];
+					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
 				}
 				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.01 + xyzToolDeg[3];
+					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
 				}
 
 				// Convert delta tool coordinate to world coordinate (use new gamma value?)
@@ -392,6 +398,14 @@ public class RobotArm extends Subsystem {
 				
 				// Calculate joint angles from adjusted XYZ coordinate
 				double[] jointAngles = motionProfileForOutput.calcInverseKinematicsDeg(xyzToolDeg);
+				
+				// Add in the J1 position jog
+				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
+				}
+				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
+				}
 
 				m_positionCommandJ1 = jointAngles[0];
 				m_positionCommandJ2 = jointAngles[1];

@@ -1,0 +1,379 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="Motion Profile Human To Stack 2" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="527"/>
+	</widget>
+	<widget field="Motion Profile Stack 1 To Human" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="503"/>
+	</widget>
+	<widget field="Bin Grabber Deploy and Go PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1121" y="231"/>
+	</widget>
+	<widget field="Right Bin Grabber Deg Converted 2 Talon" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="911" y="0"/>
+	</widget>
+	<widget field="Left Bin Grabber Deg Converted 2 Talon" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="621" y="-2"/>
+	</widget>
+	<widget field="Right Bin Grabber Analog In Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="862" y="21"/>
+	</widget>
+	<widget field="Left Bin Grabber Analog In Raw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="605" y="21"/>
+	</widget>
+	<widget field="Right Bin Grabber Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="887" y="43"/>
+	</widget>
+	<widget field="Left Bin Grabber Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="621" y="43"/>
+	</widget>
+	<widget field="Right Bin Grabber Position (Deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="857" y="114"/>
+	</widget>
+	<widget field="Left Bin Grabber Position (Deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="601" y="115"/>
+	</widget>
+	<widget field="Rear Right Distance (Inches)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="373" y="42"/>
+	</widget>
+	<widget field="Rear Left Distance (Inches)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="140" y="43"/>
+	</widget>
+	<widget field="Rear Left Pos (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="29" y="602"/>
+	</widget>
+	<widget field="J1 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="172" y="309"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="1431" y="22"/>
+		<property name="Text" value="Autonomous"/>
+	</static-widget>
+	<widget field="Bin Grabber Cancel PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1308" y="204"/>
+	</widget>
+	<widget field="Autonomous Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="1419" y="37"/>
+	</widget>
+	<widget field="J3 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="740" y="448"/>
+	</widget>
+	<widget field="J2 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="657" y="547"/>
+	</widget>
+	<widget field="Y Robot (in)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1251" y="403"/>
+	</widget>
+	<widget field="IMU Yaw (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1245" y="482"/>
+	</widget>
+	<widget field="Tool angle (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1235" y="456"/>
+	</widget>
+	<widget field="Z Robot (in)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1255" y="430"/>
+	</widget>
+	<widget field="X Robot (in)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1249" y="375"/>
+	</widget>
+	<widget field="Drivetrain Hold Off" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="404"/>
+	</widget>
+	<widget field="Drivetrain Hold On" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="380"/>
+	</widget>
+	<widget field="Motion Profile Human To Stack" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="479"/>
+	</widget>
+	<widget field="Motion Profile Master To Human" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="455"/>
+	</widget>
+	<widget field="J1 Velocity (deg-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="870" y="368"/>
+	</widget>
+	<widget field="J1 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="165" y="250"/>
+	</widget>
+	<widget field="J3 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="527" y="423"/>
+	</widget>
+	<widget field="J1 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="163" y="346"/>
+	</widget>
+	<widget field="J4 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="697" y="359"/>
+	</widget>
+	<widget field="RobotArm Control loop time (ms)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1245" y="304"/>
+	</widget>
+	<widget field="Motion Profile Start J3 C" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="533" y="507"/>
+	</widget>
+	<widget field="Motion Profile Start J3 B" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="534" y="477"/>
+	</widget>
+	<widget field="Motion Profile Start J3 A" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="533" y="449"/>
+	</widget>
+	<widget field="Motion Profile Start J2 C" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="349" y="515"/>
+	</widget>
+	<widget field="Motion Profile Start J2 B" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="346" y="488"/>
+	</widget>
+	<widget field="Motion Profile Start J2 A" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="346" y="461"/>
+	</widget>
+	<widget field="Motion Profile Start J1 C" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="147" y="431"/>
+	</widget>
+	<widget field="Motion Profile Start J1 B" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="147" y="402"/>
+	</widget>
+	<widget field="Motion Profile Start J1 A" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="147" y="377"/>
+	</widget>
+	<widget field="J3 isLimited" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="529" y="393"/>
+	</widget>
+	<widget field="J3 Limit (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="526" y="367"/>
+	</widget>
+	<widget field="J2 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="666" y="574"/>
+	</widget>
+	<widget field="J2 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="341" y="414"/>
+	</widget>
+	<widget field="J2 Input (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="340" y="362"/>
+	</widget>
+	<widget field="Motion Profile Start Master to 0" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="408" y="1"/>
+	</widget>
+	<widget field="Bin Grabber Deploy and Drive" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1129" y="206"/>
+	</widget>
+	<widget field="J2 Output Voltage" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="336" y="387"/>
+	</widget>
+	<widget field="J1 Profile Actual (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1502" y="303"/>
+	</widget>
+	<widget field="J1 Profile Command (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1500" y="330"/>
+	</widget>
+	<widget field="Motion Profile Start 45 to 0" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1466" y="177"/>
+	</widget>
+	<widget field="Motion Profile Start -45 to 45" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1466" y="150"/>
+	</widget>
+	<widget field="Motion Profile Start 0 to -45" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1463" y="123"/>
+	</widget>
+	<widget field="RobotArm Controller" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1516" y="260"/>
+	</widget>
+	<widget field="Motion Profile Pause" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1644" y="151"/>
+	</widget>
+	<widget field="Main loop time (ms)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1272" y="275"/>
+	</widget>
+	<widget field="Motion Profile Resume" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1644" y="177"/>
+	</widget>
+	<widget field="DriveTrain Test Speed" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="182" y="166"/>
+	</widget>
+	<widget field="Bin Grabber Deploy and Go" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1128" y="178"/>
+	</widget>
+	<widget field="DriveTrain Test Position PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="353" y="143"/>
+	</widget>
+	<widget field="Left Bin Grabber Get" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="672" y="67"/>
+		<width>158</width>
+	</widget>
+	<widget field="Left Bin Grabber Analog Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="588" y="91"/>
+		<width>241</width>
+	</widget>
+	<widget field="Right Bin Grabber Get" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="929" y="66"/>
+		<width>169</width>
+	</widget>
+	<widget field="J4 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="688" y="263"/>
+		<width>141</width>
+	</widget>
+	<widget field="J3 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="750" y="423"/>
+		<width>139</width>
+		<height>21</height>
+	</widget>
+	<widget field="DriveTrain Test Velocity PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="181" y="142"/>
+	</widget>
+	<widget field="Bin Grabber Drag Position PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1129" y="146"/>
+	</widget>
+	<widget field="Bin Grabber Stowed Position PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1127" y="119"/>
+	</widget>
+	<widget field="Bin Grabber Deploy Position PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1126" y="92"/>
+		<width>187</width>
+	</widget>
+	<widget field="Bin Grabber Deploy Angle Limit" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1125" y="65"/>
+		<width>187</width>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="12" y="47"/>
+		<property name="Text" value="Drive Mode"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="9" y="223"/>
+		<property name="Text" value="Robot Arm Control Mode"/>
+	</static-widget>
+	<widget field="J4 Velocity (deg-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="675" y="333"/>
+		<width>154</width>
+	</widget>
+	<widget field="Robot Arm Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="2" y="244"/>
+	</widget>
+	<widget field="Tote Grabber Position" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="868" y="261"/>
+	</widget>
+	<widget field="J2 Velocity (deg-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="340" y="332"/>
+		<width>148</width>
+	</widget>
+	<widget field="J3 Velocity (deg-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="501" y="335"/>
+		<width>150</width>
+	</widget>
+	<widget field="Left Y Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="683" y="221"/>
+		<width>129</width>
+	</widget>
+	<widget field="Left X Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="686" y="197"/>
+		<width>129</width>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="35" y="10"/>
+		<property name="Text" value="Connection Status"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="7" y="7"/>
+		<width>19</width>
+		<height>20</height>
+	</static-widget>
+	<widget field="IR Tote Grabber Switch" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="861" y="286"/>
+	</widget>
+	<widget field="J2 Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="344" y="282"/>
+		<width>157</width>
+		<height>20</height>
+	</widget>
+	<widget field="J3 Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="516" y="285"/>
+		<width>131</width>
+	</widget>
+	<widget field="Right Y Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="831" y="221"/>
+		<width>133</width>
+	</widget>
+	<widget field="Right X Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="827" y="197"/>
+		<width>131</width>
+	</widget>
+	<widget field="J4 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="695" y="310"/>
+		<width>135</width>
+	</widget>
+	<widget field="J1 Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="183" y="282"/>
+		<width>135</width>
+	</widget>
+	<widget field="Bin Grabber Pivot Unlock" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="850" y="168"/>
+	</widget>
+	<widget field="Bin Grabber Pivot Lock" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="849" y="140"/>
+	</widget>
+	<widget field="Bin Grabber Claw Closed" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="680" y="167"/>
+	</widget>
+	<widget field="Bin Grabber Claw Open" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="678" y="140"/>
+		<width>150</width>
+	</widget>
+	<widget field="Tote Grabber Auto Close" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1075" y="313"/>
+	</widget>
+	<widget field="Tote Grabber Closed" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1073" y="286"/>
+		<width>152</width>
+	</widget>
+	<widget field="Tote Grabber Open" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1072" y="261"/>
+		<width>153</width>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="308" y="7"/>
+		<width>138</width>
+		<height>33</height>
+		<property name="Text" value="Drive Train"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
+		<location x="791" y="-11"/>
+		<width>127</width>
+		<height>34</height>
+		<property name="Text" value="Bin Grabber"/>
+	</static-widget>
+	<widget field="Bin Grabber Deploy Timed" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="1123" y="38"/>
+		<width>187</width>
+	</widget>
+	<widget field="J4 Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="694" y="286"/>
+		<width>137</width>
+	</widget>
+	<widget field="Right Bin Grabber Analog Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="844" y="91"/>
+		<width>255</width>
+	</widget>
+	<widget field="Rear Right Speed (deg-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="368" y="112"/>
+		<width>194</width>
+	</widget>
+	<widget field="Rear Left Speed (deg-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="164" y="111"/>
+		<width>195</width>
+	</widget>
+	<widget field="Rear Left Speed (ft-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="174" y="67"/>
+		<width>184</width>
+	</widget>
+	<widget field="Drive Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="6" y="55"/>
+	</widget>
+	<widget field="Rear Right Pos (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="400" y="89"/>
+		<width>163</width>
+	</widget>
+	<widget field="Rear Right Speed (ft-sec)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="376" y="66"/>
+		<width>187</width>
+	</widget>
+</dashboard>
+<live-window>
+</live-window>
+</xml>

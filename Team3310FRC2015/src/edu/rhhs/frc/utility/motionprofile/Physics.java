@@ -7,7 +7,7 @@ public class Physics {
 		 		
 		public static ProfileOutput VelAccPos(int Npts, double[][] JointPos, double[][] CartPos) {
 		
-			ProfileOutput out = new ProfileOutput(Npts);
+			ProfileOutput out = new ProfileOutput(Npts, true);
 			
 			// Calculate X, Y, & Z components of Cartesian Speed & Acceleration
 			for (int j = 0; j < 3; j++) {

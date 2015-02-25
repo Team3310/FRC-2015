@@ -1,6 +1,7 @@
 package edu.rhhs.frc.commands.robotarm;
 
 import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
+import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
 public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator {
@@ -27,6 +28,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	private StackPriority stackPriority = StackPriority.VERTICAL;
 	private int numStacks = 1;
 	private int numTotesPerStack = 6;
+	private double[] homeOffset = new double[] {0,0,0,0};
 	
 	public HumanLoadCommandListGenerator() {		
 	}
@@ -37,6 +39,14 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 		this.numTotesPerStack = numTotesPerStack;
 	}
 	
+	public synchronized double[] getHome() {
+		return homeOffset;
+	}
+
+	public synchronized void setHomeCartesian(double[] homeXYZInchesGammaDeg) {
+		this.homeOffset = calcPositionOffset(HUMAN_LOAD_START_COORD, homeXYZInchesGammaDeg);
+	}
+
 	public void calculate() {
 		int primaryCount = 0;
 		int secondaryCount = 0;
@@ -49,6 +59,11 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 			secondaryCount = numTotesPerStack;
 		}
 		
+		// Go from the current location to human station
+    	WaypointList waypointsGoHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+    	waypointsGoHome.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_START_COORD);
+    	addMotionProfileCurrentToPathCommand(waypointsGoHome);
+		
 		// Initialize to position of first tote
     	double[] toteReleasePosition = LEFT_STACK_UNLOAD_COORD;   	
 		
@@ -60,25 +75,26 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 				}
 				
 				// Wait for tote detection
-//				addToteGrabberAutoCloseCommand();
 				addWaitForNextCommand();
+				
+				// Grab tote
+				addToteGrabberCloseCommand();
 				
 				// Pull away from human load station
 				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
 		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_START_COORD);
 		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_FINISH_COORD);
 
-		    	// Move up
-		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
-		    	double[] totePreUnloadVerticalPosition = new double[] {HUMAN_LOAD_FINISH_COORD[0], HUMAN_LOAD_FINISH_COORD[1], totePreUnloadPosition[2], HUMAN_LOAD_FINISH_COORD[3]};
-		    	// waypointsHumanToStack.addWaypoint(totePreUnloadVerticalPosition);
-
 				// Move to the pre-unload position
+		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
 		    	waypointsHumanToStack.addWaypoint(totePreUnloadPosition);
 				
 				// Move to the final unload position
 		    	waypointsHumanToStack.addWaypoint(toteReleasePosition);
 		    	addMotionProfileCommand(waypointsHumanToStack);
+				
+				// Wait for release ok
+				addWaitForNextCommand();
 				
 				// Release tote
 				addToteGrabberOpenCommand();

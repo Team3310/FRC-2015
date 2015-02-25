@@ -138,11 +138,11 @@ public class XboxController
         return getAxisWithDeadZoneCheck(stick.getRawAxis(RIGHT_Y_AXIS)); 
     }
     
-    private double getLeftTriggerAxis(){
+    public double getLeftTriggerAxis(){
         return getAxisWithDeadZoneCheck(stick.getRawAxis(LEFT_TRIGGER_AXIS)); 
     }
     
-    private double getRightTriggerAxis(){
+    public double getRightTriggerAxis(){
         return getAxisWithDeadZoneCheck(stick.getRawAxis(RIGHT_TRIGGER_AXIS)); 
     }
     
