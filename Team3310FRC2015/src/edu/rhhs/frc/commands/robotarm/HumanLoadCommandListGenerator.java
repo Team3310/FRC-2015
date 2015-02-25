@@ -71,7 +71,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 		    	// Move up
 		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
 		    	double[] totePreUnloadVerticalPosition = new double[] {HUMAN_LOAD_FINISH_COORD[0], HUMAN_LOAD_FINISH_COORD[1], totePreUnloadPosition[2], HUMAN_LOAD_FINISH_COORD[3]};
-		    	waypointsHumanToStack.addWaypoint(totePreUnloadVerticalPosition);
+		    	// waypointsHumanToStack.addWaypoint(totePreUnloadVerticalPosition);
 
 				// Move to the pre-unload position
 		    	waypointsHumanToStack.addWaypoint(totePreUnloadPosition);
