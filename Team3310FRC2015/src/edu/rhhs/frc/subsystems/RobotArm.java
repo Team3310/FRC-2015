@@ -569,6 +569,7 @@ public class RobotArm extends Subsystem {
 		SmartDashboard.putNumber("J2 Position (deg)", 		m_j2Motor.getPositionDeg());
 		SmartDashboard.putNumber("J2 Velocity (deg-sec)", 	m_j2Motor.getVelocityDegPerSec());
 		SmartDashboard.putNumber("J2 Current", 				m_j2Motor.getOutputCurrent());
+		
 
 		SmartDashboard.putNumber("J3 Limit (deg)", 			m_limitJ3Deg);
 		SmartDashboard.putBoolean("J3 isLimited", 			isJ3Limited);
