@@ -1,9 +1,7 @@
 package edu.rhhs.frc.commands.robotarm;
 
 import edu.rhhs.frc.RobotMain;
-import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
-import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
 /**

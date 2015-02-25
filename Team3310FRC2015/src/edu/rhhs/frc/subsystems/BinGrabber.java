@@ -2,7 +2,6 @@ package edu.rhhs.frc.subsystems;
 
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
-import edu.rhhs.frc.commands.BinGrabberWithJoystick;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.PIDParams;

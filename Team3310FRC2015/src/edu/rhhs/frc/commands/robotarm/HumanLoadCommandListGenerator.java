@@ -7,8 +7,8 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 
-	public static final double[] HUMAN_LOAD_START_COORD =  {-39.577, -39.187, 22.961, -143.5}; 
-	public static final double[] HUMAN_LOAD_FINISH_COORD = {-29.556, -25.889, 16.0, -143.5}; 
+	public static final double[] HUMAN_LOAD_START_COORD =  {-39.577, -39.187, 22.961, -129}; 
+	public static final double[] HUMAN_LOAD_FINISH_COORD = {-29.556, -25.889, 16.0, -129}; 
 	public static final double[] LEFT_STACK_UNLOAD_COORD = { 29, -18, 11, 0.0};
 	
 	public static final double STACK_DELTA_Y_SPACING = -17.0; 
@@ -18,7 +18,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 4; 
 	
-	public static final double STACK_X_POST_UNLOAD_OFFSET = 6;   
+	public static final double STACK_X_POST_UNLOAD_OFFSET = -6;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Z_POST_UNLOAD_OFFSET = 0; 
 
@@ -68,8 +68,12 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_START_COORD);
 		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_FINISH_COORD);
 
-				// Move to the pre-unload position
+		    	// Move up
 		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
+		    	double[] totePreUnloadVerticalPosition = new double[] {HUMAN_LOAD_FINISH_COORD[0], HUMAN_LOAD_FINISH_COORD[1], totePreUnloadPosition[2], HUMAN_LOAD_FINISH_COORD[3]};
+		    	waypointsHumanToStack.addWaypoint(totePreUnloadVerticalPosition);
+
+				// Move to the pre-unload position
 		    	waypointsHumanToStack.addWaypoint(totePreUnloadPosition);
 				
 				// Move to the final unload position

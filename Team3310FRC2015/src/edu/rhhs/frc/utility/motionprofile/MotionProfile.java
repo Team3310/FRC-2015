@@ -1,6 +1,6 @@
 package edu.rhhs.frc.utility.motionprofile;
 
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -10,10 +10,10 @@ public class MotionProfile {
 	
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
 	public static final double DEFAULT_PATH_VELOCITY = 120;   						// inches/second
-	public static final double J1_JOINT_VELOCITY = 240;   							// deg/second
+	public static final double J1_JOINT_VELOCITY = 180;   							// deg/second
 	public static final double J2_JOINT_VELOCITY = 180;   							// deg/second
 	public static final double J3_JOINT_VELOCITY = 180;   							// deg/second
-	public static final double J4_JOINT_VELOCITY = 240;   							// deg/second
+	public static final double J4_JOINT_VELOCITY = 180;   							// deg/second
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
 	public static final double DEFAULT_JOINT_ACCEL1 = 400.0/1000.0;   				// seconds
@@ -573,7 +573,8 @@ public class MotionProfile {
 
     	double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
     	
-    	double[] jointAngleInputDeg = new double[] { 55, 94.7, -65.6, -55};
+    	double[] jointAngleInputDeg = new double[] {0, 89,  -101.7,   0};
+//    	double[] jointAngleInputDeg = new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG};
     	System.out.println("Forward KIN joint angle input deg = " + jointAngleInputDeg[0] + "," + jointAngleInputDeg[1] + "," + jointAngleInputDeg[2] + "," + jointAngleInputDeg[3]);
     	
     	double[] xyzToolOutputDeg = profile.calcForwardKinematicsDeg(jointAngleInputDeg);

@@ -1,7 +1,6 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
-import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class BinGrabberPositionUpPID extends Command 

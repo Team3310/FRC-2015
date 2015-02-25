@@ -26,7 +26,6 @@ import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.RobotArm;
@@ -303,6 +302,31 @@ public class OI
 		motionProfileM2H.whenPressed(new RobotArmMotionProfileStart(commandListM2H));
 		SmartDashboard.putData("Motion Profile Master To Human", motionProfileM2H);
 		
+		// Master to human station Profile
+    	WaypointList waypointsM2HCart = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+    	waypointsM2HCart.addWaypoint(RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG);
+    	waypointsM2HCart.addWaypoint(30.9, 0.0, 11.8, 0.0);
+    	waypointsM2HCart.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_START_COORD);
+    	RobotArmCommandList commandListM2HCart = new RobotArmCommandList();
+    	commandListM2HCart.add(new RobotArmMotionProfilePath(waypointsM2HCart));
+
+		InternalButton motionProfileM2HCart = new InternalButton();
+		motionProfileM2HCart.whenPressed(new RobotArmMotionProfileStart(commandListM2HCart));
+		SmartDashboard.putData("Motion Profile Master To Human Cartesian", motionProfileM2HCart);
+
+		// human station to stack Profile
+    	WaypointList waypointsH2SCart = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+    	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_START_COORD);
+    	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_FINISH_COORD);
+    	waypointsH2SCart.addWaypoint(29, -18, 15, 0.0);
+    	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.LEFT_STACK_UNLOAD_COORD);
+    	RobotArmCommandList commandListH2SCart = new RobotArmCommandList();
+    	commandListH2SCart.add(new RobotArmMotionProfilePath(waypointsH2SCart));
+
+		InternalButton motionProfileH2SCart = new InternalButton();
+		motionProfileH2SCart.whenPressed(new RobotArmMotionProfileStart(commandListH2SCart));
+		SmartDashboard.putData("Motion Profile Human To Stack Cartesian", motionProfileH2SCart);
+
 		// Human station to stack Profile
     	WaypointList waypointsH2S = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
     	waypointsH2S.addWaypoint(-129, 73, -42.69, 0);

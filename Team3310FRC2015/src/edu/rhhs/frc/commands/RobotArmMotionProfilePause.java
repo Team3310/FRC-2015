@@ -1,8 +1,6 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
-import edu.rhhs.frc.utility.motionprofile.MotionProfile;
-import edu.rhhs.frc.utility.motionprofile.WaypointList;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class RobotArmMotionProfilePause extends Command 
