@@ -7,8 +7,8 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 
-	public static final double[] HUMAN_LOAD_START_COORD =  {-39.577, -39.187, 22.961, -143.5}; 
-	public static final double[] HUMAN_LOAD_FINISH_COORD = {-29.556, -25.889, 16.0, -143.5}; 
+	public static final double[] HUMAN_LOAD_START_COORD =  {-39.577, -39.187, 22.961, -129}; 
+	public static final double[] HUMAN_LOAD_FINISH_COORD = {-29.556, -25.889, 16.0, -129}; 
 	public static final double[] LEFT_STACK_UNLOAD_COORD = { 29, -18, 11, 0.0};
 	
 	public static final double STACK_DELTA_Y_SPACING = -17.0; 
