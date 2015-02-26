@@ -35,7 +35,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 
 	// Original gripper
 	public static final double[] DEFAULT_HOME_COORD =  {-37.5, -40.0, 22.5, -125.0};  // {-39.577, -39.187, 22.961, -129}; 
-	public static final double[] HUMAN_LOAD_FINISH_COORD = {-22.0, -28.0, 22.5, -125.0}; 
+	public static final double[] HOME_EXTRACT_TOTE_COORD = {-22.0, -28.0, 22.5, -125.0}; 
 
 	public static final double[] LEFT_POSITION_BUILD_STACK_RELEASE_COORD = {35, -12, 11, 0.0};  // {29, -24, 11, 0.0}
 	public static final double[] LEFT_POSITION_MOVE_STACK_RELEASE_COORD = {29, -8, 11, 0.0};
@@ -103,9 +103,11 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 			secondaryCount = numTotesPerStack;
 		}
 		
+		commandList.clear();
+		
 		// Go from the current location to human station
     	WaypointList waypointsGoHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
-    	waypointsGoHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
+    	waypointsGoHome.addWaypoint(homePosition);
     	addMotionProfileCurrentToPathCommand(waypointsGoHome);
 		
 		// Initialize to position of first tote
@@ -129,11 +131,11 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 				
 				// Pull away from human load station
 				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
-		    	waypointsHumanToStack.addWaypoint(DEFAULT_HOME_COORD);
-		    	waypointsHumanToStack.addWaypoint(HUMAN_LOAD_FINISH_COORD);
+		    	waypointsHumanToStack.addWaypoint(homePosition);
+		    	waypointsHumanToStack.addWaypoint(HOME_EXTRACT_TOTE_COORD);
 
 		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
-		    	double[] toteGetToHeightPosition = new double[] {HUMAN_LOAD_FINISH_COORD[0], HUMAN_LOAD_FINISH_COORD[1], totePreUnloadPosition[2],  HUMAN_LOAD_FINISH_COORD[3]};
+		    	double[] toteGetToHeightPosition = new double[] {HOME_EXTRACT_TOTE_COORD[0], HOME_EXTRACT_TOTE_COORD[1], totePreUnloadPosition[2],  HOME_EXTRACT_TOTE_COORD[3]};
 		    	
 		    	// Move tote straight up to pre unload height
 			    waypointsHumanToStack.addWaypoint(toteGetToHeightPosition);
@@ -178,7 +180,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 					// Move to post-unload position
 					waypointsReturnToHuman.addWaypoint(totePostUnloadPosition);
 					
-					waypointsReturnToHuman.addWaypoint(DEFAULT_HOME_COORD);
+					waypointsReturnToHuman.addWaypoint(homePosition);
 			    	addMotionProfileCommand(waypointsReturnToHuman);
 					
 			    	toteReleasePosition = incrementPrimaryTotePosition(toteReleasePosition);

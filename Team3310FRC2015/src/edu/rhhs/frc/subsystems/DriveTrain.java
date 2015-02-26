@@ -25,6 +25,7 @@ public class DriveTrain extends Subsystem
 	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0);
 
 	private double m_error;
+	private boolean isHoldOn = false;
 	 
     private RobotDrive m_drive;
     
@@ -136,12 +137,14 @@ public class DriveTrain extends Subsystem
 		m_rearLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
 		m_rearRightMotor.setPIDVelocityDegPerSecNoLimits(rightTargetDegPerSec);
 		m_error = errorDegPerSec;
+		isHoldOn = false;
 	}
 	
 	public void startPIDPositionHold() {
 		m_rearLeftMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 		m_rearRightMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 		startPIDPosition(0, 0, 1);
+		isHoldOn = true;
 	}
 	
 	public void startPIDPosition(double leftTargetInches, double rightTargetInches, double errorInches) {
@@ -151,10 +154,12 @@ public class DriveTrain extends Subsystem
 		m_rearLeftMotor.setPIDPositionInches(leftTargetInches);
 		m_rearRightMotor.setPIDPositionInches(rightTargetInches);
 		m_error = errorInches;
+		isHoldOn = false;
 	}
 	
 	public void stopPID() {
 		setSpeed(0);
+		isHoldOn = false;
 	}
 	
 	public void setSpeed(double speed) {
@@ -282,5 +287,6 @@ public class DriveTrain extends Subsystem
 //		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_rearRightMotor.getVelocityFtPerSec());		
 		SmartDashboard.putNumber("Rear Left Distance (Inches)", m_rearLeftMotor.getPositionInches());
 		SmartDashboard.putNumber("Rear Right Distance (Inches)", m_rearRightMotor.getPositionInches());
+		SmartDashboard.putBoolean("Drivetrain Hold On", isHoldOn);
 	}
 }

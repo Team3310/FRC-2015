@@ -11,7 +11,7 @@ public class RobotArmSetHome extends Command
 	
 	@Override
 	protected void initialize() {
-		RobotMain.robotArm.resetMasterPosition();
+		RobotMain.commandListGenerator.setHome(RobotMain.robotArm.getJointAngles());
 	}
 
 	@Override

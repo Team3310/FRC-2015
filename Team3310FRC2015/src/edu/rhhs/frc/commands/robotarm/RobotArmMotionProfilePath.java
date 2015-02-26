@@ -14,25 +14,27 @@ public class RobotArmMotionProfilePath extends RobotArmCommand {
 	protected ProfileOutput profileOutput;
 	protected int currentProfileIndex;
 	protected boolean isFinished;
+	protected WaypointList waypoints;
+	protected double[] jointVelocities; 
 	
     public RobotArmMotionProfilePath(WaypointList waypoints) {
-    	if (waypoints != null) {
-	    	MotionProfile motionProfile = new MotionProfile(waypoints);
-			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
-			profileOutput = motionProfile.getProfile();
-    	}
+    	this.waypoints = waypoints;
     }
 
-    public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointSpeeds) {
-    	if (waypoints != null) {
-	    	MotionProfile motionProfile = new MotionProfile(waypoints);
-	    	motionProfile.setJointVelocities(jointSpeeds);
-			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
-			profileOutput = motionProfile.getProfile();
-    	}
+    public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointVelocities) {
+       	this.waypoints = waypoints;
+       	this.jointVelocities = jointVelocities;
     }
     
     protected void initialize() {    	
+    	if (waypoints != null) {
+	    	MotionProfile motionProfile = new MotionProfile(waypoints);
+	    	if (jointVelocities != null) {
+	    		motionProfile.setJointVelocities(jointVelocities);
+	    	}
+			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
+			profileOutput = motionProfile.getProfile();
+    	}
     	currentProfileIndex = 0;
     	isFinished = false;
     }

@@ -18,6 +18,7 @@ import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
 import edu.rhhs.frc.commands.RobotArmMotionProfileReset;
 import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
+import edu.rhhs.frc.commands.RobotArmSetHome;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
@@ -115,8 +116,8 @@ public class OI
         JoystickButton motionProfileGoHome = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.START_BUTTON);
         motionProfileGoHome.whenPressed(new RobotArmMotionProfileStart(commandListCurrentToHome));
 
-//       JoystickButton resetMaster = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.BACK_BUTTON);
-//       resetMaster.whenPressed(new RobotArmResetMaster());
+        JoystickButton resetHome = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.BACK_BUTTON);
+        resetHome.whenPressed(new RobotArmSetHome());
 
         JoystickButton toteGrabberOpen = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.LEFT_BUMPER_BUTTON);
         toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));

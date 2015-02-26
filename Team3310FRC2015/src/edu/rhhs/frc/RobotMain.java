@@ -5,15 +5,22 @@ import com.kauailabs.navx_mxp.AHRS;
 
 import edu.rhhs.frc.commands.BinGrabberDeployAndGo;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
+import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
+import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
+import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
+import edu.rhhs.frc.utility.motionprofile.MotionProfile;
+import edu.rhhs.frc.utility.motionprofile.WaypointList;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -38,8 +45,14 @@ public class RobotMain extends IterativeRobot
     private SendableChooser m_autonomousChooser;
 //    private SendableChooser m_driveModeChooser;
     private SendableChooser m_robotArmControlModeChooser;
+    private SendableChooser m_numStacksChooser;
+    private SendableChooser m_numTotesPerStackChooser;
+    private SendableChooser m_stackPriorityChooser;
 
     private long m_loopTime;
+    private Integer numStacks = null;
+    private Integer numTotesPerStack = null;
+    private StackPriority stackPriority;
 
     private SerialPort m_imuSerialPort;
     public AHRS m_imu;
@@ -55,8 +68,6 @@ public class RobotMain extends IterativeRobot
         	m_loopTime = System.nanoTime();
         	
         	commandListGenerator.setStackPriority(StackPriority.VERTICAL);
-        	commandListGenerator.setNumStacks(4);
-        	commandListGenerator.setNumTotesPerStack(6);
 
 //        	m_driveModeChooser = new SendableChooser();
 //        	m_driveModeChooser.addObject ("XBox Arcade Left", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
@@ -67,6 +78,28 @@ public class RobotMain extends IterativeRobot
 //        	m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
 //        	SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
 
+        	m_stackPriorityChooser = new SendableChooser();
+        	m_stackPriorityChooser.addDefault("Vertical Priority", StackPriority.VERTICAL);
+        	m_stackPriorityChooser.addObject ("Horizontal Priority", StackPriority.HORIZONTAL);
+        	SmartDashboard.putData("Stack Priority", m_stackPriorityChooser);
+
+        	m_numStacksChooser = new SendableChooser();
+        	m_numStacksChooser.addObject ("1 Stack", 	new Integer(1));
+        	m_numStacksChooser.addObject ("2 Stacks", 	new Integer(2));
+        	m_numStacksChooser.addDefault("3 Stacks", 	new Integer(3));
+        	m_numStacksChooser.addObject ("4 Stacks", 	new Integer(4));
+        	m_numStacksChooser.addObject ("5 Stacks", 	new Integer(5));
+        	SmartDashboard.putData("Num Stacks", m_numStacksChooser);
+       	
+        	m_numTotesPerStackChooser = new SendableChooser();
+        	m_numTotesPerStackChooser.addObject ("1 Totes", new Integer(1));
+        	m_numTotesPerStackChooser.addObject ("2 Totes", new Integer(2));
+        	m_numTotesPerStackChooser.addObject ("3 Totes", new Integer(3));
+        	m_numTotesPerStackChooser.addObject ("4 Totes", new Integer(4));
+        	m_numTotesPerStackChooser.addObject ("5 Totes", new Integer(5));
+        	m_numTotesPerStackChooser.addDefault("6 Totes", new Integer(6));
+        	SmartDashboard.putData("Num Totes Per Stack", m_numTotesPerStackChooser);
+       	
         	m_robotArmControlModeChooser = new SendableChooser();
         	m_robotArmControlModeChooser.addObject ("VBus Only", 				CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
         	m_robotArmControlModeChooser.addObject ("VBus Position Hold", 		CANTalonEncoderPID.ControlMode.VBUS_POSITION_HOLD);
@@ -74,10 +107,15 @@ public class RobotMain extends IterativeRobot
         	m_robotArmControlModeChooser.addDefault("Position Incremental", 	CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);
         	m_robotArmControlModeChooser.addObject ("Velocity Position Hold", 	CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD);
         	SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
+       	
+        	WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+        	waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
+        	RobotArmCommandList commandListCurrentToHome = new RobotArmCommandList();
+        	commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 
         	m_autonomousChooser = new SendableChooser();
-        	m_autonomousChooser.addObject("BinGrabberDeployAndGo", 	new BinGrabberDeployAndGo());
-        	m_autonomousChooser.addDefault ("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
+        	m_autonomousChooser.addDefault("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
+        	m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
         	SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 
 	    	m_imuSerialPort = new SerialPort(57600,SerialPort.Port.kMXP);
@@ -108,8 +146,7 @@ public class RobotMain extends IterativeRobot
         m_imuFirstIteration = true;
  
         updateStatus();
-        System.out.println("\nRobot code successfully enabled!");
-    }
+     }
 	
 	public void disabledPeriodic() {
 		// Set up the IMU
@@ -117,10 +154,13 @@ public class RobotMain extends IterativeRobot
         if ( m_imuFirstIteration && !isCalibrating ) {
             Timer.delay( 0.3 );
             m_imu.zeroYaw();
-            m_imuFirstIteration = false;
-            
-            commandListGenerator.calculate();
+            m_imuFirstIteration = false; 
         }
+
+        // Update the command list generator
+        numStacks = (Integer)m_numStacksChooser.getSelected();
+        numTotesPerStack = (Integer)m_numTotesPerStackChooser.getSelected();
+        stackPriority = (StackPriority)m_stackPriorityChooser.getSelected();
 
         // Get the command used for the autonomous period
     	m_autonomousCommand = (Command)m_autonomousChooser.getSelected();
@@ -154,6 +194,9 @@ public class RobotMain extends IterativeRobot
 //        driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
         driveTrain.setJoystickControllerMode(DriveTrain.CONTROLLER_JOYSTICK_CHEESY);
         robotArm.setControlMode((CANTalonEncoderPID.ControlMode)m_robotArmControlModeChooser.getSelected());
+        commandListGenerator.setNumStacks(numStacks);
+    	commandListGenerator.setNumTotesPerStack(numTotesPerStack);
+        commandListGenerator.calculate();
         updateStatus();
     }
 
@@ -190,6 +233,9 @@ public class RobotMain extends IterativeRobot
     		long currentTime = System.nanoTime();
     		SmartDashboard.putNumber("Main loop time (ms)", (currentTime - m_loopTime) / 1000000.0);
     		SmartDashboard.putNumber("IMU Yaw (deg)", m_imu.getYaw());
+    		SmartDashboard.putNumber("Num Stacks", numStacks);
+    		SmartDashboard.putNumber("Num Totes Per Stack", numTotesPerStack);
+       		SmartDashboard.putString("Stack Priority", stackPriority == StackPriority.HORIZONTAL ? "Horizontal" : "Vertical");
     		m_loopTime = currentTime;
     		driveTrain.updateStatus();
     		binGrabber.updateStatus();

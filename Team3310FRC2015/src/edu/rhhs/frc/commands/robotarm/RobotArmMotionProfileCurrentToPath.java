@@ -58,7 +58,8 @@ public class RobotArmMotionProfileCurrentToPath extends RobotArmMotionProfilePat
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
     	profileOutput = motionProfile.getProfile();
 
-    	super.initialize();
+    	currentProfileIndex = 0;
+    	isFinished = false;
     }
     
     private boolean isAngleClose(double angle1, double angle2) {
