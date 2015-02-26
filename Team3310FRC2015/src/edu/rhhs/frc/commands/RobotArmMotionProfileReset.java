@@ -1,27 +1,21 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
-import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class BinGrabberSetSpeed extends Command
+public class RobotArmMotionProfileReset extends Command 
 {
-	private double speed;
-	
-	public BinGrabberSetSpeed(double speed) {
-		this.speed = speed;
-		requires(RobotMain.binGrabber);
+	public RobotArmMotionProfileReset() {
+		requires(RobotMain.robotArm);
 	}
 	
 	@Override
 	protected void initialize() {
-		RobotMain.binGrabber.setTalonControlMode(CANTalon.ControlMode.PercentVbus);
-		RobotMain.binGrabber.setSpeed(speed, speed);
+		RobotMain.robotArm.disableControlLoop();
 	}
 
 	@Override
 	protected void execute() {
-		
 	}
 
 	@Override
@@ -38,5 +32,4 @@ public class BinGrabberSetSpeed extends Command
 	protected void interrupted() {
 		
 	}
-
 }

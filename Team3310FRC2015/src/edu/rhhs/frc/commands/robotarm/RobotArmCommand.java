@@ -51,9 +51,9 @@ public abstract class RobotArmCommand {
      */
     public synchronized boolean run() {
         if (!m_initialized) {
-            m_initialized = true;
             startTiming();
             initialize();
+            m_initialized = true;
         }
         execute();
         return isFinished();

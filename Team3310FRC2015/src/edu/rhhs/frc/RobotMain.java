@@ -76,8 +76,8 @@ public class RobotMain extends IterativeRobot
         	SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
 
         	m_autonomousChooser = new SendableChooser();
-        	m_autonomousChooser.addDefault("BinGrabberDeployAndGo", 	new BinGrabberDeployAndGo());
-        	m_autonomousChooser.addObject ("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
+        	m_autonomousChooser.addObject("BinGrabberDeployAndGo", 	new BinGrabberDeployAndGo());
+        	m_autonomousChooser.addDefault ("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
         	SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 
 	    	m_imuSerialPort = new SerialPort(57600,SerialPort.Port.kMXP);

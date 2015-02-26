@@ -106,7 +106,7 @@ public class BinGrabber extends Subsystem
 		}
 	}
 
-	private void setTalonControlMode(CANTalon.ControlMode mode) {
+	public void setTalonControlMode(CANTalon.ControlMode mode) {
 		m_leftMotor.changeControlMode(mode);
 		m_rightMotor.changeControlMode(mode);
 	}
@@ -190,11 +190,11 @@ public class BinGrabber extends Subsystem
 	}
 
 	public void updateStatus() {
-		SmartDashboard.putNumber("Left Bin Grabber Get", m_leftMotor.get());
-		SmartDashboard.putNumber("Right Bin Grabber Get", m_rightMotor.get());
-
-		SmartDashboard.putNumber("Left Bin Grabber Analog In Raw", m_leftMotor.getAnalogInRaw());
-		SmartDashboard.putNumber("Right Bin Grabber Analog In Raw", m_rightMotor.getAnalogInRaw());
+//		SmartDashboard.putNumber("Left Bin Grabber Get", m_leftMotor.get());
+//		SmartDashboard.putNumber("Right Bin Grabber Get", m_rightMotor.get());
+//
+//		SmartDashboard.putNumber("Left Bin Grabber Analog In Raw", m_leftMotor.getAnalogInRaw());
+//		SmartDashboard.putNumber("Right Bin Grabber Analog In Raw", m_rightMotor.getAnalogInRaw());
 
 		SmartDashboard.putNumber("Left Bin Grabber Analog Position (raw)", m_leftMotor.getPosition());
 		SmartDashboard.putNumber("Right Bin Grabber Analog Position (raw)", m_rightMotor.getPosition());
@@ -202,10 +202,10 @@ public class BinGrabber extends Subsystem
 		SmartDashboard.putNumber("Left Bin Grabber Position (Deg)", getLeftPositionDeg());
 		SmartDashboard.putNumber("Right Bin Grabber Position (Deg)", getRightPositionDeg());
 
-		SmartDashboard.putNumber("Left Bin Grabber Deg Converted 2 Talon", RobotUtility.convertDegToAnalogPosition(getLeftPositionDeg(), LEFT_ANALOG_ZERO_PRACTICE, -1));
-		SmartDashboard.putNumber("Right Bin Grabber Deg Converted 2 Talon", RobotUtility.convertDegToAnalogPosition(getRightPositionDeg(), RIGHT_ANALOG_ZERO_PRACTICE, 1));
-
-		SmartDashboard.putNumber("Left Bin Grabber Throttle", m_leftMotor.getOutputVoltage() / m_leftMotor.getBusVoltage());
-		SmartDashboard.putNumber("Right Bin Grabber Throttle", m_rightMotor.getOutputVoltage() / m_rightMotor.getBusVoltage());
+//		SmartDashboard.putNumber("Left Bin Grabber Deg Converted 2 Talon", RobotUtility.convertDegToAnalogPosition(getLeftPositionDeg(), LEFT_ANALOG_ZERO_PRACTICE, -1));
+//		SmartDashboard.putNumber("Right Bin Grabber Deg Converted 2 Talon", RobotUtility.convertDegToAnalogPosition(getRightPositionDeg(), RIGHT_ANALOG_ZERO_PRACTICE, 1));
+//
+//		SmartDashboard.putNumber("Left Bin Grabber Throttle", m_leftMotor.getOutputVoltage() / m_leftMotor.getBusVoltage());
+//		SmartDashboard.putNumber("Right Bin Grabber Throttle", m_rightMotor.getOutputVoltage() / m_rightMotor.getBusVoltage());
 	}
 }

@@ -274,12 +274,12 @@ public class DriveTrain extends Subsystem
 	}
 	
 	public void updateStatus() {
-		SmartDashboard.putNumber("Rear Left Pos (deg)", m_rearLeftMotor.getPositionDeg());
-		SmartDashboard.putNumber("Rear Right Pos (deg)", m_rearRightMotor.getPositionDeg());
-		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", m_rearLeftMotor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", m_rearRightMotor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", m_rearLeftMotor.getVelocityFtPerSec());
-		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_rearRightMotor.getVelocityFtPerSec());		
+//		SmartDashboard.putNumber("Rear Left Pos (deg)", m_rearLeftMotor.getPositionDeg());
+//		SmartDashboard.putNumber("Rear Right Pos (deg)", m_rearRightMotor.getPositionDeg());
+//		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", m_rearLeftMotor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", m_rearRightMotor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", m_rearLeftMotor.getVelocityFtPerSec());
+//		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_rearRightMotor.getVelocityFtPerSec());		
 		SmartDashboard.putNumber("Rear Left Distance (Inches)", m_rearLeftMotor.getPositionInches());
 		SmartDashboard.putNumber("Rear Right Distance (Inches)", m_rearRightMotor.getPositionInches());
 	}

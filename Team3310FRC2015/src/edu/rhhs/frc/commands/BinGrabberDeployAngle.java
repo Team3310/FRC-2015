@@ -1,6 +1,7 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -19,6 +20,7 @@ public class BinGrabberDeployAngle extends Command
 	
 	@Override
 	protected void initialize() {
+		RobotMain.binGrabber.setTalonControlMode(CANTalon.ControlMode.PercentVbus);
 		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 		RobotMain.binGrabber.setSpeed(speed, speed);
 		this.setTimeout(timeoutMs/1000.0);

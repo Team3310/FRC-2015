@@ -1,6 +1,7 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class BinGrabberSetRightSpeed extends Command
@@ -14,6 +15,7 @@ public class BinGrabberSetRightSpeed extends Command
 	
 	@Override
 	protected void initialize() {
+		RobotMain.binGrabber.setTalonControlMode(CANTalon.ControlMode.PercentVbus);
 		RobotMain.binGrabber.setRightSpeed(speed);
 	}
 

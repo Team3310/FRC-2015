@@ -272,10 +272,10 @@ public class RobotArm extends Subsystem {
 			double triggerRight = OI.getInstance().getRobotArmController().getRightTriggerAxis();
 			double triggerLeft = OI.getInstance().getRobotArmController().getLeftTriggerAxis();
 
-			SmartDashboard.putNumber("Right X Throttle", throttleRightX);
-			SmartDashboard.putNumber("Right Y Throttle", throttleRightY);
-			SmartDashboard.putNumber("Left X Throttle" , throttleLeftX);
-			SmartDashboard.putNumber("Left Y Throttle" , throttleLeftY);
+//			SmartDashboard.putNumber("Right X Throttle", throttleRightX);
+//			SmartDashboard.putNumber("Right Y Throttle", throttleRightY);
+//			SmartDashboard.putNumber("Left X Throttle" , throttleLeftX);
+//			SmartDashboard.putNumber("Left Y Throttle" , throttleLeftY);
 
 			if (m_robotArmControlMode == CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD) {
 				double velocityCommandJ1 = -throttleRightX * J1_MAX_SPEED_DEG_PER_SEC;
@@ -571,41 +571,40 @@ public class RobotArm extends Subsystem {
 	}
 
 	public void updateStatus() {
-		SmartDashboard.putNumber("J1 Throttle Calc", 		m_j1Motor.getOutputVoltage() / m_j1Motor.getBusVoltage());
-		SmartDashboard.putNumber("J1 Profile Command (deg)", m_positionCommandJ1);
-		SmartDashboard.putNumber("J1 Profile Actual (deg)", m_j1Motor.getPositionDeg());
+//		SmartDashboard.putNumber("J1 Throttle Calc", 		m_j1Motor.getOutputVoltage() / m_j1Motor.getBusVoltage());
+//		SmartDashboard.putNumber("J1 Profile Command (deg)", m_positionCommandJ1);
+//		SmartDashboard.putNumber("J1 Profile Actual (deg)", m_j1Motor.getPositionDeg());
 
-		SmartDashboard.putNumber("J1 Position (raw)", 		m_j1Motor.getPosition());
+//		SmartDashboard.putNumber("J1 Position (raw)", 		m_j1Motor.getPosition());
 		SmartDashboard.putNumber("J1 Position (deg)", 		m_j1Motor.getPositionDeg());
-		SmartDashboard.putNumber("J1 Velocity (deg-sec)", 	m_j1Motor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("J1 Current", 				m_j1Motor.getOutputCurrent());
+//		SmartDashboard.putNumber("J1 Velocity (deg-sec)", 	m_j1Motor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("J1 Current", 				m_j1Motor.getOutputCurrent());
 
 		SmartDashboard.putNumber("J2 Throttle Calc", 		m_j2Motor.getOutputVoltage() / m_j2Motor.getBusVoltage());
-		SmartDashboard.putNumber("J2 Output Voltage", 		m_j2Motor.getOutputVoltage());
-		SmartDashboard.putNumber("J2 Position (raw)", 		m_j2Motor.getPosition());
+//		SmartDashboard.putNumber("J2 Output Voltage", 		m_j2Motor.getOutputVoltage());
+//		SmartDashboard.putNumber("J2 Position (raw)", 		m_j2Motor.getPosition());
 		SmartDashboard.putNumber("J2 Position (deg)", 		m_j2Motor.getPositionDeg());
-		SmartDashboard.putNumber("J2 Velocity (deg-sec)", 	m_j2Motor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("J2 Current", 				m_j2Motor.getOutputCurrent());
-		
+//		SmartDashboard.putNumber("J2 Velocity (deg-sec)", 	m_j2Motor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("J2 Current", 				m_j2Motor.getOutputCurrent());		
 
-		SmartDashboard.putNumber("J3 Limit (deg)", 			m_limitJ3Deg);
-		SmartDashboard.putBoolean("J3 isLimited", 			isJ3Limited);
+//		SmartDashboard.putNumber("J3 Limit (deg)", 			m_limitJ3Deg);
+//		SmartDashboard.putBoolean("J3 isLimited", 			isJ3Limited);
 		SmartDashboard.putNumber("J3 Throttle Calc", 		m_j3Motor.getOutputVoltage() / m_j3Motor.getBusVoltage());
-		SmartDashboard.putNumber("J3 Position (raw)", 		m_j3Motor.getPosition());
+//		SmartDashboard.putNumber("J3 Position (raw)", 		m_j3Motor.getPosition());
 		SmartDashboard.putNumber("J3 Position (deg)", 		m_j3Motor.getPositionDeg());
-		SmartDashboard.putNumber("J3 Velocity (deg-sec)", 	m_j3Motor.getVelocityDegPerSec());
-		SmartDashboard.putNumber("J3 Current", 				m_j3Motor.getOutputCurrent());
+//		SmartDashboard.putNumber("J3 Velocity (deg-sec)", 	m_j3Motor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("J3 Current", 				m_j3Motor.getOutputCurrent());
 
 		SmartDashboard.putNumber("J4 Throttle Calc", 		m_j4Motor.getOutputVoltage() / m_j4Motor.getBusVoltage());
-		SmartDashboard.putNumber("J4 Position (raw)", 		m_j4Motor.getPosition());
+//		SmartDashboard.putNumber("J4 Position (raw)", 		m_j4Motor.getPosition());
 		SmartDashboard.putNumber("J4 Position (deg)", 		m_j4Motor.getPositionDeg());
-		SmartDashboard.putNumber("J4 Velocity (deg-sec)", 	m_j4Motor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("J4 Velocity (deg-sec)", 	m_j4Motor.getVelocityDegPerSec());
 
-		SmartDashboard.putBoolean("IR Tote Grabber Switch", getToteGrabberSwitch());
-		SmartDashboard.putString("Tote Grabber Position", 	getToteGrabberPosition().toString());
+//		SmartDashboard.putBoolean("IR Tote Grabber Switch", getToteGrabberSwitch());
+//		SmartDashboard.putString("Tote Grabber Position", 	getToteGrabberPosition().toString());
 
 		SmartDashboard.putBoolean("RobotArm Controller", 	m_controlLoopEnabled);
-		SmartDashboard.putNumber("RobotArm Control loop time (ms)", 	getControlLoopDeltaTime() / 1000000);
+//		SmartDashboard.putNumber("RobotArm Control loop time (ms)", 	getControlLoopDeltaTime() / 1000000);
 		
 		double[] jointAnglesDeg = new double[] {m_j1Motor.getPositionDeg(), m_j2Motor.getPositionDeg(), m_j3Motor.getPositionDeg(), m_j4Motor.getPositionDeg()};
 		double[] xyzToolDeg = motionProfileForOutput.calcForwardKinematicsDeg(jointAnglesDeg);
