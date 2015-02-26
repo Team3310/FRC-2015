@@ -123,8 +123,8 @@ public class OI
         JoystickButton motionProfileGoHome = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.START_BUTTON);
         motionProfileGoHome.whenPressed(new RobotArmMotionProfileStart(commandListCurrentToHome));
 
-        JoystickButton resetMaster = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.BACK_BUTTON);
-        resetMaster.whenPressed(new RobotArmResetMaster());
+//       JoystickButton resetMaster = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.BACK_BUTTON);
+//       resetMaster.whenPressed(new RobotArmResetMaster());
 
         JoystickButton toteGrabberOpen = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.LEFT_BUMPER_BUTTON);
         toteGrabberOpen.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
@@ -342,7 +342,7 @@ public class OI
     	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_START_COORD);
     	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.HUMAN_LOAD_FINISH_COORD);
     	waypointsH2SCart.addWaypoint(29, -18, 15, 0.0);
-    	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.LEFT_STACK_UNLOAD_COORD);
+    	waypointsH2SCart.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
     	RobotArmCommandList commandListH2SCart = new RobotArmCommandList();
     	commandListH2SCart.add(new RobotArmMotionProfilePath(waypointsH2SCart));
 

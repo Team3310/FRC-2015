@@ -89,9 +89,11 @@ public class RobotArm extends Subsystem {
 	private CANTalonAnalogPID  m_j4Motor;
 
 	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.1, 0.0, 50, 0);
-	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
-	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
-	private PIDParams j4PositionPidParams = new PIDParams(3.0, 0.005, 0.0, 0.0, 50, 0);
+//	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
+//	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
+	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.2, 150, 0);
+	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.17, 150, 0);
+	private PIDParams j4PositionPidParams = new PIDParams(5.0, 0.005, 0.0, 0.0, 50, 0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0);
 	private PIDParams j2VelocityPidParams = new PIDParams(0.5, 0.02, 0.0, 0.0, 0, 0);
@@ -378,16 +380,16 @@ public class RobotArm extends Subsystem {
 				double deltaToolX = 0;
 				double deltaToolY = 0;
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05;
+					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.06;
 				}
 				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					deltaToolY = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05; 
+					deltaToolY = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.06; 
 				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
+					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.06 + xyzToolDeg[2];
 				}
 				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
+					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.06 + xyzToolDeg[3];
 				}
 
 				// Convert delta tool coordinate to world coordinate (use new gamma value?)
@@ -401,10 +403,10 @@ public class RobotArm extends Subsystem {
 				
 				// Add in the J1 position jog
 				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
+					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.04;
 				}
 				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
+					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.04;
 				}
 
 				m_positionCommandJ1 = jointAngles[0];
@@ -436,6 +438,7 @@ public class RobotArm extends Subsystem {
 
 	// Motion profiling
 	public void startRobotArmCommandList(RobotArmCommandList commandList) {
+		this.disableControlLoop();
 		m_controllerLoopCommandList = commandList;
 		m_currentControllerLoopCommandIndex = 0;
 		if (m_controllerLoopCommandList != null && m_controllerLoopCommandList.size() > 0) {
@@ -517,18 +520,18 @@ public class RobotArm extends Subsystem {
 		}
 
 		// Height limit check
-		if (j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG) {
-			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg) {
-				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg;
-				isJ3Limited = true;
-			}
-		}
-		if (j2AngleDeg >= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG && j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG) {
-			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg) {
-				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg;
-				isJ3Limited = true;
-			}			
-		}
+//		if (j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG) {
+//			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg) {
+//				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg;
+//				isJ3Limited = true;
+//			}
+//		}
+//		if (j2AngleDeg >= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG && j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG) {
+//			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg) {
+//				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg;
+//				isJ3Limited = true;
+//			}			
+//		}
 		
 		return j3AngleDeg;
 	}

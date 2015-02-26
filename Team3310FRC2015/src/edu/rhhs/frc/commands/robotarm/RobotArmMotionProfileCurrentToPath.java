@@ -11,8 +11,8 @@ import edu.rhhs.frc.utility.motionprofile.WaypointList;
  */
 public class RobotArmMotionProfileCurrentToPath extends RobotArmMotionProfilePath {
 
-	private static final double CLOSE_DELTA_ANGLE_DEG = 5.0;
-	private static final double CLOSE_DELTA_POSITION_IN = 3.0;
+	private static final double CLOSE_DELTA_ANGLE_DEG = 2.0;
+	private static final double CLOSE_DELTA_POSITION_IN = 2.0;
 	private WaypointList waypoints;
 	
     public RobotArmMotionProfileCurrentToPath(WaypointList waypoints) {

@@ -23,6 +23,15 @@ public class RobotArmMotionProfilePath extends RobotArmCommand {
     	}
     }
 
+    public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointSpeeds) {
+    	if (waypoints != null) {
+	    	MotionProfile motionProfile = new MotionProfile(waypoints);
+	    	motionProfile.setJointVelocities(jointSpeeds);
+			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
+			profileOutput = motionProfile.getProfile();
+    	}
+    }
+    
     protected void initialize() {    	
     	currentProfileIndex = 0;
     	isFinished = false;

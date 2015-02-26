@@ -1,16 +1,29 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="J3 Current" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="869" y="412"/>
+		<width>328</width>
+		<height>272</height>
+	</widget>
+	<widget field="J2 Current" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="548" y="412"/>
+		<width>313</width>
+		<height>274</height>
+	</widget>
+	<widget field="J1 Current" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="965" y="70"/>
+	</widget>
 	<widget field="J4 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="916" y="299"/>
+		<location x="916" y="295"/>
 	</widget>
 	<widget field="J3 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="913" y="214"/>
+		<location x="913" y="222"/>
 	</widget>
 	<widget field="J2 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="920" y="135"/>
+		<location x="918" y="135"/>
 	</widget>
 	<widget field="J1 Stick Command" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="920" y="51"/>
+		<location x="915" y="47"/>
 	</widget>
 	<widget field="Left Y Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="671" y="378"/>
@@ -43,13 +56,13 @@
 		<location x="411" y="508"/>
 	</widget>
 	<widget field="Motion Profile Human To Stack" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="411" y="484"/>
+		<location x="354" y="456"/>
 	</widget>
 	<widget field="Motion Profile Human To Stack Cartesian" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="1046" y="451"/>
+		<location x="1029" y="353"/>
 	</widget>
 	<widget field="Motion Profile Master To Human Cartesian" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="1043" y="426"/>
+		<location x="824" y="354"/>
 	</widget>
 	<widget field="Motion Profile Master To Human" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
 		<location x="411" y="412"/>
@@ -100,10 +113,10 @@
 		<location x="188" y="481"/>
 	</widget>
 	<widget field="Tote Grabber Closed" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="1001" y="367"/>
+		<location x="876" y="326"/>
 	</widget>
 	<widget field="Tote Grabber Open" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="1004" y="394"/>
+		<location x="1010" y="328"/>
 	</widget>
 	<widget field="DriveTrain Test Position PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
 		<location x="1104" y="27"/>
@@ -160,7 +173,7 @@
 		<location x="671" y="210"/>
 	</widget>
 	<widget field="J2 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="928" y="89"/>
+		<location x="928" y="93"/>
 		<height>20</height>
 	</widget>
 	<widget field="Autonomous Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
@@ -218,16 +231,16 @@
 		<location x="244" y="147"/>
 	</widget>
 	<widget field="J1 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="924" y="28"/>
+		<location x="921" y="25"/>
 	</widget>
 	<widget field="J1 Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="244" y="105"/>
 	</widget>
 	<widget field="J2 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="925" y="112"/>
+		<location x="924" y="115"/>
 	</widget>
 	<widget field="J3 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="924" y="169"/>
+		<location x="924" y="181"/>
 	</widget>
 	<widget field="J2 Position (raw)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="244" y="42"/>
@@ -236,7 +249,7 @@
 		<location x="395" y="0"/>
 	</widget>
 	<widget field="J3 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="919" y="191"/>
+		<location x="919" y="202"/>
 	</widget>
 	<widget field="J3 Limit (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="244" y="0"/>
@@ -254,7 +267,7 @@
 		<location x="0" y="336"/>
 	</widget>
 	<widget field="J1 Throttle Calc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="928" y="6"/>
+		<location x="926" y="3"/>
 	</widget>
 	<widget field="Left Bin Grabber Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="294"/>

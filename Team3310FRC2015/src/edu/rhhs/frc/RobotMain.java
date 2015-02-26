@@ -55,7 +55,7 @@ public class RobotMain extends IterativeRobot
         	m_loopTime = System.nanoTime();
         	
         	commandListGenerator.setStackPriority(StackPriority.VERTICAL);
-        	commandListGenerator.setNumStacks(1);
+        	commandListGenerator.setNumStacks(4);
         	commandListGenerator.setNumTotesPerStack(6);
 
 //        	m_driveModeChooser = new SendableChooser();

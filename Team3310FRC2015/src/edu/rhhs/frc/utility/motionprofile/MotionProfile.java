@@ -1,5 +1,6 @@
 package edu.rhhs.frc.utility.motionprofile;
 
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -8,15 +9,15 @@ public class MotionProfile {
 	public enum ProfileMode {CartesianInputLinearMotion, JointInputJointMotion, CartesianInputJointMotion};
 	
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
-	public static final double DEFAULT_PATH_VELOCITY = 120;   						// inches/second
-	public static final double J1_JOINT_VELOCITY = 180;   							// deg/second
-	public static final double J2_JOINT_VELOCITY = 180;   							// deg/second
-	public static final double J3_JOINT_VELOCITY = 180;   							// deg/second
-	public static final double J4_JOINT_VELOCITY = 180;   							// deg/second
+	public static final double DEFAULT_PATH_VELOCITY = 130;   						// inches/second
+	public static final double J1_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double J2_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double J3_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double J4_JOINT_VELOCITY = 150;   							// deg/second
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
-	public static final double DEFAULT_JOINT_ACCEL1 = 400.0/1000.0;   				// seconds
-	public static final double DEFAULT_JOINT_ACCEL2 = 200.0/1000.0;   				// seconds	
+	public static final double DEFAULT_JOINT_ACCEL1 = 200.0/1000.0;   				// seconds
+	public static final double DEFAULT_JOINT_ACCEL2 = 100.0/1000.0;   				// seconds	
 	public static final double DEFAULT_END_TYPE_CNT = 0;   							
 
 	public static final double INNER_ARM_LENGTH = 28.0; 		// inches 
@@ -316,7 +317,9 @@ public class MotionProfile {
 	}
 
 	public void setJointVelocities(double[] jointVelocities) {
-		this.jointVelocities = jointVelocities;
+		for (int i = 0; i < 4; i++) {
+			this.jointVelocities[i] = Math.toRadians(jointVelocities[i]);
+		}
 	}
 
 	public double[] getJointAccels1() {
@@ -432,12 +435,27 @@ public class MotionProfile {
 //    	profile.calculatePath();
 //    	profile.printOutput();
     	
-		WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.JointInputJointMotion);	
-    	waypointsHumanToStack.addWaypoint(new double[] {0,0,0,0});
-    	waypointsHumanToStack.addWaypoint(new double[] {50,40,30,30});
-    	waypointsHumanToStack.addWaypoint(new double[] {100,80,60,60});
-    	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
-    	profile.calculatePath(false, 10);
+//		WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.JointInputJointMotion);	
+//    	waypointsHumanToStack.addWaypoint(new double[] {0,0,0,0});
+//    	waypointsHumanToStack.addWaypoint(new double[] {50,40,30,30});
+//    	waypointsHumanToStack.addWaypoint(new double[] {100,80,60,60});
+//    	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
+//    	profile.calculatePath(false, 10);
+//    	profile.printOutput(10);   	
+//    	
+//		WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
+//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
+//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_MOVE_STACK_RELEASE_COORD);
+//    	MotionProfile profile = new MotionProfile(waypointsMoveStack);
+//    	profile.calculatePath(true, 10);
+//    	profile.printOutput(10);
+
+		WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
+		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
+		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_MOVE_STACK_RELEASE_COORD);
+		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
+    	MotionProfile profile = new MotionProfile(waypointsMoveStack);
+    	profile.calculatePath(true, 10);
     	profile.printOutput(10);
 
 //    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
