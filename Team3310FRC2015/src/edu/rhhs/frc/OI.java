@@ -89,11 +89,11 @@ public class OI
         JoystickButton binGrabberClawClose = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
         binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
         
-        XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT_TRIGGER);
-        driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
-
-        XBoxDPadTriggerButton driveTrainHoldOff = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT_TRIGGER);
-        driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
+//        XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT_TRIGGER);
+//        driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
+//
+//        XBoxDPadTriggerButton driveTrainHoldOff = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT_TRIGGER);
+//        driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
         
         // Robot arm controller
         JoystickButton motionProfilePause = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.Y_BUTTON);

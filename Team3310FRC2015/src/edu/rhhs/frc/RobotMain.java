@@ -116,6 +116,7 @@ public class RobotMain extends IterativeRobot
         	m_autonomousChooser = new SendableChooser();
         	m_autonomousChooser.addDefault("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
         	m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
+        	m_autonomousChooser.addObject ("Do nothing", null);
         	SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 
 	    	m_imuSerialPort = new SerialPort(57600,SerialPort.Port.kMXP);
@@ -175,7 +176,9 @@ public class RobotMain extends IterativeRobot
 	}
 
     public void autonomousInit() {
-        m_autonomousCommand.start();
+    	if (m_autonomousCommand != null) {
+    		m_autonomousCommand.start();
+    	}
     }
 
     /**
