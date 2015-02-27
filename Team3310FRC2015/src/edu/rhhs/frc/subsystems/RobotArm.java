@@ -88,7 +88,7 @@ public class RobotArm extends Subsystem {
 	private CANTalonEncoderPID m_j3Motor;
 	private CANTalonAnalogPID  m_j4Motor;
 
-	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.1, 0.0, 50, 0);
+	private PIDParams j1PositionPidParams = new PIDParams(1.0, 0.0, 0.2, 0.0, 50, 0);
 //	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
 //	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
 	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.2, 150, 0);

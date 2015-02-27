@@ -81,7 +81,7 @@ public class RobotMain extends IterativeRobot
         	m_stackPriorityChooser = new SendableChooser();
         	m_stackPriorityChooser.addDefault("Vertical Priority", StackPriority.VERTICAL);
         	m_stackPriorityChooser.addObject ("Horizontal Priority", StackPriority.HORIZONTAL);
-        	SmartDashboard.putData("Stack Priority", m_stackPriorityChooser);
+        	SmartDashboard.putData("Stack Priority Chooser", m_stackPriorityChooser);
 
         	m_numStacksChooser = new SendableChooser();
         	m_numStacksChooser.addObject ("1 Stack", 	new Integer(1));
@@ -89,7 +89,7 @@ public class RobotMain extends IterativeRobot
         	m_numStacksChooser.addDefault("3 Stacks", 	new Integer(3));
         	m_numStacksChooser.addObject ("4 Stacks", 	new Integer(4));
         	m_numStacksChooser.addObject ("5 Stacks", 	new Integer(5));
-        	SmartDashboard.putData("Num Stacks", m_numStacksChooser);
+        	SmartDashboard.putData("Num Stacks Chooser", m_numStacksChooser);
        	
         	m_numTotesPerStackChooser = new SendableChooser();
         	m_numTotesPerStackChooser.addObject ("1 Totes", new Integer(1));
@@ -98,7 +98,7 @@ public class RobotMain extends IterativeRobot
         	m_numTotesPerStackChooser.addObject ("4 Totes", new Integer(4));
         	m_numTotesPerStackChooser.addObject ("5 Totes", new Integer(5));
         	m_numTotesPerStackChooser.addDefault("6 Totes", new Integer(6));
-        	SmartDashboard.putData("Num Totes Per Stack", m_numTotesPerStackChooser);
+        	SmartDashboard.putData("Num Totes Per Stack Chooser", m_numTotesPerStackChooser);
        	
         	m_robotArmControlModeChooser = new SendableChooser();
         	m_robotArmControlModeChooser.addObject ("VBus Only", 				CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
@@ -233,9 +233,9 @@ public class RobotMain extends IterativeRobot
     		long currentTime = System.nanoTime();
     		SmartDashboard.putNumber("Main loop time (ms)", (currentTime - m_loopTime) / 1000000.0);
     		SmartDashboard.putNumber("IMU Yaw (deg)", m_imu.getYaw());
-    		SmartDashboard.putNumber("Num Stacks", numStacks);
-    		SmartDashboard.putNumber("Num Totes Per Stack", numTotesPerStack);
-       		SmartDashboard.putString("Stack Priority", stackPriority == StackPriority.HORIZONTAL ? "Horizontal" : "Vertical");
+    		SmartDashboard.putNumber("Num Stacks Verify", numStacks);
+    		SmartDashboard.putNumber("Num Totes Per Stack Verify", numTotesPerStack);
+       		SmartDashboard.putString("Stack Priority Verify", stackPriority == StackPriority.HORIZONTAL ? "Horizontal" : "Vertical");
     		m_loopTime = currentTime;
     		driveTrain.updateStatus();
     		binGrabber.updateStatus();

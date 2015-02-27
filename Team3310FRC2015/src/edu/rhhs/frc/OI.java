@@ -395,7 +395,7 @@ public class OI
 		
 		InternalButton driveTrainHoldOnTest = new InternalButton();
 		driveTrainHoldOnTest.whenPressed(new DriveTrainPositionHoldOn());
-		SmartDashboard.putData("Drivetrain Hold On", driveTrainHoldOnTest);
+		SmartDashboard.putData("Drivetrain Hold On 1", driveTrainHoldOnTest);
 		
 		InternalButton driveTrainHoldOffTest = new InternalButton();
 		driveTrainHoldOffTest.whenPressed(new DriveTrainStopPID());
