@@ -75,6 +75,12 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 
 		stackStartPositions.add(new double[] {35, -30, 11, 0});
 		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
+
+		stackStartPositions.add(new double[] {35, -30, 11, 0});
+		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
+
+		stackStartPositions.add(new double[] {35, -30, 11, 0});
+		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
 	}
 
 	public HumanLoadCommandListGenerator(StackPriority stackPriority, int numStacks, int numTotesPerStack) {
@@ -115,8 +121,9 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
      	double[] toteMovePosition = LEFT_POSITION_MOVE_STACK_RELEASE_COORD;
 		
 		for (int j = 0; j < secondaryCount; j++) {
-		   	double[] toteReleasePosition = stackStartPositions.get(j); 
-		   	double[] toteOffsetPosition = stackOffsetPositions.get(j); 
+			int stackId = 4 - secondaryCount + j;
+		   	double[] toteReleasePosition = stackStartPositions.get(stackId); 
+		   	double[] toteOffsetPosition = stackOffsetPositions.get(stackId); 
 			
 			for (int i = 0; i < primaryCount; i++) {
 				if (debug) {

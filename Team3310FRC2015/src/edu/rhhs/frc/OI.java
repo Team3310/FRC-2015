@@ -1,6 +1,5 @@
 package edu.rhhs.frc;
 
-import edu.rhhs.frc.buttons.XBoxDPadTriggerButton;
 import edu.rhhs.frc.buttons.XBoxTriggerButton;
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
@@ -9,6 +8,7 @@ import edu.rhhs.frc.commands.BinGrabberPositionDownPID;
 import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
 import edu.rhhs.frc.commands.BinGrabberSetLeftSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetRightSpeed;
+import edu.rhhs.frc.commands.BinGrabberSetSpeed;
 import edu.rhhs.frc.commands.BinGrabberStopPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
@@ -69,13 +69,13 @@ public class OI
         binGrabberLeftUpManual.whenPressed(new BinGrabberSetLeftSpeed(-0.3));
         binGrabberLeftUpManual.whenReleased(new BinGrabberSetLeftSpeed(0));
         
-        XBoxTriggerButton binGrabberRightDownManual = new XBoxTriggerButton(m_drivetrainController, XBoxTriggerButton.RIGHT_TRIGGER);
-        binGrabberRightDownManual.whenPressed(new BinGrabberSetRightSpeed(0.3));
-        binGrabberRightDownManual.whenReleased(new BinGrabberSetRightSpeed(0.0));
+//        XBoxTriggerButton binGrabberRightDownManual = new XBoxTriggerButton(m_drivetrainController, XBoxTriggerButton.RIGHT_TRIGGER);
+//        binGrabberRightDownManual.whenPressed(new BinGrabberSetRightSpeed(0.3));
+//        binGrabberRightDownManual.whenReleased(new BinGrabberSetRightSpeed(0.0));
 
         XBoxTriggerButton binGrabberLeftDownManual = new XBoxTriggerButton(m_drivetrainController, XBoxTriggerButton.LEFT_TRIGGER);
-        binGrabberLeftDownManual.whenPressed(new BinGrabberSetLeftSpeed(0.3));
-        binGrabberLeftDownManual.whenReleased(new BinGrabberSetLeftSpeed(0.0));
+        binGrabberLeftDownManual.whenPressed(new BinGrabberSetSpeed(0.3));
+        binGrabberLeftDownManual.whenReleased(new BinGrabberSetSpeed(0.0));
 
         JoystickButton binGrabberPivotLockExtend = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.START_BUTTON);
         binGrabberPivotLockExtend.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.EXTENDED));

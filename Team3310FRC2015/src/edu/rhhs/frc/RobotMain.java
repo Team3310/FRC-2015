@@ -88,7 +88,7 @@ public class RobotMain extends IterativeRobot
         	m_numStacksChooser.addObject ("2 Stacks", 	new Integer(2));
         	m_numStacksChooser.addDefault("3 Stacks", 	new Integer(3));
         	m_numStacksChooser.addObject ("4 Stacks", 	new Integer(4));
-        	m_numStacksChooser.addObject ("5 Stacks", 	new Integer(5));
+//        	m_numStacksChooser.addObject ("5 Stacks", 	new Integer(5));
         	SmartDashboard.putData("Num Stacks Chooser", m_numStacksChooser);
        	
         	m_numTotesPerStackChooser = new SendableChooser();

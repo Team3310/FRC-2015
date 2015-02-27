@@ -93,7 +93,7 @@ public class RobotArm extends Subsystem {
 //	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
 	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.2, 150, 0);
 	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.17, 150, 0);
-	private PIDParams j4PositionPidParams = new PIDParams(5.0, 0.005, 0.0, 0.0, 50, 0);
+	private PIDParams j4PositionPidParams = new PIDParams(10.0, 0.02, 0.0, 0.0, 75, 0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0);
 	private PIDParams j2VelocityPidParams = new PIDParams(0.5, 0.02, 0.0, 0.0, 0, 0);
@@ -455,6 +455,7 @@ public class RobotArm extends Subsystem {
 		if (m_controllerLoopCommandList != null && m_controllerLoopCommandList.size() > 0) {
 			m_currentControllerLoopCommand = m_controllerLoopCommandList.get(m_currentControllerLoopCommandIndex);
 			m_currentControllerLoopCommand.reset();
+			m_waitForNext = false;
 			this.enableControlLoop();
 		}
 	}
