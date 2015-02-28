@@ -55,11 +55,17 @@ public class OI
         JoystickButton binGrabberStowPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
         binGrabberStowPID.whenPressed(new BinGrabberPositionStowedPID());
         
-        JoystickButton binGrabberCancelPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.X_BUTTON);
-        binGrabberCancelPID.whenPressed(new BinGrabberStopPID());
+//        JoystickButton binGrabberCancelPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.X_BUTTON);
+//        binGrabberCancelPID.whenPressed(new BinGrabberStopPID());
 	    
-        JoystickButton binGrabberDragPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.B_BUTTON);
-        binGrabberDragPID.whenPressed(new BinGrabberPositionDownPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG));
+//        JoystickButton binGrabberDragPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.B_BUTTON);
+//        binGrabberDragPID.whenPressed(new BinGrabberPositionDownPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG));
+ 
+        JoystickButton driveTrainHoldOnButton = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.B_BUTTON);
+        driveTrainHoldOnButton.whenPressed(new DriveTrainPositionHoldOn());
+
+        JoystickButton driveTrainHoldOffButton = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.X_BUTTON);
+        driveTrainHoldOffButton.whenPressed(new DriveTrainStopPID());
 
         JoystickButton binGrabberRightUpManual = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.RIGHT_BUMPER_BUTTON);
         binGrabberRightUpManual.whenPressed(new BinGrabberSetRightSpeed(-0.3));
