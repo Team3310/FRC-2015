@@ -91,8 +91,8 @@ public class RobotArm extends Subsystem {
 	private PIDParams j1PositionPidParams = new PIDParams(1.0, 0.0, 0.2, 0.0, 50, 0);
 //	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
 //	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
-	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.2, 150, 0);
-	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.17, 150, 0);
+	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.26, 150, 0);
+	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.22, 150, 0);
 	private PIDParams j4PositionPidParams = new PIDParams(10.0, 0.02, 0.0, 0.0, 75, 0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0);

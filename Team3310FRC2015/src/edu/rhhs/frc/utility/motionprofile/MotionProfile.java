@@ -11,8 +11,8 @@ public class MotionProfile {
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
 	public static final double DEFAULT_PATH_VELOCITY = 130;   						// inches/second
 	public static final double J1_JOINT_VELOCITY = 160;   							// deg/second
-	public static final double J2_JOINT_VELOCITY = 100;   							// deg/second
-	public static final double J3_JOINT_VELOCITY = 100;   							// deg/second
+	public static final double J2_JOINT_VELOCITY = 120;   							// deg/second
+	public static final double J3_JOINT_VELOCITY = 120;   							// deg/second
 	public static final double J4_JOINT_VELOCITY = 150;   							// deg/second
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
