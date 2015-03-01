@@ -50,9 +50,9 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	
 	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 3; 
+	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 4; 
 	
-	public static final double STACK_X_POST_UNLOAD_OFFSET = -9;   
+	public static final double STACK_X_POST_UNLOAD_OFFSET = -10;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Z_POST_UNLOAD_OFFSET = 0; 
 
@@ -64,22 +64,22 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	private double[] homePosition = DEFAULT_HOME_COORD;
 	
 	public HumanLoadCommandListGenerator() {	
-		stackStartPositions.add(new double[]  {33.5, 24.2, 11, 40});
+		stackStartPositions.add(new double[]  {35.5, 24.2, 11, 40});
 		stackOffsetPositions.add(new double[] {-5.5, -4, 0, 0});
 
-		stackStartPositions.add(new double[]  {35, 5.5, 11, 40});
+		stackStartPositions.add(new double[]  {37, 5.5, 11, 40});
 		stackOffsetPositions.add(new double[] {-5, -3, 0, 0});
 
-		stackStartPositions.add(new double[] {35, -12, 11, 0});
+		stackStartPositions.add(new double[] {37, -12, 11, 0});
 		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
 
-		stackStartPositions.add(new double[] {35, -30, 11, 0});
+		stackStartPositions.add(new double[] {37, -30, 11, 0});
 		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
 
-		stackStartPositions.add(new double[] {35, -30, 11, 0});
+		stackStartPositions.add(new double[] {37, -30, 11, 0});
 		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
 
-		stackStartPositions.add(new double[] {35, -30, 11, 0});
+		stackStartPositions.add(new double[] {37, -30, 11, 0});
 		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
 	}
 

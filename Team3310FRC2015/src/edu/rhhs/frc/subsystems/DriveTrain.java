@@ -20,7 +20,7 @@ public class DriveTrain extends Subsystem
 	
 	private CANTalonEncoderPID.ControlMode m_controlMode;
 	
-	private PIDParams positionMovePidParams = new PIDParams(0.4, 0, 0.0, 0, 50, 0);  // drivetrain
+	private PIDParams positionMovePidParams = new PIDParams(0.6, 0, 0.0, 0, 50, 0);  // drivetrain
 	private PIDParams positionHoldPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0);   //hold
 	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0);
 
