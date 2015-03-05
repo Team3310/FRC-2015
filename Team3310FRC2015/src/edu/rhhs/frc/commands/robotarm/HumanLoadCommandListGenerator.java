@@ -94,7 +94,10 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	}
 
 	public synchronized void setHome(double[] homeXYZInchesGammaDeg) {
-		this.homePosition = homeXYZInchesGammaDeg;
+		this.homePosition[0] = homeXYZInchesGammaDeg[0];
+		this.homePosition[1] = homeXYZInchesGammaDeg[1];
+		this.homePosition[2] = homeXYZInchesGammaDeg[2];
+		this.homePosition[3] = homeXYZInchesGammaDeg[3];
 	}
 
 	public void calculate() {

@@ -1,7 +1,6 @@
 package edu.rhhs.frc.subsystems;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
@@ -10,7 +9,9 @@ import edu.rhhs.frc.commands.robotarm.RobotArmCommand;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
+import edu.rhhs.frc.utility.ControlLoopable;
 import edu.rhhs.frc.utility.CANTalonEncoderPID.ControlMode;
+import edu.rhhs.frc.utility.ControlLooper;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.wpi.first.wpilibj.CANTalon;
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class RobotArm extends Subsystem {
+public class RobotArm extends Subsystem implements ControlLoopable {
 
 	public static enum ToteGrabberPosition {OPEN, CLOSE};
 
@@ -89,8 +90,6 @@ public class RobotArm extends Subsystem {
 	private CANTalonAnalogPID  m_j4Motor;
 
 	private PIDParams j1PositionPidParams = new PIDParams(1.0, 0.0, 0.2, 0.0, 50, 0);
-//	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.426, 150, 0);
-//	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.341, 150, 0);
 	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.26, 150, 0);
 	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.22, 150, 0);
 	private PIDParams j4PositionPidParams = new PIDParams(10.0, 0.02, 0.0, 0.0, 75, 0);
@@ -110,37 +109,15 @@ public class RobotArm extends Subsystem {
 	private double m_positionCommandJ2 = J2_MASTER_ANGLE_DEG;
 	private double m_positionCommandJ3 = J3_MASTER_ANGLE_DEG;
 	private double m_positionCommandJ4 = J4_MASTER_ANGLE_DEG;
-	private double m_limitJ3Deg;
-	private boolean isJ3Limited = false;
 	
 	private RobotArmCommandList m_controllerLoopCommandList;
 	private RobotArmCommand m_currentControllerLoopCommand;
 	private int m_currentControllerLoopCommandIndex;
 
-	private Timer m_controlLoop;
-	private boolean m_controlLoopEnabled = false;
-	private long m_controlLoopStartTime = 0;
-	private long m_controlLoopDeltaTime = 0;
+	private ControlLooper m_controlLoop;
 	private boolean m_waitForNext;
 	
 	private MotionProfile motionProfileForOutput = new MotionProfile();
-
-	private class ControlLoopTask extends TimerTask {
-
-		private RobotArm arm;
-
-		public ControlLoopTask(RobotArm arm) {
-			if (arm == null) {
-				throw new NullPointerException("Given RobotArm was null");
-			}
-			this.arm = arm;
-		}
-
-		@Override
-		public void run() {
-			arm.controlLoopUpdate();
-		}
-	}
 
 	public RobotArm() {
 		try {
@@ -187,8 +164,8 @@ public class RobotArm extends Subsystem {
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
 			setToteGrabberPosition(ToteGrabberPosition.OPEN);		
 
-			m_controlLoop = new Timer();
-			m_controlLoop.schedule(new ControlLoopTask(this), 0L, OUTER_LOOP_UPDATE_RATE_MS);
+			m_controlLoop = new ControlLooper(this, OUTER_LOOP_UPDATE_RATE_MS);
+			m_controlLoop.start();
 		}
 		catch (Exception e) {
 			System.out.println("Unknown error initializing robot arm.  Message = " + e.getMessage());
@@ -263,7 +240,7 @@ public class RobotArm extends Subsystem {
 	}
 
 	public void controlWithJoystick() {
-		if (!m_controlLoopEnabled) {
+		if (!m_controlLoop.isEnabled()) {
 			double throttleRightX = OI.getInstance().getRobotArmController().getRightXAxis();
 			double throttleRightY = OI.getInstance().getRobotArmController().getRightYAxis();
 			double throttleLeftX = OI.getInstance().getRobotArmController().getLeftXAxis();
@@ -448,7 +425,7 @@ public class RobotArm extends Subsystem {
 	// Motion profiling
 	public void startRobotArmCommandList(RobotArmCommandList commandList) {
 		if (isControlLoopEnabled()) {
-			this.disableControlLoop();
+			disableControlLoop();
 		}
 		m_controllerLoopCommandList = commandList;
 		m_currentControllerLoopCommandIndex = 0;
@@ -456,34 +433,23 @@ public class RobotArm extends Subsystem {
 			m_currentControllerLoopCommand = m_controllerLoopCommandList.get(m_currentControllerLoopCommandIndex);
 			m_currentControllerLoopCommand.reset();
 			m_waitForNext = false;
-			this.enableControlLoop();
+			enableControlLoop();
 		}
 	}
 
-	protected void controlLoopUpdate() {
-		boolean enabled;
-        synchronized (this) {
-            enabled = m_controlLoopEnabled; // take snapshot of this value
-        }
-		
-        if (enabled) {
-			boolean isFinished = m_currentControllerLoopCommand.run();
-			if (isFinished) {
-				if (m_currentControllerLoopCommandIndex < m_controllerLoopCommandList.size() - 1) {
-					m_currentControllerLoopCommandIndex++;
-					m_currentControllerLoopCommand = m_controllerLoopCommandList.get(m_currentControllerLoopCommandIndex);
-					m_currentControllerLoopCommand.reset();
-				}
-				else {
-					disableControlLoop();
-					return;
-				}
+	public void controlLoopUpdate() {
+		boolean isFinished = m_currentControllerLoopCommand.run();
+		if (isFinished) {
+			if (m_currentControllerLoopCommandIndex < m_controllerLoopCommandList.size() - 1) {
+				m_currentControllerLoopCommandIndex++;
+				m_currentControllerLoopCommand = m_controllerLoopCommandList.get(m_currentControllerLoopCommandIndex);
+				m_currentControllerLoopCommand.reset();
+			}
+			else {
+				disableControlLoop();
+				return;
 			}
 		}
-        
-        long currentTime = System.nanoTime();
-        setControlLoopDeltaTime(currentTime - getControlLoopStartTime());
-        setControlLoopStartTime(currentTime);
 	}
 	
 	public synchronized void setJointAngles(double[] jointAngles) {
@@ -491,11 +457,10 @@ public class RobotArm extends Subsystem {
 	}
 	
 	public synchronized void setPIDPosition(double j1PositionDeg, double j2PositionDeg, double j3PositionDeg, double j4PositionDeg) {
-		m_limitJ3Deg = limitJ3(j2PositionDeg, j3PositionDeg);
 		
 		m_positionCommandJ1 = j1PositionDeg;
 		m_positionCommandJ2 = j2PositionDeg;
-		m_positionCommandJ3 = m_limitJ3Deg;
+		m_positionCommandJ3 = limitJ3(j2PositionDeg, j3PositionDeg);
 		m_positionCommandJ4 = j4PositionDeg;
 		
 		m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
@@ -519,29 +484,24 @@ public class RobotArm extends Subsystem {
 	}
 	
 	private double limitJ3(double j2AngleDeg, double j3AngleDeg) {
-		isJ3Limited = false;
 		
 		// Interference checks
 		if ((j2AngleDeg + j3AngleDeg) > J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG) {
 			j3AngleDeg = J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG - j2AngleDeg;
-			isJ3Limited = true;
 		}
 		else if ((j2AngleDeg + j3AngleDeg) < J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG) {
 			j3AngleDeg = J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG - j2AngleDeg;
-			isJ3Limited = true;
 		}
 
 		// Height limit check
 //		if (j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG) {
 //			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg) {
 //				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN * j2AngleDeg;
-//				isJ3Limited = true;
 //			}
 //		}
 //		if (j2AngleDeg >= J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG && j2AngleDeg <= J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG) {
 //			if (j3AngleDeg > J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg) {
 //				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg;
-//				isJ3Limited = true;
 //			}			
 //		}
 		
@@ -549,37 +509,15 @@ public class RobotArm extends Subsystem {
 	}
 
 	public synchronized void enableControlLoop() {
-		m_controlLoopEnabled = true;
+		m_controlLoop.enable();
 	}
 
-	public synchronized void setControlLoopStartTime(long time) {
-		m_controlLoopStartTime = time;
-	}
-
-	public synchronized long getControlLoopStartTime() {
-		return m_controlLoopStartTime;
-	}
-
-	public synchronized void setControlLoopDeltaTime(long time) {
-		m_controlLoopDeltaTime = time;
-	}
-
-	public synchronized long getControlLoopDeltaTime() {
-		return m_controlLoopDeltaTime;
-	}
-
-	/**
-	 * Stop running the PIDController, this sets the output to zero before stopping.
-	 */
 	public synchronized void disableControlLoop() {
-		m_controlLoopEnabled = false;
+		m_controlLoop.disable();
 	}
 
-	/**
-	 * Return true if PIDController is enabled.
-	 */
 	public synchronized boolean isControlLoopEnabled() {
-		return m_controlLoopEnabled;
+		return m_controlLoop.isEnabled();
 	}
 
 	public void updateStatus() {
@@ -599,8 +537,6 @@ public class RobotArm extends Subsystem {
 //		SmartDashboard.putNumber("J2 Velocity (deg-sec)", 	m_j2Motor.getVelocityDegPerSec());
 //		SmartDashboard.putNumber("J2 Current", 				m_j2Motor.getOutputCurrent());		
 
-//		SmartDashboard.putNumber("J3 Limit (deg)", 			m_limitJ3Deg);
-//		SmartDashboard.putBoolean("J3 isLimited", 			isJ3Limited);
 //		SmartDashboard.putNumber("J3 Throttle Calc", 		m_j3Motor.getOutputVoltage() / m_j3Motor.getBusVoltage());
 //		SmartDashboard.putNumber("J3 Position (raw)", 		m_j3Motor.getPosition());
 		SmartDashboard.putNumber("J3 Position (deg)", 		m_j3Motor.getPositionDeg());
@@ -615,7 +551,7 @@ public class RobotArm extends Subsystem {
 //		SmartDashboard.putBoolean("IR Tote Grabber Switch", getToteGrabberSwitch());
 //		SmartDashboard.putString("Tote Grabber Position", 	getToteGrabberPosition().toString());
 
-		SmartDashboard.putBoolean("RobotArm Controller", 	m_controlLoopEnabled);
+		SmartDashboard.putBoolean("RobotArm Controller", 	m_controlLoop.isEnabled());
 //		SmartDashboard.putNumber("RobotArm Control loop time (ms)", 	getControlLoopDeltaTime() / 1000000);
 		
 		double[] xyzToolDeg = motionProfileForOutput.calcForwardKinematicsDeg(getJointAngles());

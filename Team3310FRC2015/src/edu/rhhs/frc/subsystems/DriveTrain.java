@@ -3,15 +3,22 @@ package edu.rhhs.frc.subsystems;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
+import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
+import edu.rhhs.frc.utility.ControlLoopable;
+import edu.rhhs.frc.utility.ControlLooper;
 import edu.rhhs.frc.utility.PIDParams;
+import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class DriveTrain extends Subsystem
+public class DriveTrain extends Subsystem implements ControlLoopable
 {	
+	public static final long OUTER_LOOP_UPDATE_RATE_MS = 40;
+	public static final double TRACK_WIDTH_INCHES = 26.425;
+
 	// Talons
 	private CANTalon m_frontLeftMotor;
 	private CANTalon m_frontRightMotor;
@@ -20,8 +27,9 @@ public class DriveTrain extends Subsystem
 	
 	private CANTalonEncoderPID.ControlMode m_controlMode;
 	
-	private PIDParams positionMovePidParams = new PIDParams(0.6, 0, 0.0, 0, 50, 0);  // drivetrain
-	private PIDParams positionHoldPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0);   //hold
+	private PIDParams positionMovePidParams = new PIDParams(0.6, 0, 0.0, 0, 50, 0);  
+	private PIDParams positionHoldPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0);   
+	private PIDParams positionMotionProfilePidParams = new PIDParams(3, 0, 0.0, 0, 50, 0);   
 	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0);
 
 	private double m_error;
@@ -57,6 +65,10 @@ public class DriveTrain extends Subsystem
     private double m_steerTrim = 0.0;
     
 	private int m_controllerMode;
+
+	private ControlLooper m_controlLoop;
+	private ProfileOutput m_motionProfile;
+	private int m_motionProfileIndex;
     
     public DriveTrain() {
 		try {
@@ -102,6 +114,9 @@ public class DriveTrain extends Subsystem
             m_drive.setSafetyEnabled(false);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
+
+			m_controlLoop = new ControlLooper(this, OUTER_LOOP_UPDATE_RATE_MS);
+			m_controlLoop.start();
         } 
 		catch (Exception e) {
             System.out.println("Unknown error initializing drivetrain.  Message = " + e.getMessage());
@@ -194,6 +209,48 @@ public class DriveTrain extends Subsystem
 
 	public void setJoystickControllerMode(int driveMode) {
 		m_controllerMode = driveMode;
+	}
+
+	// Motion profiling
+	public void startMotionProfile(ProfileOutput profile) {
+		if (isControlLoopEnabled()) {
+			disableControlLoop();
+		}
+		m_motionProfile = profile;
+		m_motionProfileIndex = 0;
+		m_rearLeftMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_rearRightMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
+		m_rearLeftMotor.setPosition(0);
+		m_rearRightMotor.setPosition(0);
+		isHoldOn = false;
+		enableControlLoop();
+	}
+
+	public void controlLoopUpdate() {
+		if (m_motionProfileIndex < m_motionProfile.numPoints - 1) {
+			m_motionProfileIndex++;
+			double distanceLeft = m_motionProfile.jointPos[m_motionProfileIndex][0];    // hack, use J1
+			double distanceRight = m_motionProfile.jointPos[m_motionProfileIndex][1];   // hack, use J2
+			m_rearLeftMotor.setPIDPositionInches(distanceLeft);
+			m_rearRightMotor.setPIDPositionInches(distanceRight);
+		}
+		else {
+			disableControlLoop();
+			return;
+		}
+	}
+
+	public synchronized void enableControlLoop() {
+		m_controlLoop.enable();
+	}
+
+	public synchronized void disableControlLoop() {
+		m_controlLoop.disable();
+	}
+
+	public synchronized boolean isControlLoopEnabled() {
+		return m_controlLoop.isEnabled();
 	}
 
 	public void driveWithJoystick() {
