@@ -6,6 +6,8 @@ import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
 
 public class MotionProfile {
+	public static final double[] ZERO_OFFSET = {0, 0, 0};
+	
 	public enum ProfileMode {CartesianInputLinearMotion, JointInputJointMotion, CartesianInputJointMotion};
 	
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
@@ -100,13 +102,20 @@ public class MotionProfile {
 
     // Perform profile calculations.  Return success/failure.
 	public boolean calculatePath(boolean calcVelocitiesAccels, double servoFilterOutputMs) {
+		return calculatePath(calcVelocitiesAccels, servoFilterOutputMs, 0, ZERO_OFFSET);
+	}
+
+	// Perform profile calculations.  Return success/failure.
+	public boolean calculatePath(boolean calcVelocitiesAccels, double servoFilterOutputMs, double worldToRobotAngleDeg, double[] worldToRobotOffsetInches) {
         
     	IKINOutput iKINOutput = null;
     	Kinematics kinematics = new Kinematics();
 
     	// Convert all angles to radians
-    	double[][] taughtPositionsConverted = new double[taughtPositions.length][4];
+    	// Need to save a copy here because some of the coordinates are fixed points, we don't want to modify them
+    	double[][] taughtPositionsConverted = null;
     	if (profileMode == ProfileMode.JointInputJointMotion) { 
+        	taughtPositionsConverted = new double[taughtPositions.length][4];
             for (int i = 0; i < taughtPositions.length; i++) {
                 for (int j = 0; j < 4; j++) {
                 	taughtPositionsConverted[i][j] = Math.toRadians(taughtPositions[i][j]);
@@ -114,13 +123,12 @@ public class MotionProfile {
             }
     	}
     	
-    	// Convert tool angles to radians
+    	// Convert tool angles to radians and convert from world to robot coordinates 
     	else { 
+        	taughtPositionsConverted = new double[taughtPositions.length][];
             for (int i = 0; i < taughtPositions.length; i++) {
-            	taughtPositionsConverted[i][0] = taughtPositions[i][0];
-            	taughtPositionsConverted[i][1] = taughtPositions[i][1];
-            	taughtPositionsConverted[i][2] = taughtPositions[i][2];
-            	taughtPositionsConverted[i][3] = Math.toRadians(taughtPositions[i][3]);
+            	taughtPositionsConverted[i] = xformWorldToRobot(taughtPositions[i], worldToRobotAngleDeg, worldToRobotOffsetInches);
+            	taughtPositionsConverted[i][3] = Math.toRadians(taughtPositionsConverted[i][3]);
             }
     	}
     	    	
@@ -221,6 +229,41 @@ public class MotionProfile {
         
         return true;
 	} 
+	
+	public double[] xformWorldToRobot(double[] xyzGammaPosition, double worldToRobotAngleDeg, double[] worldToRobotOffset) {
+		
+		double xWorld = xyzGammaPosition[0] - worldToRobotOffset[0];
+		double yWorld = xyzGammaPosition[1] - worldToRobotOffset[1];
+		
+		double worldToRobotAngleRad = Math.toRadians(worldToRobotAngleDeg);
+		
+		double cosAlpha = Math.cos(worldToRobotAngleRad);
+		double sinAlpha = Math.sin(worldToRobotAngleRad);
+		
+		double[] xyzPositionOutput = new double[4];
+		xyzPositionOutput[0] =  cosAlpha * xWorld + sinAlpha * yWorld;
+		xyzPositionOutput[1] = -sinAlpha * xWorld + cosAlpha * yWorld;
+		xyzPositionOutput[2] = xyzGammaPosition[2] - worldToRobotOffset[2];
+		xyzPositionOutput[3] = xyzGammaPosition[3] - worldToRobotAngleDeg;
+
+		return xyzPositionOutput;
+	}
+	
+	public double[] xformRobotToWorld(double[] xyzGammaPosition, double worldToRobotAngleDeg, double[] worldToRobotOffset) {
+		
+		double worldToRobotAngleRad = Math.toRadians(worldToRobotAngleDeg);
+		
+		double cosAlpha = Math.cos(worldToRobotAngleRad);
+		double sinAlpha = Math.sin(worldToRobotAngleRad);
+		
+		double[] xyzPositionOutput = new double[4];
+		xyzPositionOutput[0] =  cosAlpha * xyzGammaPosition[0] - sinAlpha * xyzGammaPosition[1] + worldToRobotOffset[0];
+		xyzPositionOutput[1] =  sinAlpha * xyzGammaPosition[0] + cosAlpha * xyzGammaPosition[1] + worldToRobotOffset[1];
+		xyzPositionOutput[2] = xyzGammaPosition[2] + worldToRobotOffset[2];
+		xyzPositionOutput[3] = xyzGammaPosition[3] + worldToRobotAngleDeg;
+
+		return xyzPositionOutput;
+	}
 	
 	public double[] calcInverseKinematicsRad(double[] xyzToolPointRad) {
 		double[][] inputPoints = { xyzToolPointRad };
@@ -450,12 +493,26 @@ public class MotionProfile {
 //    	profile.calculatePath(true, 10);
 //    	profile.printOutput(10);
 
-		WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
-		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
-		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_MOVE_STACK_RELEASE_COORD);
-		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
-    	MotionProfile profile = new MotionProfile(waypointsMoveStack);
-    	profile.calculatePath(true, 10);
+//		WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
+//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
+//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_MOVE_STACK_RELEASE_COORD);
+//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
+//    	MotionProfile profile = new MotionProfile(waypointsMoveStack);
+//    	profile.calculatePath(true, 10);
+//    	profile.printOutput(10);
+
+//		WaypointList waypointsXFormTest = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
+//		waypointsXFormTest.addWaypoint(0,0,0,0);
+//		waypointsXFormTest.addWaypoint(-5,-5,0,0);
+//    	MotionProfile profile = new MotionProfile(waypointsXFormTest);
+//    	profile.calculatePath(true, 10, 45, new double[] {1, 1, 0, 0});
+//    	profile.printOutput(10);
+
+		WaypointList waypointsXFormTest = new WaypointList(ProfileMode.CartesianInputJointMotion);				
+		waypointsXFormTest.addWaypoint(30,0,0,0);
+		waypointsXFormTest.addWaypoint(0,-30,0,0);
+    	MotionProfile profile = new MotionProfile(waypointsXFormTest);
+    	profile.calculatePath(true, 10, 0, new double[] {0, 0, 0, 0});
     	profile.printOutput(10);
 
 //    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);

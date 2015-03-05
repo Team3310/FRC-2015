@@ -62,6 +62,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 	private int numStacks = 1;
 	private int numTotesPerStack = 6;
 	private double[] homePosition = DEFAULT_HOME_COORD;
+	private double[] worldToRobotOffsetInches = {0, 0, 0};
 	
 	public HumanLoadCommandListGenerator() {	
 		stackStartPositions.add(new double[]  {35.5, 24.2, 11, 40});
@@ -89,15 +90,27 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 		this.numTotesPerStack = numTotesPerStack;
 	}
 	
-	public synchronized double[] getHome() {
+	private synchronized double[] getHome() {
 		return homePosition;
 	}
 
-	public synchronized void setHome(double[] homeXYZInchesGammaDeg) {
+	private synchronized void setHome(double[] homeXYZInchesGammaDeg) {
 		this.homePosition[0] = homeXYZInchesGammaDeg[0];
 		this.homePosition[1] = homeXYZInchesGammaDeg[1];
 		this.homePosition[2] = homeXYZInchesGammaDeg[2];
 		this.homePosition[3] = homeXYZInchesGammaDeg[3];
+	}
+
+	public synchronized double[] getWorldToRobotOffsetInches() {
+		return worldToRobotOffsetInches;
+	}
+	
+	public synchronized void updateWorldToRobotOffset(double[] nominalWorldPosition, double[] currentRobotPosition, double worldToRobotAngleDeg) {
+		MotionProfile motionProfile = new MotionProfile();
+		double[] currentWorldPosition = motionProfile.xformRobotToWorld(currentRobotPosition, worldToRobotAngleDeg, MotionProfile.ZERO_OFFSET);
+		worldToRobotOffsetInches[0] = nominalWorldPosition[0] - currentWorldPosition[0];
+		worldToRobotOffsetInches[1] = nominalWorldPosition[1] - currentWorldPosition[1];
+		worldToRobotOffsetInches[2] = nominalWorldPosition[2] - currentWorldPosition[2];
 	}
 
 	public void calculate() {

@@ -56,7 +56,7 @@ public class RobotMain extends IterativeRobot
     private StackPriority stackPriority;
 
     private SerialPort m_imuSerialPort;
-    public AHRS m_imu;
+    private static AHRS m_imu = null;
     private boolean m_imuFirstIteration;
     
     /**
@@ -229,8 +229,12 @@ public class RobotMain extends IterativeRobot
         updateStatus();
     }
     
-    public AHRS getIMU() {
+    public static AHRS getIMU() {
     	return m_imu;
+    }
+    
+    public static double getYawAngleDeg() {
+    	return m_imu.getYaw();
     }
     
     public void updateStatus() {
