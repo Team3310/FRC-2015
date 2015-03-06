@@ -3,7 +3,6 @@ package edu.rhhs.frc.subsystems;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
-import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.ControlLoopable;
 import edu.rhhs.frc.utility.ControlLooper;
@@ -129,9 +128,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	}
 	
 	public void teleopInit() {
-		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
-		m_rearLeftMotor.set(0);
-		m_rearRightMotor.set(0);
+		stopPID();
 	}
 
 	public void keepAlive() {

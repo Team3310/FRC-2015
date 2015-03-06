@@ -1,5 +1,6 @@
 package edu.rhhs.frc;
 
+import edu.rhhs.frc.buttons.XBoxDPadTriggerButton;
 import edu.rhhs.frc.buttons.XBoxTriggerButton;
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
@@ -25,6 +26,7 @@ import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
+import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileJ1ToZero;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.RobotArm;
@@ -77,13 +79,13 @@ public class OI
         binGrabberLeftUpManual.whenPressed(new BinGrabberSetLeftSpeed(-0.3));
         binGrabberLeftUpManual.whenReleased(new BinGrabberSetLeftSpeed(0));
         
-//        XBoxTriggerButton binGrabberRightDownManual = new XBoxTriggerButton(m_drivetrainController, XBoxTriggerButton.RIGHT_TRIGGER);
-//        binGrabberRightDownManual.whenPressed(new BinGrabberSetRightSpeed(0.3));
-//        binGrabberRightDownManual.whenReleased(new BinGrabberSetRightSpeed(0.0));
+        XBoxTriggerButton binGrabberRightDownManual = new XBoxTriggerButton(m_drivetrainController, XBoxTriggerButton.RIGHT_TRIGGER);
+        binGrabberRightDownManual.whenPressed(new BinGrabberSetRightSpeed(0.3));
+        binGrabberRightDownManual.whenReleased(new BinGrabberSetRightSpeed(0.0));
 
         XBoxTriggerButton binGrabberLeftDownManual = new XBoxTriggerButton(m_drivetrainController, XBoxTriggerButton.LEFT_TRIGGER);
-        binGrabberLeftDownManual.whenPressed(new BinGrabberSetSpeed(0.3));
-        binGrabberLeftDownManual.whenReleased(new BinGrabberSetSpeed(0.0));
+        binGrabberLeftDownManual.whenPressed(new BinGrabberSetLeftSpeed(0.3));
+        binGrabberLeftDownManual.whenReleased(new BinGrabberSetLeftSpeed(0.0));
 
         JoystickButton binGrabberPivotLockExtend = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.START_BUTTON);
         binGrabberPivotLockExtend.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.EXTENDED));
@@ -97,11 +99,11 @@ public class OI
         JoystickButton binGrabberClawClose = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
         binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
         
-//        XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT_TRIGGER);
-//        driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
-//
-//        XBoxDPadTriggerButton driveTrainHoldOff = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT_TRIGGER);
-//        driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
+        XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT);
+        driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
+
+        XBoxDPadTriggerButton driveTrainHoldOff = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT);
+        driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
         
         // Robot arm controller
         JoystickButton motionProfilePause = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.Y_BUTTON);
@@ -421,6 +423,13 @@ public class OI
 		motionProfileReset.whenPressed(new RobotArmMotionProfileReset());
 		SmartDashboard.putData("Motion Profile Reset", motionProfileReset);
 		
+    	RobotArmCommandList commandListJ1ToZero = new RobotArmCommandList();
+    	commandListJ1ToZero.add(new RobotArmMotionProfileJ1ToZero());
+
+        InternalButton motionProfileJ1Zero = new InternalButton();
+		motionProfileJ1Zero.whenPressed(new RobotArmMotionProfileStart(commandListJ1ToZero));
+		SmartDashboard.putData("Motion Profile J1 To Zero", motionProfileJ1Zero);
+				
 		InternalButton driveTrainHoldOnTest = new InternalButton();
 		driveTrainHoldOnTest.whenPressed(new DriveTrainPositionHoldOn());
 		SmartDashboard.putData("Drivetrain Hold On 1", driveTrainHoldOnTest);

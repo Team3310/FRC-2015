@@ -5,41 +5,35 @@
 package edu.rhhs.frc.buttons;
 
 import edu.rhhs.frc.controller.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 
 /**
  *
  * @author bselle
  */
-public class XBoxDPadTriggerButton extends Button {
+    public class XBoxDPadTriggerButton extends Button {
+        
+    	public static final int UP 			= 0;
+    	public static final int UP_RIGHT 	= 45;
+    	public static final int RIGHT 		= 90;
+    	public static final int DOWN_RIGHT 	= 135;
+    	public static final int DOWN 		= 180;
+    	public static final int DOWN_LEFT 	= 225;
+    	public static final int LEFT 		= 270;
+    	public static final int UP_LEFT	 	= 315;
 
-    public static final int RIGHT_TRIGGER = 0;
-    public static final int LEFT_TRIGGER = 1;
-//    public static final int TOP_TRIGGER = 3;
-//    public static final int BOTTOM_TRIGGER = 4;
-    
-    private XboxController m_controller;
-    private int m_trigger;
-    
-    public XBoxDPadTriggerButton(XboxController controller, int trigger) {
-        m_controller = controller;
-        m_trigger = trigger;
-    }
-    
-    public boolean get() {
-        if (m_trigger == RIGHT_TRIGGER) {
-            return m_controller.getDPadRight();
+        private int buttonAngle;
+        private XboxController  controller;
+        
+        public XBoxDPadTriggerButton(XboxController parent, int dPadButtonAngle) {
+            this.buttonAngle = dPadButtonAngle;
+            this.controller = parent;
         }
-        else if (m_trigger == LEFT_TRIGGER) {
-            return m_controller.getDPadLeft();
+        
+        @Override
+        public boolean get() {
+            return controller.getDpadAngle() == buttonAngle;
         }
-//        else if (m_trigger == TOP_TRIGGER) {
-//            return m_controller.getDPadTop();
-//        }
-//        else if (m_trigger == BOTTOM_TRIGGER) {
-//            return m_controller.getDPadBottom();
-//        }
-        return false;
     }
-    
-}
+

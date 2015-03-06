@@ -1,7 +1,5 @@
 package edu.rhhs.frc.subsystems;
 
-import java.util.Timer;
-
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.RobotArmWithJoystick;
@@ -9,8 +7,8 @@ import edu.rhhs.frc.commands.robotarm.RobotArmCommand;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
-import edu.rhhs.frc.utility.ControlLoopable;
 import edu.rhhs.frc.utility.CANTalonEncoderPID.ControlMode;
+import edu.rhhs.frc.utility.ControlLoopable;
 import edu.rhhs.frc.utility.ControlLooper;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
@@ -56,14 +54,17 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J3_SENSOR_GEAR_RATIO = 84.0/18.0;
 	private static final double J4_SENSOR_GEAR_RATIO = 60.0/30.0;
 
-	private static final double J1_MAX_ANGLE_DEG = 170.0;
-	private static final double J1_MIN_ANGLE_DEG = -170.0;
-	private static final double J2_MAX_ANGLE_DEG = 100.0;
+	private static final double J1_MAX_ANGLE_DEG = 250.0;
+	private static final double J1_MIN_ANGLE_DEG = -250.0;
+	private static final double J2_MAX_ANGLE_DEG = 105.0;
 	private static final double J2_MIN_ANGLE_DEG = -30.0;
 	private static final double J3_MAX_ANGLE_DEG = 27.0;
 	private static final double J3_MIN_ANGLE_DEG = -110.0;
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
+	
+	private static final double Z_MAX_INCHES = 77.0;
+	private static final double Z_MIN_INCHES = 1.0;
 	
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -60.0;
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG = 60.0;
@@ -322,33 +323,46 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 					xyzToolDeg[0] = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[0];
 				}
-				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[1] = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[1]; 
-				}
+				
+//	Disable Y control 
+//				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					xyzToolDeg[1] = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[1]; 
+//				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
 				}
-				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
+				
+				// Do a quick check for Z limits
+				if (xyzToolDeg[2] > Z_MAX_INCHES) {
+					xyzToolDeg[2] = Z_MAX_INCHES;
 				}
+				else if (xyzToolDeg[2] < Z_MIN_INCHES) {
+					xyzToolDeg[2] = Z_MIN_INCHES;
+				}
+				
+// Disable gamma control
+//				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
+//				}
 
 				// Calculate joint angles from adjusted XYZ coordinate
 				double[] jointAngles = motionProfileForOutput.calcInverseKinematicsDeg(xyzToolDeg);
 
 				// Add in the J1 position jog
-				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.04;
-				}
-				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.04;
-				}
+// Disable J1 control
+//				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
+//				}
+//				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+//					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
+//				}
 
 				m_positionCommandJ1 = jointAngles[0];
 				m_positionCommandJ2 = jointAngles[1];
 				m_positionCommandJ3 = jointAngles[2];
 				m_positionCommandJ4 = jointAngles[3];
 				
-				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
+ 				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
 				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
 				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
 				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
@@ -458,18 +472,21 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	
 	public synchronized void setPIDPosition(double j1PositionDeg, double j2PositionDeg, double j3PositionDeg, double j4PositionDeg) {
 		
-		m_positionCommandJ1 = j1PositionDeg;
-		m_positionCommandJ2 = j2PositionDeg;
+		// We need to check the limits now so we can save the limited angle in the position command.  If you let the Talon limit
+		// the angles the positionCommands keep incrementing in manual mode and inverse/forward kinematics get weird.
+		m_positionCommandJ1 = limitAngle(j1PositionDeg, J1_MIN_ANGLE_DEG, J1_MAX_ANGLE_DEG);
+		m_positionCommandJ2 = limitAngle(j2PositionDeg, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
 		m_positionCommandJ3 = limitJ3(j2PositionDeg, j3PositionDeg);
-		m_positionCommandJ4 = j4PositionDeg;
-		
-		m_j1Motor.setPIDPositionDeg(m_positionCommandJ1);
-		m_j2Motor.setPIDPositionDeg(m_positionCommandJ2);
-		m_j3Motor.setPIDPositionDeg(m_positionCommandJ3);
-		m_j4Motor.setPIDPositionDeg(m_positionCommandJ4);	
+		m_positionCommandJ4 = limitAngle(j1PositionDeg, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
+				
+		m_j1Motor.setPIDPositionDegNoLimits(m_positionCommandJ1);
+		m_j2Motor.setPIDPositionDegNoLimits(m_positionCommandJ2);
+		m_j3Motor.setPIDPositionDegNoLimits(m_positionCommandJ3);
+		m_j4Motor.setPIDPositionDegNoLimits(m_positionCommandJ4);	
 		
 		// Setting the PID coefficients each pass causes a 30-40 ms delay. This killed the 10 ms control loop.
-		// If you must schedule the gains, much better to switch between the 2 profiles stored in the Talon.
+		// If you must schedule the gains, much better to switch between the 2 profiles stored in the Talon or
+		// just set the one/two coefficients you need.  
 //		m_j2Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ2, j2PositionPidParamsNegative, j2PositionPidParamsPositive);
 //		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
 	}
@@ -481,6 +498,18 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				m_j3Motor.getPositionDeg(),
 				m_j4Motor.getPositionDeg()				
 		};
+	}
+	
+	private double limitAngle(double jointAngle, double minJointAngle, double maxJointAngle) {
+		double outputAngle = jointAngle;
+		if (outputAngle > maxJointAngle) {
+			outputAngle = maxJointAngle;
+		}
+		if (outputAngle < minJointAngle) {
+			outputAngle = minJointAngle;
+		}		
+		
+		return outputAngle;
 	}
 	
 	private double limitJ3(double j2AngleDeg, double j3AngleDeg) {
@@ -504,6 +533,8 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 //				j3AngleDeg = J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN * j2AngleDeg;
 //			}			
 //		}
+		
+		j3AngleDeg = limitAngle(j3AngleDeg, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
 		
 		return j3AngleDeg;
 	}

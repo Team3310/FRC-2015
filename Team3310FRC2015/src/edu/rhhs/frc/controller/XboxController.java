@@ -20,7 +20,7 @@ public class XboxController
     public static final int RIGHT_TRIGGER_AXIS = 3;
     public static final int RIGHT_X_AXIS = 4;
     public static final int RIGHT_Y_AXIS = 5;
-    public static final int LEFT_RIGHT_DPAD_AXIS = 6;
+//    public static final int LEFT_RIGHT_DPAD_AXIS = 6;
 //    public static final int TOP_BOTTOM_DPAD_AXIS = 7;    // Can't use this axis... the Driver Station only transmits 6 axes.
     
     public static final int A_BUTTON = 1;
@@ -40,8 +40,8 @@ public class XboxController
 //    private static final double BOTTOM_DPAD_TOLERANCE = -0.9;
 //    private static final double TOP_DPAD_TOLERANCE = 0.9;
     
-    private static final double LEFT_TRIGGER_TOLERANCE = 0.9;
-    private static final double RIGHT_TRIGGER_TOLERANCE =-0.9;
+    private static final double LEFT_TRIGGER_TOLERANCE = 0.5;
+    private static final double RIGHT_TRIGGER_TOLERANCE = 0.5;
     
     private static final double RIGHT_AXIS_UP_TOLERANCE = -0.9;
     private static final double RIGHT_AXIS_DOWN_TOLERANCE = 0.9;
@@ -146,14 +146,19 @@ public class XboxController
         return getAxisWithDeadZoneCheck(stick.getRawAxis(RIGHT_TRIGGER_AXIS)); 
     }
     
-    public boolean getDPadLeft(){
-        return (stick.getRawAxis(LEFT_RIGHT_DPAD_AXIS) < LEFT_DPAD_TOLERANCE);
-    }
-            
-    public boolean getDPadRight(){
-        return (stick.getRawAxis(LEFT_RIGHT_DPAD_AXIS) > RIGHT_DPAD_TOLERANCE);
+    // Returns -1 if nothing is pressed, or the angle of the button pressed 0 = up, 90 = right, etc.
+    public int getDpadAngle() {
+    	return stick.getPOV();
     }
     
+//    public boolean getDPadLeft(){
+//        return (stick.getRawAxis(LEFT_RIGHT_DPAD_AXIS) < LEFT_DPAD_TOLERANCE);
+//    }
+//            
+//    public boolean getDPadRight(){
+//        return (stick.getRawAxis(LEFT_RIGHT_DPAD_AXIS) > RIGHT_DPAD_TOLERANCE);
+//    }
+//    
 //    public boolean getDPadTop(){
 //        return (stick.getRawAxis(TOP_BOTTOM_DPAD_AXIS) < TOP_DPAD_TOLERANCE);
 //    }

@@ -144,6 +144,13 @@ public class CANTalonEncoderPID extends CANTalon {
 		return talonInput;
 	}
 
+	public double setPIDPositionDegNoLimits(double positionCommandDeg) {
+		double talonInput = RobotUtility.convertDegToEncoderPosition(positionCommandDeg + offsetAngleDeg, sensorToOutputGearRatio);
+		this.set(talonInput);
+		
+		return talonInput;
+	}
+
 	public void setPIDVelocityDegPerSec(double velocityCommandDegPerSec) {
 		if ((getPositionDeg() > maxAngleDeg && velocityCommandDegPerSec > 0) ||
 			(getPositionDeg() < minAngleDeg && velocityCommandDegPerSec < 0)) {

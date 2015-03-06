@@ -5,7 +5,7 @@ public class Physics {
 		
 		// NOTE: 4th array spot on Vel & Acc is for magnitude on a linear move
 		 		
-		public static ProfileOutput VelAccPos(int Npts, double[][] JointPos, double[][] CartPos) {
+		public static ProfileOutput VelAccPos(int Npts, double[][] JointPos, double[][] CartPos, double outputRateSec) {
 		
 			ProfileOutput out = new ProfileOutput(Npts, true);
 			
@@ -19,8 +19,8 @@ public class Physics {
 		      // Determine Cartesian V and Accel at each millisecond using
 		      // numerical methods
 		      for (int i = 1; i < Npts + 1; i++) {
-		          out.cartVel[i][j] = (CartPos[i][j] - CartPos[i-1][j]) / 0.001;
-		          out.cartAccel[i][j] = (out.cartVel[i][j] - out.cartVel[i-1][j]) / 0.001;
+		          out.cartVel[i][j] = (CartPos[i][j] - CartPos[i-1][j]) / outputRateSec;
+		          out.cartAccel[i][j] = (out.cartVel[i][j] - out.cartVel[i-1][j]) / outputRateSec;
 		      }
 		  }
 		
@@ -43,8 +43,8 @@ public class Physics {
 		      // Determine Joint V and Accel at each millisecond using
 		      // numerical methods
 		      for (int i = 1; i < Npts + 1; i++) {
-		          out.jointVel[i][j] = (JointPos[i][j] - JointPos[i-1][j]) / 0.001;
-		          out.jointAccel[i][j] = (out.jointVel[i][j] - out.jointVel[i-1][j]) / 0.001;
+		          out.jointVel[i][j] = (JointPos[i][j] - JointPos[i-1][j]) / outputRateSec;
+		          out.jointAccel[i][j] = (out.jointVel[i][j] - out.jointVel[i-1][j]) / outputRateSec;
 		      }
 		  }
 		  

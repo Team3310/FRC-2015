@@ -1,7 +1,5 @@
 package edu.rhhs.frc.utility.motionprofile;
 
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
-import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -45,8 +43,8 @@ public class MotionProfile {
     protected double[] endTypeCNT; 
 
     protected double controllerUpdateRateSec = DEFAULT_CONTROLLER_UPDATE_RATE;  // Controller update rate seconds 
-    protected int outputRateMs = 1;   //  Output rate milliseconds
-    protected double serverExponentialFilterDecayTime = controllerUpdateRateSec;   // Servo filter exponential decay
+    protected int outputRateMs = 1;   //  Output rate factor (1 = every point)
+    protected double servoExponentialFilterDecayTime = controllerUpdateRateSec;   // Servo filter exponential decay
     protected boolean isServerExponentialFilterEnable = false;
     
     protected ProfileOutput profileOutput;
@@ -102,13 +100,18 @@ public class MotionProfile {
     }
 
     // Perform profile calculations.  Return success/failure.
-	public boolean calculatePath(boolean calcVelocitiesAccels, double servoFilterOutputMs) {
-		return calculatePath(calcVelocitiesAccels, servoFilterOutputMs, 0, ZERO_OFFSET);
+	public boolean calculatePath(boolean calcVelocitiesAccels, double controllerAndServoFilterOutputMs) {
+		return calculatePath(calcVelocitiesAccels, controllerAndServoFilterOutputMs, 0, ZERO_OFFSET);
 	}
 
 	// Perform profile calculations.  Return success/failure.
-	public boolean calculatePath(boolean calcVelocitiesAccels, double servoFilterOutputMs, double worldToRobotAngleDeg, double[] worldToRobotOffsetInches) {
+	public boolean calculatePath(boolean calcVelocitiesAccels, double controllerAndServoFilterOutputMs, double worldToRobotAngleDeg, double[] worldToRobotOffsetInches) {
         
+		// The controller, exponential filter decay and servo filter output were separate values in the original app.  To keep things
+		// simple for our purposes we are going to always make them the same.
+		controllerUpdateRateSec = controllerAndServoFilterOutputMs / 1000.0;
+		servoExponentialFilterDecayTime = controllerUpdateRateSec;
+		
     	IKINOutput iKINOutput = null;
     	Kinematics kinematics = new Kinematics();
 
@@ -194,7 +197,7 @@ public class MotionProfile {
  
         // Input code to call the Servo filters
         Filter filter = new Filter();
-        ServoFilterOutput serverFilterOutput = filter.servoFilter(servoFilterOutputMs/1000.0, controllerUpdateRateSec, serverExponentialFilterDecayTime, Out2, coMotionFilterOutput.NumITPs, isServerExponentialFilterEnable);
+        ServoFilterOutput serverFilterOutput = filter.servoFilter(controllerAndServoFilterOutputMs/1000.0, controllerUpdateRateSec, servoExponentialFilterDecayTime, Out2, coMotionFilterOutput.NumITPs, isServerExponentialFilterEnable);
         
         // Servo position [ServoOut()] is actually deltaPos, so we take the
         // joint position of the 1st taught point [PosFilterIn(0,J)] to
@@ -221,7 +224,7 @@ public class MotionProfile {
 	        double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, armLengths, dHLengths);
 	        
 	        // Call procedure to calculate velocity and acceleration
-	        profileOutput = Physics.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos);
+	        profileOutput = Physics.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos, controllerAndServoFilterOutputMs/1000.0);
         }
         else {
 	        profileOutput = new ProfileOutput(serverFilterOutput.pointCount, false);
@@ -414,31 +417,6 @@ public class MotionProfile {
 		this.endTypeCNT = endTypeCNT;
 	}
 
-	public double getControllerUpdateRateSec() {
-		return controllerUpdateRateSec;
-	}
-
-	public void setControllerUpdateRateSec(double controllerUpdateRateSec) {
-		this.controllerUpdateRateSec = controllerUpdateRateSec;
-	}
-
-	public int getOutputRateMs() {
-		return outputRateMs;
-	}
-
-	public void setOutputRateMs(int outputRateMs) {
-		this.outputRateMs = outputRateMs;
-	}
-
-	public double getServerExponentialFilterDecayTime() {
-		return serverExponentialFilterDecayTime;
-	}
-
-	public void setServerExponentialFilterDecayTime(
-			double serverExponentialFilterDecayTime) {
-		this.serverExponentialFilterDecayTime = serverExponentialFilterDecayTime;
-	}
-
 	public boolean isServerExponentialFilterEnable() {
 		return isServerExponentialFilterEnable;
 	}
@@ -521,11 +499,11 @@ public class MotionProfile {
     	wayPoints.addWaypoint(60, 60, 0, 0);
     	
     	MotionProfile motionProfile = new MotionProfile(wayPoints);
-    	motionProfile.setJointVelocities(new double[] {60, 60, 60, 60});
-    	motionProfile.setJointAccels1(new double[] {0.6, 0.6, 0.6, 0.6});
-    	motionProfile.setJointAccels2(new double[] {0.3, 0.3, 0.3, 0.3});
- 		motionProfile.calculatePath(false, 10);
-		motionProfile.printOutput(10);
+    	motionProfile.setJointVelocities(new double[] {20, 20, 20, 20});
+    	motionProfile.setJointAccels1(new double[] {0.2, 0.2, 0.6, 0.6});
+    	motionProfile.setJointAccels2(new double[] {0.2, 0.2, 0.6, 0.6});
+ 		motionProfile.calculatePath(true, 40);
+		motionProfile.printOutput(40);
 
 		//    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 //    	waypointsM2H.addWaypoint(RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG);
