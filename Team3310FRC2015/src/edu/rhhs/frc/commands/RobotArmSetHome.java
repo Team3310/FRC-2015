@@ -15,7 +15,7 @@ public class RobotArmSetHome extends Command
 	protected void initialize() {
 		MotionProfile motionProfile = new MotionProfile();
 		double[] currentRobotPosition = motionProfile.calcForwardKinematicsDeg(RobotMain.robotArm.getJointAngles());
-		RobotMain.commandListGenerator.updateWorldToRobotOffset(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD, currentRobotPosition, RobotMain.getYawAngleDeg());
+		RobotMain.commandListGenerator.updateWorldToRobotOffset(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD, currentRobotPosition, 0);
 	}
 
 	@Override

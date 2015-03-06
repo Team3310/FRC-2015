@@ -20,7 +20,7 @@ public class ControlLooper {
 
 		public ControlLoopTask(ControlLooper controlLooper) {
 			if (controlLooper == null) {
-				throw new NullPointerException("Given RobotArm was null");
+				throw new NullPointerException("Given control looper was null");
 			}
 			this.controlLooper = controlLooper;
 		}

@@ -10,6 +10,8 @@ import edu.rhhs.frc.commands.BinGrabberSetLeftSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetRightSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetSpeed;
 import edu.rhhs.frc.commands.BinGrabberStopPID;
+import edu.rhhs.frc.commands.DriveTrainMotionProfileStraight;
+import edu.rhhs.frc.commands.DriveTrainMotionProfileTurn;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
 import edu.rhhs.frc.commands.DriveTrainStopPID;
@@ -208,7 +210,27 @@ public class OI
 		binGrabberPivotUnlockTest.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
 		SmartDashboard.putData("Bin Grabber Pivot Unlock", binGrabberPivotUnlockTest);
 		
-//    	WaypointList waypoints0 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
+		InternalButton driveStraightTest = new InternalButton();
+		driveStraightTest.whenPressed(new DriveTrainMotionProfileStraight(60, 60));
+		SmartDashboard.putData("Drive Straight Test", driveStraightTest);
+		
+		InternalButton driveTurnRightTest = new InternalButton();
+		driveTurnRightTest.whenPressed(new DriveTrainMotionProfileTurn(-45, 60, false));
+		SmartDashboard.putData("Drive Turn -45 Test", driveTurnRightTest);		
+		
+		InternalButton driveTurnLeftTest = new InternalButton();
+		driveTurnLeftTest.whenPressed(new DriveTrainMotionProfileTurn(45, 60, false));
+		SmartDashboard.putData("Drive Turn 45 Test", driveTurnLeftTest);
+		
+		InternalButton driveTankTurnLeftTest = new InternalButton();
+		driveTankTurnLeftTest.whenPressed(new DriveTrainMotionProfileTurn(45, 60, true));
+		SmartDashboard.putData("Drive Tank Turn 45 Test", driveTankTurnLeftTest);
+		
+		InternalButton driveTankTurnRightTest = new InternalButton();
+		driveTankTurnRightTest.whenPressed(new DriveTrainMotionProfileTurn(-45, 60, true));
+		SmartDashboard.putData("Drive Tank Turn -45 Test", driveTankTurnRightTest);
+
+		//    	WaypointList waypoints0 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
 //    	waypoints0.addWaypoint(RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG);
 //    	waypoints0.addWaypoint(0, 0, 0, 0);
 //    	RobotArmCommandList commandList0 = new RobotArmCommandList();

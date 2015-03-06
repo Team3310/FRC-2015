@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem implements ControlLoopable
 {	
-	public static final long OUTER_LOOP_UPDATE_RATE_MS = 40;
+	public static final long OUTER_LOOP_UPDATE_RATE_MS = 10;
 	public static final double TRACK_WIDTH_INCHES = 26.425;
 
 	// Talons
@@ -223,17 +223,19 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
 		m_rearLeftMotor.setPosition(0);
 		m_rearRightMotor.setPosition(0);
+		m_rearLeftMotor.set(0);
+		m_rearRightMotor.set(0);
 		isHoldOn = false;
 		enableControlLoop();
 	}
 
 	public void controlLoopUpdate() {
-		if (m_motionProfileIndex < m_motionProfile.numPoints - 1) {
-			m_motionProfileIndex++;
+		if (m_motionProfileIndex < m_motionProfile.numPoints) {
 			double distanceLeft = m_motionProfile.jointPos[m_motionProfileIndex][0];    // hack, use J1
 			double distanceRight = m_motionProfile.jointPos[m_motionProfileIndex][1];   // hack, use J2
 			m_rearLeftMotor.setPIDPositionInches(distanceLeft);
 			m_rearRightMotor.setPIDPositionInches(distanceRight);
+			m_motionProfileIndex++;
 		}
 		else {
 			disableControlLoop();

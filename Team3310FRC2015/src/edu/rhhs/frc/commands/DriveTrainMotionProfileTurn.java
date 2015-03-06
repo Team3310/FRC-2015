@@ -18,13 +18,13 @@ public class DriveTrainMotionProfileTurn extends Command
     	wayPoints.addWaypoint(0, 0, 0, 0);
     	
     	if (isTank) {
-        	double wheelDistanceInches = Math.toRadians(turnAngleDeg) * DriveTrain.TRACK_WIDTH_INCHES / 2;
+        	double wheelDistanceInches = Math.abs(Math.toRadians(turnAngleDeg) * DriveTrain.TRACK_WIDTH_INCHES / 2);
 	    	double leftWheelDistance = turnAngleDeg > 0 ? -wheelDistanceInches : wheelDistanceInches;
 	    	double rightWheelDistance = turnAngleDeg > 0 ? wheelDistanceInches : -wheelDistanceInches;
 	    	wayPoints.addWaypoint(leftWheelDistance, rightWheelDistance, 0, 0);
     	}
     	else {
-        	double outerWheelDistanceInches = Math.toRadians(turnAngleDeg) * DriveTrain.TRACK_WIDTH_INCHES;
+        	double outerWheelDistanceInches = Math.abs(Math.toRadians(turnAngleDeg) * DriveTrain.TRACK_WIDTH_INCHES);
 	    	double leftWheelDistance = turnAngleDeg > 0 ? 0 : outerWheelDistanceInches;
 	    	double rightWheelDistance = turnAngleDeg > 0 ? outerWheelDistanceInches : 0;
 	    	wayPoints.addWaypoint(leftWheelDistance, rightWheelDistance, 0, 0);
@@ -32,6 +32,8 @@ public class DriveTrainMotionProfileTurn extends Command
 
     	MotionProfile motionProfile = new MotionProfile(wayPoints);
     	motionProfile.setJointVelocities(new double[] {maxSpeedInchesPerSecond, maxSpeedInchesPerSecond, maxSpeedInchesPerSecond, maxSpeedInchesPerSecond});
+    	motionProfile.setJointAccels1(new double[] {0.8, 0.8, 0.8, 0.8});
+    	motionProfile.setJointAccels2(new double[] {0.4, 0.4, 0.4, 0.4});
 		motionProfile.calculatePath(false, DriveTrain.OUTER_LOOP_UPDATE_RATE_MS);
     	profileOutput = motionProfile.getProfile();
 

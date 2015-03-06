@@ -1,6 +1,7 @@
 package edu.rhhs.frc.utility.motionprofile;
 
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -508,14 +509,25 @@ public class MotionProfile {
 //    	profile.calculatePath(true, 10, 45, new double[] {1, 1, 0, 0});
 //    	profile.printOutput(10);
 
-		WaypointList waypointsXFormTest = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-		waypointsXFormTest.addWaypoint(30,0,0,0);
-		waypointsXFormTest.addWaypoint(0,-30,0,0);
-    	MotionProfile profile = new MotionProfile(waypointsXFormTest);
-    	profile.calculatePath(true, 10, 0, new double[] {0, 0, 0, 0});
-    	profile.printOutput(10);
+//		WaypointList waypointsXFormTest = new WaypointList(ProfileMode.CartesianInputJointMotion);				
+//		waypointsXFormTest.addWaypoint(30,0,0,0);
+//		waypointsXFormTest.addWaypoint(0,-30,0,0);
+//    	MotionProfile profile = new MotionProfile(waypointsXFormTest);
+//    	profile.calculatePath(true, 10, 0, new double[] {0, 0, 0, 0});
+//    	profile.printOutput(10);
 
-//    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+    	WaypointList wayPoints = new WaypointList(ProfileMode.JointInputJointMotion);
+    	wayPoints.addWaypoint(0, 0, 0, 0);
+    	wayPoints.addWaypoint(60, 60, 0, 0);
+    	
+    	MotionProfile motionProfile = new MotionProfile(wayPoints);
+    	motionProfile.setJointVelocities(new double[] {60, 60, 60, 60});
+    	motionProfile.setJointAccels1(new double[] {0.6, 0.6, 0.6, 0.6});
+    	motionProfile.setJointAccels2(new double[] {0.3, 0.3, 0.3, 0.3});
+ 		motionProfile.calculatePath(false, 10);
+		motionProfile.printOutput(10);
+
+		//    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 //    	waypointsM2H.addWaypoint(RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG);
 //    	waypointsM2H.addWaypoint(-19.45362530920832,-24.023226578639672,11.800983061590966,-129.0);
 //    	waypointsM2H.addWaypoint(-36.392038457272776,-44.94042481140042,28.534465949865748,-129.0);
@@ -567,6 +579,8 @@ public class MotionProfile {
 //    	double[] masterAngleOutputDeg = profile.calcInverseKinematicsDeg(masterXYZOutputDeg);
 //    	System.out.println("Inverse KIN joint angle output deg = " + masterAngleOutputDeg[0] + "," + masterAngleOutputDeg[1] + "," + masterAngleOutputDeg[2] + "," + masterAngleOutputDeg[3]);
 
+    	
+    	MotionProfile profile = new MotionProfile();
     	double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
     	
     	double[] jointAngleInputDeg = new double[] {0, 89,  -101.7,   0};
