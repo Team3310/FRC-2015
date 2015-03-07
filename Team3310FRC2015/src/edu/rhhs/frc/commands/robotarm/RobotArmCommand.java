@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 
 public abstract class RobotArmCommand {
 
+	public enum RobotArmCommandType { BEGIN_CYCLE, BEGIN_STACK, MIDDLE_STACK, NULL };
+	protected RobotArmCommandType m_commandType;
     /** The time since this command was initialized */
     private double m_startTime = -1;
     /** The time (in seconds) before this command "times out" (or -1 if no timeout) */
@@ -14,6 +16,11 @@ public abstract class RobotArmCommand {
     private boolean m_initialized = false;
 
     public RobotArmCommand() {
+    	m_commandType = RobotArmCommandType.NULL;
+    }
+    
+    public RobotArmCommand(RobotArmCommandType givenType) {
+    	m_commandType = givenType;
     }
     
     public RobotArmCommand(double timeout) {
@@ -21,6 +28,10 @@ public abstract class RobotArmCommand {
             throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
         }
         m_timeout = timeout;
+    }
+    
+    protected void setCommandType(RobotArmCommandType type) {
+    	m_commandType = type;
     }
 
     /**
@@ -61,6 +72,10 @@ public abstract class RobotArmCommand {
     
     public synchronized void reset() {
     	m_initialized = false;
+    }
+    
+    public RobotArmCommandType getCommandType() {
+    	return m_commandType;
     }
 
     /**
