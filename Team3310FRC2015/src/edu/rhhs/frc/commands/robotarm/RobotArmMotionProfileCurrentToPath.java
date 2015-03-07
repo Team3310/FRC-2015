@@ -55,7 +55,7 @@ public class RobotArmMotionProfileCurrentToPath extends RobotArmMotionProfilePat
     	}
     	
     	motionProfile = new MotionProfile(waypoints);
-		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
+		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, RobotMain.driveTrain.getYawAngleDeg(), RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
     	profileOutput = motionProfile.getProfile();
 
     	currentProfileIndex = 0;

@@ -2,6 +2,7 @@ package edu.rhhs.frc;
 
 import edu.rhhs.frc.buttons.XBoxDPadTriggerButton;
 import edu.rhhs.frc.buttons.XBoxTriggerButton;
+import edu.rhhs.frc.commands.AutonGet3TotesTip3Bins;
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
@@ -437,6 +438,10 @@ public class OI
 		InternalButton driveTrainHoldOffTest = new InternalButton();
 		driveTrainHoldOffTest.whenPressed(new DriveTrainStopPID());
 		SmartDashboard.putData("Drivetrain Hold Off", driveTrainHoldOffTest);
+		
+		InternalButton autonGet3TotesTip3Bins = new InternalButton();
+		autonGet3TotesTip3Bins.whenPressed(new AutonGet3TotesTip3Bins());
+		SmartDashboard.putData("Autonomous 3 Totes Tip 3 Bins Test", autonGet3TotesTip3Bins);
 	}
 	
 	public static OI getInstance() {

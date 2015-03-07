@@ -64,7 +64,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
 	private static final double Z_MAX_INCHES = 77.0;
-	private static final double Z_MIN_INCHES = 1.0;
+	private static final double Z_MIN_INCHES = 5.0;
 	
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -60.0;
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG = 60.0;
@@ -91,8 +91,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private CANTalonAnalogPID  m_j4Motor;
 
 	private PIDParams j1PositionPidParams = new PIDParams(1.0, 0.0, 0.2, 0.0, 50, 0);
-	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.26, 150, 0);
-	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.22, 150, 0);
+//	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.26, 150, 0);
+//	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.22, 150, 0);
+	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.009, 0.15, -0.26, 150, 0);
+	private PIDParams j3PositionPidParams = new PIDParams(3.5, 0.002, 0.15, 0.02, 150, 0);
 	private PIDParams j4PositionPidParams = new PIDParams(10.0, 0.02, 0.0, 0.0, 75, 0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0);
@@ -350,24 +352,14 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 				// Add in the J1 position jog
 // Disable J1 control
-//				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
-//				}
-//				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
-//				}
+				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.02;
+				}
+				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
+					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.02;
+				}
 
-				m_positionCommandJ1 = jointAngles[0];
-				m_positionCommandJ2 = jointAngles[1];
-				m_positionCommandJ3 = jointAngles[2];
-				m_positionCommandJ4 = jointAngles[3];
-				
- 				SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
-				SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
-				SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
-				SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
-
-				setPIDPosition(m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4);
+				setPIDPosition(jointAngles[0], jointAngles[1], jointAngles[2], jointAngles[3]);
 			}
 
 			// Incremental robot tool coordinate position control
@@ -475,15 +467,26 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		// We need to check the limits now so we can save the limited angle in the position command.  If you let the Talon limit
 		// the angles the positionCommands keep incrementing in manual mode and inverse/forward kinematics get weird.
 		m_positionCommandJ1 = limitAngle(j1PositionDeg, J1_MIN_ANGLE_DEG, J1_MAX_ANGLE_DEG);
-		m_positionCommandJ2 = limitAngle(j2PositionDeg, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
-		m_positionCommandJ3 = limitJ3(j2PositionDeg, j3PositionDeg);
-		m_positionCommandJ4 = limitAngle(j1PositionDeg, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
+		
+		// Only update J2 and J3 if neither has been limited
+		double J2AfterLimits = limitAngle(j2PositionDeg, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
+		double J3AfterLimits = limitJ3(j2PositionDeg, j3PositionDeg);
+		if (J2AfterLimits == j2PositionDeg && J3AfterLimits == j3PositionDeg) {
+			m_positionCommandJ2 = j2PositionDeg;
+			m_positionCommandJ3 = j3PositionDeg;
+		}
+		m_positionCommandJ4 = limitAngle(j4PositionDeg, J4_MIN_ANGLE_DEG, J4_MAX_ANGLE_DEG);
 				
 		m_j1Motor.setPIDPositionDegNoLimits(m_positionCommandJ1);
 		m_j2Motor.setPIDPositionDegNoLimits(m_positionCommandJ2);
 		m_j3Motor.setPIDPositionDegNoLimits(m_positionCommandJ3);
 		m_j4Motor.setPIDPositionDegNoLimits(m_positionCommandJ4);	
 		
+		SmartDashboard.putNumber("J1 Stick Command", m_positionCommandJ1);
+		SmartDashboard.putNumber("J2 Stick Command", m_positionCommandJ2);
+		SmartDashboard.putNumber("J3 Stick Command", m_positionCommandJ3);
+		SmartDashboard.putNumber("J4 Stick Command", m_positionCommandJ4);
+
 		// Setting the PID coefficients each pass causes a 30-40 ms delay. This killed the 10 ms control loop.
 		// If you must schedule the gains, much better to switch between the 2 profiles stored in the Talon or
 		// just set the one/two coefficients you need.  
