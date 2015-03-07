@@ -52,10 +52,6 @@ public class RobotMain extends IterativeRobot
     private Integer numTotesPerStack = null;
     private StackPriority stackPriority;
 
-    private SerialPort m_imuSerialPort;
-    private AHRS m_imu = null;
-    private boolean m_imuFirstIteration;
-    
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -118,45 +114,18 @@ public class RobotMain extends IterativeRobot
         	m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
         	SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 
-	    	m_imuSerialPort = new SerialPort(57600,SerialPort.Port.kMXP);
-			
-			// You can add a second parameter to modify the 
-			// update rate (in hz) from.  The minimum is 4.  
-	    	// The maximum (and the default) is 100 on a nav6, 60 on a navX MXP.
-			// If you need to minimize CPU load, you can set it to a
-			// lower value, as shown here, depending upon your needs.
-	    	// The recommended maximum update rate is 50Hz
-			
-			// You can also use the IMUAdvanced class for advanced
-			// features on a nav6 or a navX MXP.
-	    	
-	    	// You can also use the AHRS class for advanced features on 
-	    	// a navX MXP.  This offers superior performance to the
-	    	// IMU Advanced class, and also access to 9-axis headings
-	    	// and magnetic disturbance detection.  This class also offers
-	    	// access to altitude/barometric pressure data from a
-	    	// navX MXP Aero.
-			
-			byte updateRateHz = 50;
-			m_imu = new AHRS(m_imuSerialPort, updateRateHz);
 
         } catch( Exception ex ) {
     		
     	}
-        m_imuFirstIteration = true;
  
         updateStatus();
      }
 	
 	public void disabledPeriodic() {
-		// Set up the IMU
-        boolean isCalibrating = m_imu.isCalibrating();
-        if ( m_imuFirstIteration && !isCalibrating ) {
-            Timer.delay( 0.3 );
-            m_imu.zeroYaw();
-            m_imuFirstIteration = false; 
-        }
-
+		// Calibrate the IMU
+		driveTrain.calibrateIMU();
+		
         // Update the command list generator
         numStacks = (Integer)m_numStacksChooser.getSelected();
         numTotesPerStack = (Integer)m_numTotesPerStackChooser.getSelected();
@@ -226,19 +195,10 @@ public class RobotMain extends IterativeRobot
         updateStatus();
     }
     
-    public AHRS getIMU() {
-    	return m_imu;
-    }
-    
-    public double getYawAngleDeg() {
-    	return m_imu.getYaw();
-    }
-    
     public void updateStatus() {
     	try {
     		long currentTime = System.nanoTime();
     		SmartDashboard.putNumber("Main loop time (ms)", (currentTime - m_loopTime) / 1000000.0);
-    		SmartDashboard.putNumber("IMU Yaw (deg)", m_imu.getYaw());
     		SmartDashboard.putNumber("Num Stacks Verify", numStacks);
     		SmartDashboard.putNumber("Num Totes Per Stack Verify", numTotesPerStack);
        		SmartDashboard.putString("Stack Priority Verify", stackPriority == StackPriority.HORIZONTAL ? "Horizontal" : "Vertical");

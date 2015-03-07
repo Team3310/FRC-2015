@@ -1,5 +1,6 @@
 package edu.rhhs.frc.subsystems;
 
+import com.kauailabs.navx_mxp.AHRS;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
@@ -10,6 +11,8 @@ import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -69,6 +72,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	private ProfileOutput m_motionProfile;
 	private int m_motionProfileIndex;
     
+    private SerialPort m_imuSerialPort;
+    private AHRS m_imu = null;
+    private boolean m_imuFirstIteration;
+    
     public DriveTrain() {
 		try {
 			m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
@@ -116,10 +123,32 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 
 			m_controlLoop = new ControlLooper(this, OUTER_LOOP_UPDATE_RATE_MS);
 			m_controlLoop.start();
+			
+			// You can add a second parameter to modify the 
+			// update rate (in hz) from.  The minimum is 4.  
+	    	// The maximum (and the default) is 100 on a nav6, 60 on a navX MXP.
+			// If you need to minimize CPU load, you can set it to a
+			// lower value, as shown here, depending upon your needs.
+	    	// The recommended maximum update rate is 50Hz
+			
+			// You can also use the IMUAdvanced class for advanced
+			// features on a nav6 or a navX MXP.
+	    	
+	    	// You can also use the AHRS class for advanced features on 
+	    	// a navX MXP.  This offers superior performance to the
+	    	// IMU Advanced class, and also access to 9-axis headings
+	    	// and magnetic disturbance detection.  This class also offers
+	    	// access to altitude/barometric pressure data from a
+	    	// navX MXP Aero.
+	    	m_imuSerialPort = new SerialPort(57600,SerialPort.Port.kMXP);
+			
+			byte updateRateHz = 50;
+			m_imu = new AHRS(m_imuSerialPort, updateRateHz);
         } 
 		catch (Exception e) {
             System.out.println("Unknown error initializing drivetrain.  Message = " + e.getMessage());
         }
+		m_imuFirstIteration = true;
 	}
 	
 	@Override
@@ -130,7 +159,25 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	public void teleopInit() {
 		stopPID();
 	}
+	
+	public void calibrateIMU() {
+		// Set up the IMU
+        boolean isCalibrating = m_imu.isCalibrating();
+        if ( m_imuFirstIteration && !isCalibrating ) {
+            Timer.delay( 0.3 );
+            m_imu.zeroYaw();
+            m_imuFirstIteration = false; 
+        }
+	}
 
+    public AHRS getIMU() {
+    	return m_imu;
+    }
+    
+    public double getYawAngleDeg() {
+    	return -m_imu.getYaw();
+    }
+    
 	public void keepAlive() {
 		m_frontLeftMotor.enableBrakeMode(true);
 		m_frontRightMotor.enableBrakeMode(true);
@@ -344,5 +391,6 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		SmartDashboard.putNumber("Rear Left Distance (Inches)", m_rearLeftMotor.getPositionInches());
 		SmartDashboard.putNumber("Rear Right Distance (Inches)", m_rearRightMotor.getPositionInches());
 		SmartDashboard.putBoolean("Drivetrain Hold On", isHoldOn);
+		SmartDashboard.putNumber("IMU Yaw (deg)", m_imu.getYaw());
 	}
 }
