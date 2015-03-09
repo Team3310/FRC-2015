@@ -13,6 +13,10 @@ public class RobotArmToteGrabberSetPosition extends RobotArmCommand {
 	public RobotArmToteGrabberSetPosition(RobotArm.ToteGrabberPosition position) {
     	m_position = position;
     }
+	
+	public RobotArmToteGrabberSetPosition(RobotArmCommandType givenType) {
+    	m_commandType = givenType;
+    }
 
     protected void initialize() {
     	RobotMain.robotArm.setToteGrabberPosition(m_position);
