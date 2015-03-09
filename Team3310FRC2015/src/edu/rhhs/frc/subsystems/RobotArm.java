@@ -54,16 +54,16 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J3_SENSOR_GEAR_RATIO = 84.0/18.0;
 	private static final double J4_SENSOR_GEAR_RATIO = 60.0/30.0;
 
-	private static final double J1_MAX_ANGLE_DEG = 250.0;
-	private static final double J1_MIN_ANGLE_DEG = -250.0;
+	private static final double J1_MAX_ANGLE_DEG = 175.0;
+	private static final double J1_MIN_ANGLE_DEG = -175.0;
 	private static final double J2_MAX_ANGLE_DEG = 105.0;
-	private static final double J2_MIN_ANGLE_DEG = -30.0;
+	private static final double J2_MIN_ANGLE_DEG = -25.0;
 	private static final double J3_MAX_ANGLE_DEG = 27.0;
 	private static final double J3_MIN_ANGLE_DEG = -110.0;
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
-	private static final double Z_MAX_INCHES = 77.0;
+	private static final double Z_MAX_INCHES = 85.0;
 	private static final double Z_MIN_INCHES = 5.0;
 	
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -60.0;
@@ -320,15 +320,17 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				
 				// First calculate the current XYZ coordinate
 				double[] xyzToolDeg = motionProfileForOutput.calcForwardKinematicsDeg(new double[] {m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4});
-
+				double deltaToolX = 0;
+				double deltaToolY = 0;
+				
 				// Add delta stick command to XYZ coordinate
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[0] = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[0];
+					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05;
 				}
 				
 //	Disable Y control 
 //				if (Math.abs(throttleLeftX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-//					xyzToolDeg[1] = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[1]; 
+//					deltaToolY = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05; 
 //				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
@@ -346,6 +348,12 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 //				if (Math.abs(throttleRightX) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 //					xyzToolDeg[3] = -throttleRightX  * J4_MAX_SPEED_DEG_PER_SEC * 0.05 + xyzToolDeg[3];
 //				}
+				
+				// Convert delta tool coordinate to world coordinate (use new gamma value?)
+				double cosGamma = Math.cos(Math.toRadians(m_positionCommandJ1));
+				double sinGamma = Math.sin(Math.toRadians(m_positionCommandJ1));
+				xyzToolDeg[0] = deltaToolX * cosGamma - deltaToolY * sinGamma + xyzToolDeg[0];
+				xyzToolDeg[1] = deltaToolX * sinGamma + deltaToolY * cosGamma + xyzToolDeg[1];
 
 				// Calculate joint angles from adjusted XYZ coordinate
 				double[] jointAngles = motionProfileForOutput.calcInverseKinematicsDeg(xyzToolDeg);
@@ -353,10 +361,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				// Add in the J1 position jog
 // Disable J1 control
 				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.02;
+					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
 				}
 				if (Math.abs(triggerRight) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.02;
+					jointAngles[0] += -triggerRight * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
 				}
 
 				setPIDPosition(jointAngles[0], jointAngles[1], jointAngles[2], jointAngles[3]);

@@ -48,14 +48,14 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	public static final int CONTROLLER_XBOX_ARCADE_RIGHT = 5;
 	public static final int CONTROLLER_WHEEL = 6;
  
-    public static final double STEER_NON_LINEARITY = 0.9;
-    public static final double MOVE_NON_LINEARITY = 0.9;
+    public static final double STEER_NON_LINEARITY = 1.0;
+    public static final double MOVE_NON_LINEARITY = 1.0;
     
  	private int m_moveNonLinear = 0;
     private int m_steerNonLinear = 0;
     
-    private double m_moveScale = 1.0;
-    private double m_steerScale = 1.0;
+    private double m_moveScale = 0.75;
+    private double m_steerScale = 0.75;
     
     private double m_moveInput = 0.0;
     private double m_steerInput = 0.0;

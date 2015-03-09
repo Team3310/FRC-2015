@@ -17,6 +17,7 @@ import edu.rhhs.frc.commands.DriveTrainMotionProfileTurn;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
 import edu.rhhs.frc.commands.DriveTrainStopPID;
+import edu.rhhs.frc.commands.RobotArmMotionProfileCurrentToPosition;
 import edu.rhhs.frc.commands.RobotArmMotionProfileNext;
 import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
 import edu.rhhs.frc.commands.RobotArmMotionProfileReset;
@@ -136,6 +137,12 @@ public class OI
         JoystickButton toteGrabberClose = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.RIGHT_BUMPER_BUTTON);
         toteGrabberClose.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
 
+        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 81, MotionProfile.ProfileMode.CartesianInputJointMotion));
+        
+        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
+        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 75, MotionProfile.ProfileMode.CartesianInputJointMotion));
+        
         // Testing
 //        InternalButton binGrabberDeployTimedTest = new InternalButton();
 //        binGrabberDeployTimedTest.whenReleased(new BinGrabberDeployTimed(1.0, 300));
