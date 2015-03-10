@@ -7,8 +7,6 @@ import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
 public class RobotArmCommandList extends ArrayList<RobotArmCommand> 
 {
-	private static final long serialVersionUID = 6784216752255634190L;
-
 	int currentIndex;
 
 	public RobotArmCommandList() {
@@ -18,13 +16,17 @@ public class RobotArmCommandList extends ArrayList<RobotArmCommand>
 	public RobotArmCommand getCurrent() {
 		return this.get(currentIndex);
 	}
+	
+	public RobotArmCommand getPrev() {
+		return this.get(currentIndex--);
+	}
 
 	public RobotArmCommand getNext() {
 		return this.get(currentIndex++);
 	}
 
 	public RobotArmCommand getPrev(RobotArmCommandType type) {
-		for(int i = currentIndex; i < this.size(); i++) {
+		for(int i = currentIndex; i >= 0; i--) {
 			if(get(i).getCommandType() != type) {
 				continue;
 			}
