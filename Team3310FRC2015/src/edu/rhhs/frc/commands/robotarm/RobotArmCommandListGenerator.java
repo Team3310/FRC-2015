@@ -3,9 +3,8 @@ package edu.rhhs.frc.commands.robotarm;
 import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
-
-public abstract class RobotArmCommandListGenerator {
-
+public abstract class RobotArmCommandListGenerator 
+{
 	protected RobotArmCommandList commandList = new RobotArmCommandList();
 	
 	public abstract void calculate();

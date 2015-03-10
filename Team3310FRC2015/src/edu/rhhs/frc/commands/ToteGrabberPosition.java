@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class ToteGrabberPosition extends Command {
-	
+public class ToteGrabberPosition extends Command 
+{	
 	private RobotArm.ToteGrabberPosition m_position;
 	
     public ToteGrabberPosition(RobotArm.ToteGrabberPosition position) {

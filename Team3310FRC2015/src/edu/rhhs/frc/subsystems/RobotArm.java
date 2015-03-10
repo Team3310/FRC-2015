@@ -18,9 +18,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- *
- */
 public class RobotArm extends Subsystem implements ControlLoopable {
 
 	public static enum ToteGrabberPosition {OPEN, CLOSE};
@@ -68,10 +65,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -60.0;
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG = 60.0;
-	private static final double J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG = 0.0;
+	/*private static final double J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG = 0.0;
 	private static final double J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG = 40.0;
 	private static final double J3_HEIGHT_LIMIT_FACTOR_J2_LESS_THAN_MIN = -0.5;
-	private static final double J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN = 0.5;
+	private static final double J3_HEIGHT_LIMIT_FACTOR_J2_GREATER_THAN_MIN = 0.5;*/
 
 	// This is for manual control in velocity mode.  The rates for motion profile are 
 	// set in MotionProfile.java
@@ -604,4 +601,3 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		SmartDashboard.putNumber("Tool angle (deg)", xyzToolDeg[3]);
 	}
 }
-

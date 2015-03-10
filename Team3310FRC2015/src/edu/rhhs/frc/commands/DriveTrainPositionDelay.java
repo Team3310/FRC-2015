@@ -6,9 +6,9 @@ import edu.wpi.first.wpilibj.command.WaitCommand;
 /**
  *
  */
-public class DrivetrainPositionDelay extends CommandGroup 
+public class DriveTrainPositionDelay extends CommandGroup 
 {
-    public  DrivetrainPositionDelay() {
+    public DriveTrainPositionDelay() {
         addSequential(new WaitCommand(0.050));  
         addSequential(new DriveTrainPositionControl(120, 120, true, 120));  
     }

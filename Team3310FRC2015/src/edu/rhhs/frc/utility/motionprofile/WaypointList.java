@@ -2,8 +2,8 @@ package edu.rhhs.frc.utility.motionprofile;
 
 import java.util.ArrayList;
 
-public class WaypointList {
-
+public class WaypointList 
+{
 	private ArrayList<double[]> coordinates = new ArrayList<double[]>();
 	private MotionProfile.ProfileMode profileMode;
 	

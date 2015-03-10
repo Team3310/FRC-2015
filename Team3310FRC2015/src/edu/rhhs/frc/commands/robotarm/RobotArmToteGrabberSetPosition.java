@@ -3,11 +3,8 @@ package edu.rhhs.frc.commands.robotarm;
 import edu.rhhs.frc.RobotMain;
 import edu.rhhs.frc.subsystems.RobotArm;
 
-/**
- *
- */
-public class RobotArmToteGrabberSetPosition extends RobotArmCommand {
-
+public class RobotArmToteGrabberSetPosition extends RobotArmCommand 
+{
 	private RobotArm.ToteGrabberPosition m_position;
 
 	public RobotArmToteGrabberSetPosition(RobotArm.ToteGrabberPosition position) {

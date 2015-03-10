@@ -1,7 +1,7 @@
 package edu.rhhs.frc.utility.motionprofile;
 
-public class MatrixMath {
-
+public class MatrixMath 
+{
 	/*------------------------------------------------------------------------------
 	* MatrixMult:
 	* 
@@ -134,7 +134,7 @@ public class MatrixMath {
 	    for (int i = 0; i < 3; i++) {
 	        V3[i] = ScalarIn * Vin[i];
 	    }
-	    
+	   
 	    return V3;   
 	}
 }

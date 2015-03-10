@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
-public abstract class RobotArmCommand {
-
+public abstract class RobotArmCommand 
+{
 	public enum RobotArmCommandType { BEGIN_CYCLE, BEGIN_STACK, MIDDLE_STACK, NULL };
 	protected RobotArmCommandType m_commandType;
     /** The time since this command was initialized */

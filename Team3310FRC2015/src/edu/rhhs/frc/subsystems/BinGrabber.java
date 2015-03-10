@@ -110,10 +110,10 @@ public class BinGrabber extends Subsystem
 		m_rightMotor.changeControlMode(mode);
 	}
 		
-	private void setTalonProfile(int profile) {
+	/*private void setTalonProfile(int profile) {
 		m_leftMotor.setProfile(profile);
 		m_rightMotor.setProfile(profile);
-	}
+	}*/
 		
 	public void setSpeed(double leftSpeed, double rightSpeed) {
 		setLeftSpeed(leftSpeed);

@@ -6,8 +6,8 @@ import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
-public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator {
-
+public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
+{
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 
 	// Fork gripper

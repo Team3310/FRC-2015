@@ -1,7 +1,7 @@
 package edu.rhhs.frc.utility;
 
-
-public class PIDParams {
+public class PIDParams 
+{
     public double kP = 0;
     public double kI = 0;
     public double kD = 0;

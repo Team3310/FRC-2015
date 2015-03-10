@@ -7,7 +7,7 @@ import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
 public class RobotArmCommandList extends ArrayList<RobotArmCommand> 
 {
-	int currentIndex;
+	private int currentIndex;
 
 	public RobotArmCommandList() {
 		currentIndex = 0;

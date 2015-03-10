@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  * @author rhhs
  */
-public abstract class ExtraTimeoutCommand extends Command {
-
+public abstract class ExtraTimeoutCommand extends Command 
+{
     protected double m_extraTimeout = -1;
     private double m_startExtraTime;
 

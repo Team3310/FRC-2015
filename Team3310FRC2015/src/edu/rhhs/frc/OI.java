@@ -10,7 +10,6 @@ import edu.rhhs.frc.commands.BinGrabberPositionDownPID;
 import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
 import edu.rhhs.frc.commands.BinGrabberSetLeftSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetRightSpeed;
-import edu.rhhs.frc.commands.BinGrabberSetSpeed;
 import edu.rhhs.frc.commands.BinGrabberStopPID;
 import edu.rhhs.frc.commands.DriveTrainMotionProfileStraight;
 import edu.rhhs.frc.commands.DriveTrainMotionProfileTurn;
@@ -474,4 +473,3 @@ public class OI
         return m_robotArmController;
     }
 }
-

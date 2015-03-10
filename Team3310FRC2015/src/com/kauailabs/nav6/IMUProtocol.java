@@ -23,8 +23,8 @@
  */
 package com.kauailabs.nav6;
 
-public class IMUProtocol {
-
+public class IMUProtocol 
+{
     public final static byte PACKET_START_CHAR = '!';
     final static int PROTOCOL_FLOAT_LENGTH = 7;
     final static int CHECKSUM_LENGTH = 2;

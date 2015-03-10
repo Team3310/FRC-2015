@@ -3,7 +3,8 @@ package edu.rhhs.frc.utility;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ControlLooper {
+public class ControlLooper 
+{
 	private Timer controlLoopTimer;
 	private boolean isControlLoopEnabled = false;
 	

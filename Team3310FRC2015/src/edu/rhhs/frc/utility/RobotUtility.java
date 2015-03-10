@@ -129,6 +129,5 @@ public class RobotUtility
 
     	value = convertEncoderPositionToDeg(value, -1);
     	System.out.println("convertEncoderPositionToDeg(value) (-1 gear ratio) = " + value + " deg");
-   
    }
 }

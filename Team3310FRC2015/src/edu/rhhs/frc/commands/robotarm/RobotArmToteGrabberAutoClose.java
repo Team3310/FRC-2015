@@ -3,11 +3,8 @@ package edu.rhhs.frc.commands.robotarm;
 import edu.rhhs.frc.RobotMain;
 import edu.rhhs.frc.subsystems.RobotArm;
 
-/**
- *
- */
-public class RobotArmToteGrabberAutoClose extends RobotArmCommand {
-
+public class RobotArmToteGrabberAutoClose extends RobotArmCommand 
+{
 	public RobotArmToteGrabberAutoClose() {
     }
 

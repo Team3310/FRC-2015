@@ -2,8 +2,8 @@ package edu.rhhs.frc.utility;
 
 import edu.wpi.first.wpilibj.CANTalon;
 
-public class CANTalonAnalogPID extends CANTalonEncoderPID {
-	
+public class CANTalonAnalogPID extends CANTalonEncoderPID 
+{	
 	private int zeroPositionRaw;
 	
 	public CANTalonAnalogPID(int deviceNumber, double sensorToOutputGearRatio, double offsetAngleDeg, double initAngleDeg, double minAngleDeg, double maxAngleDeg, int zeroPositionRaw) {

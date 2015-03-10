@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class ToteGrabberAutoClose extends Command {
-	
+public class ToteGrabberAutoClose extends Command 
+{	
     public ToteGrabberAutoClose() {
          requires(RobotMain.robotArm);
     }

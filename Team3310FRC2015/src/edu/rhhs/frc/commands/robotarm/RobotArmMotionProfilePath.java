@@ -6,11 +6,8 @@ import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
-/**
- *
- */
-public class RobotArmMotionProfilePath extends RobotArmCommand {
-
+public class RobotArmMotionProfilePath extends RobotArmCommand 
+{
 	protected ProfileOutput profileOutput;
 	protected int currentProfileIndex;
 	protected boolean isFinished;

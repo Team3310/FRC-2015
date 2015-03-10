@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class BinGrabberStopPID extends Command 
 {
-
     public BinGrabberStopPID() {
         // Use requires() here to declare subsystem dependencies
         requires(RobotMain.binGrabber);

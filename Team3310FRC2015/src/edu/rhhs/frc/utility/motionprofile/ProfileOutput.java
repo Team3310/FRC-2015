@@ -1,6 +1,7 @@
 package edu.rhhs.frc.utility.motionprofile;
 
-public class ProfileOutput { 
+public class ProfileOutput 
+{ 
 	public int numPoints;
 
 	public double [][] jointPos;
@@ -17,7 +18,7 @@ public class ProfileOutput {
 	public double avePathVel ;
 	public double maxPathVel;
 	public double minPathVel;
-	
+
 	public ProfileOutput(int Npts, boolean allocateArrays) {
 		this.numPoints = Npts;
 		if (allocateArrays) {
@@ -27,7 +28,7 @@ public class ProfileOutput {
 			cartAccel = new double[Npts+1][4];
 		}
 	}
-	
+
 	public void output(int outPts, double serverOutputRateMs) {
 		if (jointVel != null) {
 			System.out.println("Time (sec), J1 (deg), J2 (deg), J3 (deg), J4 (deg), J1 Speed (deg/sec), J2 Speed (deg/sec), J3 Speed (deg/sec), J4 Speed (deg/sec), X (in), Y (in), Z (in), Path Speed (in/s) ");
@@ -47,13 +48,13 @@ public class ProfileOutput {
 			}
 		}
 	}		
-		
+
 	public void setJointAngles(double[][] jointAnglesRad) {
-		  for (int i = 0; i < jointAnglesRad.length; i++) {
-		      for (int j = 0; j < 4; j++) {
-		    	  jointAnglesRad[i][j] = Math.toDegrees(jointAnglesRad[i][j]);     			// deg
-		      }		      
-		  }
-		  jointPos = jointAnglesRad;
+		for (int i = 0; i < jointAnglesRad.length; i++) {
+			for (int j = 0; j < 4; j++) {
+				jointAnglesRad[i][j] = Math.toDegrees(jointAnglesRad[i][j]);     			// deg
+			}		      
+		}
+		jointPos = jointAnglesRad;
 	}
 }

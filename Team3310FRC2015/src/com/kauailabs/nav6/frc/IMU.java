@@ -31,8 +31,8 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * class.
  * @author Scott
  */
-public class IMU extends SensorBase implements PIDSource, LiveWindowSendable, Runnable {
-
+public class IMU extends SensorBase implements PIDSource, LiveWindowSendable, Runnable 
+{
     static final int    YAW_HISTORY_LENGTH      = 10;
     static final byte   DEFAULT_UPDATE_RATE_HZ  = 100;
     static final short  DEFAULT_ACCEL_FSR_G     = 2;
@@ -340,7 +340,6 @@ public class IMU extends SensorBase implements PIDSource, LiveWindowSendable, Ru
     // IMU Class thread run method
     
     public void run() {
-
         stop = false;
         boolean stream_response_received = false;
         double last_valid_packet_time = 0.0;

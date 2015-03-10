@@ -6,11 +6,8 @@ import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
-/**
- *
- */
-public class RobotArmMotionProfileCurrentToPathNoCorrection extends RobotArmMotionProfilePath {
-
+public class RobotArmMotionProfileCurrentToPathNoCorrection extends RobotArmMotionProfilePath 
+{
 	private WaypointList waypoints;
 	
     public RobotArmMotionProfileCurrentToPathNoCorrection(WaypointList waypoints) {

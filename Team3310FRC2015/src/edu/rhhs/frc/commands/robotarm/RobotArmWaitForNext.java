@@ -2,11 +2,8 @@ package edu.rhhs.frc.commands.robotarm;
 
 import edu.rhhs.frc.RobotMain;
 
-/**
- *
- */
-public class RobotArmWaitForNext extends RobotArmCommand {
-
+public class RobotArmWaitForNext extends RobotArmCommand 
+{
 	public RobotArmWaitForNext() {
     }
 

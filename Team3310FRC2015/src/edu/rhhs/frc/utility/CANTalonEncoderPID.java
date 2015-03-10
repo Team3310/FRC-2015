@@ -2,8 +2,8 @@ package edu.rhhs.frc.utility;
 
 import edu.wpi.first.wpilibj.CANTalon;
 
-public class CANTalonEncoderPID extends CANTalon {
-	
+public class CANTalonEncoderPID extends CANTalon 
+{
 	public static enum ControlMode {PERCENT_VBUS, VBUS_POSITION_HOLD, POSITION, POSITION_INCREMENTAL, VELOCITY, VELOCITY_POSITION_HOLD};
 
 	public static final int POSITION_PROFILE = 0;
