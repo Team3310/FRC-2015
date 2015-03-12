@@ -14,6 +14,7 @@ import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -118,9 +119,14 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private boolean m_waitForNext;
 	
 	private MotionProfile motionProfileForOutput = new MotionProfile();
+	
+	private DigitalOutput m_robotArmInitialized;
 
 	public RobotArm() {
-		try {
+		try {			
+			m_robotArmInitialized = new DigitalOutput(RobotMap.ROBOT_ARM_INITIALIZED_DIO_ID);
+			m_robotArmInitialized.set(false);
+
 			m_j1Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J1_CAN_ID, J1_SENSOR_GEAR_RATIO, J1_ENCODER_OFFSET_DEG, J1_MASTER_ANGLE_DEG, J1_MIN_ANGLE_DEG, J1_MAX_ANGLE_DEG);
 			m_j2Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J2_CAN_ID, J2_SENSOR_GEAR_RATIO, J2_ENCODER_OFFSET_DEG, J2_MASTER_ANGLE_DEG, J2_MIN_ANGLE_DEG, J2_MAX_ANGLE_DEG);
 			m_j3Motor = new CANTalonEncoderPID(RobotMap.ROBOT_ARM_J3_CAN_ID, J3_SENSOR_GEAR_RATIO, J3_ENCODER_OFFSET_DEG, J3_MASTER_ANGLE_DEG, J3_MIN_ANGLE_DEG, J3_MAX_ANGLE_DEG);
@@ -160,7 +166,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 			resetMasterPosition();
 			setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 
-			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH);	
+			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH_DIO_ID);	
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
 			setToteGrabberPosition(ToteGrabberPosition.OPEN);		
 
@@ -187,6 +193,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		m_j1Motor.inititializeSensorPosition();
 		m_j2Motor.inititializeSensorPosition();
 		m_j3Motor.inititializeSensorPosition();
+		m_robotArmInitialized.set(true);
 	}
 
 	public void setControlMode(CANTalonEncoderPID.ControlMode mode) {

@@ -37,6 +37,11 @@ public class RobotArmMotionProfileCurrentToPathNoCorrection extends RobotArmMoti
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, MotionProfile.ZERO_OFFSET);
     	profileOutput = motionProfile.getProfile();
 
+    	if (profileOutput == null) {
+    		System.out.println("Error calculating path for RobotArmMotionProfileCurrentToPathNoCorrection");
+    		isFinished = true;
+    		return;
+    	}
     	currentProfileIndex = 0;
     	isFinished = false;
     }

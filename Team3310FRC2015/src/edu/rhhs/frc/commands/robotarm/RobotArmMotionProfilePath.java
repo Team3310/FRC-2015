@@ -32,6 +32,12 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, RobotMain.driveTrain.getYawAngleDeg(), RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
 			profileOutput = motionProfile.getProfile();
     	}
+    	
+    	if (profileOutput == null) {
+    		System.out.println("Error calculating path for RobotArmMotionProfilePath");
+    		isFinished = true;
+    		return;
+    	}
     	currentProfileIndex = 0;
     	isFinished = false;
     }

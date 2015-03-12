@@ -25,6 +25,11 @@ public class RobotArmMotionProfileJ1ToZero extends RobotArmMotionProfilePath
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, MotionProfile.ZERO_OFFSET);
     	profileOutput = motionProfile.getProfile();
 
+    	if (profileOutput == null) {
+    		System.out.println("Error calculating path for RobotArmMotionProfileJ1ToZero");
+    		isFinished = true;
+    		return;
+    	}
     	currentProfileIndex = 0;
     	isFinished = false;
     }

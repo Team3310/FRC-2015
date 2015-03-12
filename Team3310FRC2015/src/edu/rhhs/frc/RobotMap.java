@@ -52,5 +52,6 @@ public class RobotMap
 	public static final int STABILZER_RETRACT_PNEUMATIC_MODULE_ID = 7;
 
 	// roboRIO DIO ports
-	public static final int TOTE_GRABBER_SWITCH = 0;
+	public static final int TOTE_GRABBER_SWITCH_DIO_ID = 0;
+	public static final int ROBOT_ARM_INITIALIZED_DIO_ID = 1;
 }
