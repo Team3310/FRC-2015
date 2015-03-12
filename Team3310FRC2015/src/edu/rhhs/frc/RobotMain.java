@@ -75,16 +75,11 @@ public class RobotMain extends IterativeRobot
 			m_numStacksChooser.addObject ("1 Stack", 	new Integer(1));
 			m_numStacksChooser.addObject ("2 Stacks", 	new Integer(2));
 			m_numStacksChooser.addDefault("3 Stacks", 	new Integer(3));
-			m_numStacksChooser.addObject ("4 Stacks", 	new Integer(4));
-			//        	m_numStacksChooser.addObject ("5 Stacks", 	new Integer(5));
 			SmartDashboard.putData("Num Stacks Chooser", m_numStacksChooser);
 
 			m_numTotesPerStackChooser = new SendableChooser();
-			m_numTotesPerStackChooser.addObject ("1 Totes", new Integer(1));
 			m_numTotesPerStackChooser.addObject ("2 Totes", new Integer(2));
-			m_numTotesPerStackChooser.addObject ("3 Totes", new Integer(3));
 			m_numTotesPerStackChooser.addObject ("4 Totes", new Integer(4));
-			m_numTotesPerStackChooser.addObject ("5 Totes", new Integer(5));
 			m_numTotesPerStackChooser.addDefault("6 Totes", new Integer(6));
 			SmartDashboard.putData("Num Totes Per Stack Chooser", m_numTotesPerStackChooser);
 
@@ -107,8 +102,6 @@ public class RobotMain extends IterativeRobot
 			m_autonomousChooser.addObject ("Do nothing", null);
 			m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
 			SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
-
-
 		} catch( Exception ex ) {
 
 		}

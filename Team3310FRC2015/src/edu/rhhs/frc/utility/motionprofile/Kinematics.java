@@ -50,8 +50,9 @@ public class Kinematics
 				if (isZero(Pos[i][0]) && isZero(Pos[i][1])) {
 					Theta[0] = 0;
 				} 
-				else {
-					Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma));
+				else {					
+//					Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma));  // 4 axis robot					
+					Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]);  // 3 axis robot
 				}
 
 			} 
@@ -59,8 +60,9 @@ public class Kinematics
 				if (Pos[i][0] == 0 && Pos[i][1] == 0 ) {
 					Theta[0] = Math.PI;
 				} 
-				else {
-					Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma)) + Math.PI;
+				else {					
+//					Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma)) + Math.PI;  // 4 axis robot					
+					Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]) + Math.PI;  // 3 axis robot
 				}
 			}
 
@@ -69,9 +71,11 @@ public class Kinematics
 			S1 = Math.sin(Theta[0]);
 
 			// Where Theta[2]=asin(Kappa)
-			Theta[3] = Pos[i][3] - Theta[0];
-			px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5] * Math.cos(Theta[3]);
-			py1 = D[0] - Pos[i][2] + D[4];
+//			Theta[3] = Pos[i][3] - Theta[0];  // 4 axis
+//			px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5] * Math.cos(Theta[3]);   // 4 axis
+			px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5];  // 3 axis
+//			py1 = D[0] - Pos[i][2] + D[4];
+			py1 = D[0] - Pos[i][2];
 			px1py1sqrd = px1*px1 + py1*py1;
 			Kappa = (px1py1sqrd - L[1]*L[1] - L[2]*L[2]) / (2 * L[1] * L[2]);
 
@@ -112,8 +116,9 @@ public class Kinematics
 			// Calculate User Angles and reallocate them to pos(i,?)
 			out.userAngles[i][0] = Theta[0];
 			out.userAngles[i][1]  = Math.PI / 2 + Theta[1];
-			out.userAngles[i][2] = Theta[2] -Theta[1];
-			out.userAngles[i][3] = Theta[3];
+			out.userAngles[i][2] = Theta[2] - Theta[1];
+//			out.userAngles[i][3] = Theta[3];   // 4 axis
+			out.userAngles[i][3] = 0;
 		}
 
 		out.errorFlag = false;
@@ -218,17 +223,31 @@ public class Kinematics
 			//	        CartPos[i][2] = L[2] * Math.sin(Pos[i][2]) + L[1] * Math.cos(Pos[i][1]);
 			//	        CartPos[i][3] = Pos[i][0] + Pos[i][3];
 
-
-			double gamma = Pos[i][0] + Pos[i][3];
-			double j2j3Term = L[3] + L[2] * Math.cos(Pos[i][2]) + L[1] * Math.sin(Pos[i][1]);
-			CartPos[i][0] = Math.cos(gamma) * L[5] + Math.cos(Pos[i][0]) * j2j3Term;
+// 4 axis robot w/ grounding link
+//			double gamma = Pos[i][0] + Pos[i][3];
+//			double j2j3Term = L[3] + L[2] * Math.cos(Pos[i][2]) + L[1] * Math.sin(Pos[i][1]);
+//			CartPos[i][0] = Math.cos(gamma) * L[5] + Math.cos(Pos[i][0]) * j2j3Term;
+//
+//			// Y position
+//			CartPos[i][1] = Math.sin(gamma) * L[5] + Math.sin(Pos[i][0]) * j2j3Term;
+//
+//			// Z position
+//			CartPos[i][2] = D[0] + D[4] + L[1] * Math.cos(Pos[i][1]) + L[2] * Math.sin(Pos[i][2]);
+//			CartPos[i][3] = gamma;
+			
+			
+			// Removed J4 so 3 axis robot w/ grounding link
+			double j2j3Term = L[3] + L[2] * Math.cos(Pos[i][2]) + L[1] * Math.sin(Pos[i][1]) + L[5];
+			
+			// X position
+			CartPos[i][0] = Math.cos(Pos[i][0]) * j2j3Term;
 
 			// Y position
-			CartPos[i][1] = Math.sin(gamma) * L[5] + Math.sin(Pos[i][0]) * j2j3Term;
+			CartPos[i][1] = Math.sin(Pos[i][0]) * j2j3Term;
 
 			// Z position
-			CartPos[i][2] = D[0] + D[4] + L[1] * Math.cos(Pos[i][1]) + L[2] * Math.sin(Pos[i][2]);
-			CartPos[i][3] = gamma;
+			CartPos[i][2] = D[0] + L[1] * Math.cos(Pos[i][1]) + L[2] * Math.sin(Pos[i][2]);
+			CartPos[i][3] = 0.0;
 		}  
 		return CartPos;
 	}

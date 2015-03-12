@@ -178,6 +178,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     	return -m_imu.getYaw();
     }
     
+    public void setYawAngleZero() {
+    	m_imu.zeroYaw();
+    }
+    
 	public void keepAlive() {
 		m_frontLeftMotor.enableBrakeMode(true);
 		m_frontRightMotor.enableBrakeMode(true);

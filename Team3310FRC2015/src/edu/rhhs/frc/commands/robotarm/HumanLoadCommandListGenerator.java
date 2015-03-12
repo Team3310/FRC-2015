@@ -34,60 +34,51 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 //	public static final double STACK_Z_POST_UNLOAD_OFFSET = -4; 
 
 	// Original gripper
-	public static final double[] DEFAULT_HOME_COORD =  {-37.5, -40.0, 22.5, -125.0};  // {-39.577, -39.187, 22.961, -129}; 
-	public static final double[] HOME_EXTRACT_TOTE_COORD = {-22.0, -28.0, 22.5, -125.0}; 
-
-	public static final double[] LEFT_POSITION_BUILD_STACK_RELEASE_COORD = {35, -12, 11, 0.0};  // {29, -24, 11, 0.0}
-	public static final double[] LEFT_POSITION_MOVE_STACK_RELEASE_COORD = {29, -8, 11, 0.0};
+	public static final double[] DEFAULT_HOME_COORD =  {28.779, 0.0, 11, 0};  // {-39.577, -39.187, 22.961, -129}; 
+	public static final double[] HOME_STACK_CLEAR_COORD =  {24, 0.0, 32, 0};  // {-39.577, -39.187, 22.961, -129}; 
+	public static final double[] HOME_STACK_EXIT_COORD =  {23, 0.0, 20, 0};  // {-39.577, -39.187, 22.961, -129}; 
 
 	public ArrayList<double[]> stackStartPositions = new ArrayList<double[]>();
 	public ArrayList<double[]> stackOffsetPositions = new ArrayList<double[]>();
 	
-	public static final double STACK_DELTA_Y_SPACING = -18.0;  // 0.0
-	public static final double STACK_DELTA_Z_SPACING = 12.0; 
-	
-	public static final double MOVE_STACK_DELTA_Y_SPACING = 0.0; 
+	public static final double STACK_DELTA_Y_SPACING = 0.0; 
+	public static final double STACK_DELTA_Z_SPACING = 24.0; 
 	
 	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 4; 
+	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 6; 
 	
-	public static final double STACK_X_POST_UNLOAD_OFFSET = -10;   
+	public static final double STACK_X_POST_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_POST_UNLOAD_OFFSET = 0; 
+	public static final double STACK_Z_POST_UNLOAD_OFFSET = 18; 
 
 	public boolean debug = false;
 	
 	private StackPriority stackPriority = StackPriority.VERTICAL;
 	private int numStacks = 1;
+	private int maxStacks = 3;
 	private int numTotesPerStack = 6;
 	private double[] homePosition = DEFAULT_HOME_COORD;
 	private double[] worldToRobotOffsetInches = {0, 0, 0};
 	
 	public HumanLoadCommandListGenerator() {	
-		stackStartPositions.add(new double[]  {35.5, 24.2, 11, 40});
-		stackOffsetPositions.add(new double[] {-5.5, -4, 0, 0});
+		stackStartPositions.add(new double[] {-48, 21, 11, 0});
+		stackOffsetPositions.add(new double[] {-35, 36, 0, 0});
 
-		stackStartPositions.add(new double[]  {37, 5.5, 11, 40});
-		stackOffsetPositions.add(new double[] {-5, -3, 0, 0});
+		stackStartPositions.add(new double[]  {-26, 40, 11, 40});
+		stackOffsetPositions.add(new double[] {-1, 40, 0, 0});
 
-		stackStartPositions.add(new double[] {37, -12, 11, 0});
-		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
-
-		stackStartPositions.add(new double[] {37, -30, 11, 0});
-		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
-
-		stackStartPositions.add(new double[] {37, -30, 11, 0});
-		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
-
-		stackStartPositions.add(new double[] {37, -30, 11, 0});
-		stackOffsetPositions.add(new double[] {-9, 0, 0, 0});
+		stackStartPositions.add(new double[]  {-3, 51, 11, 0});
+		stackOffsetPositions.add(new double[] {17, 34, 0, 0});
+	
+		maxStacks = 3;
 	}
 
 	public HumanLoadCommandListGenerator(StackPriority stackPriority, int numStacks, int numTotesPerStack) {
+		this();
 		this.stackPriority = stackPriority;
 		this.numStacks = numStacks;
-		this.numTotesPerStack = numTotesPerStack;
+		this.numTotesPerStack = numTotesPerStack / 2;
 	}
 	
 	private synchronized double[] getHome() {
@@ -129,15 +120,12 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		
 		// Go from the current location to human station
     	WaypointList waypointsGoHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
+    	waypointsGoHome.addWaypoint(HOME_STACK_CLEAR_COORD);
     	waypointsGoHome.addWaypoint(homePosition);
     	addMotionProfileCurrentToPathCommand(waypointsGoHome);
-		
-		// Initialize to position of first tote
- //   	double[] toteReleasePosition = LEFT_POSITION_BUILD_STACK_RELEASE_COORD; 
-     	double[] toteMovePosition = LEFT_POSITION_MOVE_STACK_RELEASE_COORD;
-		
+				
 		for (int j = 0; j < secondaryCount; j++) {
-			int stackId = 4 - secondaryCount + j;
+			int stackId = maxStacks - secondaryCount + j;
 		   	double[] toteReleasePosition = stackStartPositions.get(stackId); 
 		   	double[] toteOffsetPosition = stackOffsetPositions.get(stackId); 
 			
@@ -155,104 +143,47 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 				// Pull away from human load station
 				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
 		    	waypointsHumanToStack.addWaypoint(homePosition);
-		    	waypointsHumanToStack.addWaypoint(HOME_EXTRACT_TOTE_COORD);
-
-		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
-		    	double[] toteGetToHeightPosition = new double[] {HOME_EXTRACT_TOTE_COORD[0], HOME_EXTRACT_TOTE_COORD[1], totePreUnloadPosition[2],  HOME_EXTRACT_TOTE_COORD[3]};
+		    	waypointsHumanToStack.addWaypoint(HOME_STACK_EXIT_COORD);
 		    	
-		    	// Move tote straight up to pre unload height
+		    	// Move tote to offset position
+		    	double[] totePreUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_PRE_UNLOAD_OFFSET, STACK_Y_PRE_UNLOAD_OFFSET, STACK_Z_PRE_UNLOAD_OFFSET, 0);
+		    	double[] toteGetToHeightPosition = new double[] {toteOffsetPosition[0], toteOffsetPosition[1], totePreUnloadPosition[2],  0};
 			    waypointsHumanToStack.addWaypoint(toteGetToHeightPosition);
 		    	
 				// Move to the pre-unload position
 		    	waypointsHumanToStack.addWaypoint(totePreUnloadPosition);
 
-		    	// Move to the final unload position
-//		    	double[] totePrePushPosition = null;
-//		    	if (i == 0 && j > 0) {
-//		    		totePrePushPosition = addPositionOffset(toteReleasePosition, 0, -10, 0, -15);
-//		    		waypointsHumanToStack.addWaypoint(toteReleasePosition);
-//		    	}
-//		    	else {
-		    		waypointsHumanToStack.addWaypoint(toteReleasePosition);
-//		    	}
+		    	// Move to unload position
+		    	waypointsHumanToStack.addWaypoint(toteReleasePosition);
 		    	addMotionProfileCommand(waypointsHumanToStack);
 				
-				// Move stack to left
-//		    	if (i == 0 && j > 0) {
-//					WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-//					waypointsMoveStack.addWaypoint(totePrePushPosition);
-//					waypointsMoveStack.addWaypoint(toteMovePosition);
-//					waypointsMoveStack.addWaypoint(totePreUnloadPosition);
-//					waypointsMoveStack.addWaypoint(toteReleasePosition);
-//			    	addMotionProfileCommand(waypointsMoveStack, new double[] {40,40,40,40});
-//		    	}
-
 		    	// Wait for release ok
 				addWaitForNextCommand();
 				
 				// Release tote
 				addToteGrabberOpenCommand();
 				
-//				double[] totePostUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_POST_UNLOAD_OFFSET, STACK_Y_POST_UNLOAD_OFFSET, STACK_Z_POST_UNLOAD_OFFSET, 0);
-				double[] totePostUnloadPosition = addPositionOffset(toteReleasePosition, toteOffsetPosition[0], toteOffsetPosition[1], toteOffsetPosition[2], 0);
-//				if (i < primaryCount - 1) {			
-					// Joint motion back to human load station
-					WaypointList waypointsReturnToHuman = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-					waypointsReturnToHuman.addWaypoint(toteReleasePosition);
-	
-					// Move to post-unload position
-					waypointsReturnToHuman.addWaypoint(totePostUnloadPosition);
-					
-					waypointsReturnToHuman.addWaypoint(homePosition);
-			    	addMotionProfileCommand(waypointsReturnToHuman);
-					
-			    	toteReleasePosition = incrementPrimaryTotePosition(toteReleasePosition);
-//				}
-//				else {
-//					// Joint motion back to human load station
-//					WaypointList waypointsPrepareToMoveStack = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-//					waypointsPrepareToMoveStack.addWaypoint(toteReleasePosition);
-//	
-//					// Move to post-unload position
-//					waypointsPrepareToMoveStack.addWaypoint(totePostUnloadPosition);
-//					
-//					double[] toteGrabStackPosition = addPositionOffset(LEFT_POSITION_BUILD_STACK_RELEASE_COORD, STACK_X_POST_UNLOAD_OFFSET, STACK_Y_POST_UNLOAD_OFFSET, STACK_Z_POST_UNLOAD_OFFSET, 0);
-//					waypointsPrepareToMoveStack.addWaypoint(toteGrabStackPosition);
-//					waypointsPrepareToMoveStack.addWaypoint(LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
-//			    	addMotionProfileCommand(waypointsPrepareToMoveStack);
-//					
-//					// Wait for tote detection
-//					addWaitForNextCommand();
-//					
-//					// Grab tote
-//					addToteGrabberCloseCommand();
-//					
-//					// Move stack to left
-//					WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-//					waypointsMoveStack.addWaypoint(LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
-//					waypointsMoveStack.addWaypoint(toteMovePosition);
-//			    	addMotionProfileCommand(waypointsMoveStack);
-//
-//					// Wait for tote detection
-//					addWaitForNextCommand();
-//					
-//					// Grab tote
-//					addToteGrabberOpenCommand();
-//					
-//					// Joint motion back to human load station
-//					WaypointList waypointsReturnToHuman = new WaypointList(ProfileMode.CartesianInputJointMotion);				
-//					waypointsReturnToHuman.addWaypoint(toteMovePosition);
-//	
-//					// Move to post-unload position
-//					double[] totePostMovePosition = addPositionOffset(toteMovePosition, STACK_X_POST_UNLOAD_OFFSET, STACK_Y_POST_UNLOAD_OFFSET, STACK_Z_POST_UNLOAD_OFFSET, 0);
-//					waypointsReturnToHuman.addWaypoint(totePostMovePosition);
-//					
-//					waypointsReturnToHuman.addWaypoint(HUMAN_LOAD_START_COORD);
-//			    	addMotionProfileCommand(waypointsReturnToHuman);
-//				}
+				// Joint motion back to human load station
+				WaypointList waypointsReturnToHuman = new WaypointList(ProfileMode.CartesianInputJointMotion);				
+				waypointsReturnToHuman.addWaypoint(toteReleasePosition);
+
+				// Move staight up to post-unload position
+				double[] totePostUnloadPosition = addPositionOffset(toteReleasePosition, STACK_X_POST_UNLOAD_OFFSET, STACK_Y_POST_UNLOAD_OFFSET, STACK_Z_POST_UNLOAD_OFFSET, 0);
+				waypointsReturnToHuman.addWaypoint(totePostUnloadPosition);
+				
+				// Move over to the offset position at the post-unload height
+		    	double[] totePostUnloadOffsetPosition = new double[] {toteOffsetPosition[0], toteOffsetPosition[1], totePostUnloadPosition[2],  0};
+		    	waypointsReturnToHuman.addWaypoint(totePostUnloadOffsetPosition);
+
+			    // Move above the new stack at the human station
+		    	waypointsReturnToHuman.addWaypoint(HOME_STACK_CLEAR_COORD);
+		    	
+		    	// Finally move to the home position
+			    waypointsReturnToHuman.addWaypoint(homePosition);
+		    	addMotionProfileCommand(waypointsReturnToHuman);
+				
+		    	toteReleasePosition = incrementPrimaryTotePosition(toteReleasePosition);
 			}
-			toteMovePosition = addPositionOffset(toteMovePosition, 0, MOVE_STACK_DELTA_Y_SPACING, 0, 0);
-			toteReleasePosition = incrementSecondaryTotePosition(toteReleasePosition);
 		}
 	}
 	
@@ -263,19 +194,6 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		}
 		else {
 			output = addPositionOffset(waypoint, 0, STACK_DELTA_Y_SPACING, 0, 0);
-		}
-		return output;
-	}
-
-	private double[] incrementSecondaryTotePosition(double[] waypoint) {
-		double[] output;
-		if (stackPriority == StackPriority.VERTICAL) {
-			waypoint[2] = LEFT_POSITION_BUILD_STACK_RELEASE_COORD[2];  // Reset Z
-			output = addPositionOffset(waypoint, 0, STACK_DELTA_Y_SPACING, 0, 0);
-		}
-		else {
-			waypoint[1] = LEFT_POSITION_BUILD_STACK_RELEASE_COORD[1];  // Reset Y
-			output = addPositionOffset(waypoint, 0, 0, STACK_DELTA_Z_SPACING, 0);
 		}
 		return output;
 	}
@@ -301,11 +219,11 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 	}
 
 	public void setNumTotesPerStack(int numTotesPerStack) {
-		this.numTotesPerStack = numTotesPerStack;
+		this.numTotesPerStack = numTotesPerStack / 2;
 	}
 	
     public static void main(String[] args) {
-    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 1, 6);
+    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 3, 6);
     	humanLoad.debug = true;
     	humanLoad.calculate();
     }

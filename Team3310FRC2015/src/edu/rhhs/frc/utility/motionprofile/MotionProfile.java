@@ -1,5 +1,6 @@
 package edu.rhhs.frc.utility.motionprofile;
 
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -24,11 +25,11 @@ public class MotionProfile
 
 	public static final double INNER_ARM_LENGTH = 28.0; 		// inches 
 	public static final double OUTER_ARM_LENGTH = 30.0; 		// inches	
-	public static final double GROUNDING_LINK_LENGTH = 4.125; 	// inches 	
-	public static final double TOOL_LENGTH = 4.875; 			// inches 	
+	public static final double GROUNDING_LINK_LENGTH = 5.868; 	// inches 	
+	public static final double TOOL_LENGTH = 0.0; 				// inches 	
 
 	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, GROUNDING_LINK_LENGTH, 0, TOOL_LENGTH};   // arm lengths in inches
-	protected double[] dHLengths = {38.85, 0, 0, 0, 1.839, 0};   // DH lengths in inches
+	protected double[] dHLengths = {38.85, 0, 0, 0, 0, 0};   // DH lengths in inches
 
 	protected boolean isElbowUp = true; 
 	protected boolean isFront = true; 
@@ -458,13 +459,15 @@ public class MotionProfile
 		//    	profile.calculatePath();
 		//    	profile.printOutput();
 
-		//		WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.JointInputJointMotion);	
-		//    	waypointsHumanToStack.addWaypoint(new double[] {0,0,0,0});
-		//    	waypointsHumanToStack.addWaypoint(new double[] {50,40,30,30});
-		//    	waypointsHumanToStack.addWaypoint(new double[] {100,80,60,60});
-		//    	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
-		//    	profile.calculatePath(false, 10);
-		//    	profile.printOutput(10);   	
+				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
+		    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
+		    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.HOME_STACK_EXIT_COORD);
+		    	waypointsHumanToStack.addWaypoint(new double[] {-35, 36, 17, 0});
+		    	waypointsHumanToStack.addWaypoint(new double[] {-48, 21, 17, 0});
+		    	waypointsHumanToStack.addWaypoint(new double[] {-48, 21, 11, 0});
+		    	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
+		    	profile.calculatePath(false, 10);
+		    	profile.printOutput(10);   	
 		//    	
 		//		WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
 		//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
@@ -558,8 +561,7 @@ public class MotionProfile
 		//    	double[] masterAngleOutputDeg = profile.calcInverseKinematicsDeg(masterXYZOutputDeg);
 		//    	System.out.println("Inverse KIN joint angle output deg = " + masterAngleOutputDeg[0] + "," + masterAngleOutputDeg[1] + "," + masterAngleOutputDeg[2] + "," + masterAngleOutputDeg[3]);
 
-		MotionProfile profile = new MotionProfile();
-		double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
+//		MotionProfile profile = new MotionProfile();
 
 		double[] jointAngleInputDeg = new double[] {0, 89,  -101.7,   0};
 		//    	double[] jointAngleInputDeg = new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG};
@@ -571,7 +573,17 @@ public class MotionProfile
 		double[] jointAngleOutputDeg = profile.calcInverseKinematicsDeg(xyzToolOutputDeg);
 		System.out.println("Inverse KIN joint angle output deg = " + jointAngleOutputDeg[0] + "," + jointAngleOutputDeg[1] + "," + jointAngleOutputDeg[2] + "," + jointAngleOutputDeg[3]);
 
+		double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
 		double[] humanAngleOutputDeg = profile.calcInverseKinematicsDeg(HUMAN_LOAD_START_COORD);
 		System.out.println("Inverse KIN human angle output deg = " + humanAngleOutputDeg[0] + "," + humanAngleOutputDeg[1] + "," + humanAngleOutputDeg[2] + "," + humanAngleOutputDeg[3]);
+
+		double[] testCoord =  {24.942, 29.7248, 76.6852, 0}; 
+		double[] testOutputDeg = profile.calcInverseKinematicsDeg(testCoord);
+		System.out.println("Inverse KIN test output deg = " + testOutputDeg[0] + "," + testOutputDeg[1] + "," + testOutputDeg[2] + "," + testOutputDeg[3]);
+
+		double[] testJointAngleInputDeg = new double[] {50, 10,  20, 0};
+		double[] xyzTestOutputDeg = profile.calcForwardKinematicsDeg(testJointAngleInputDeg);
+		System.out.println("Forward KIN test output inches and deg = " + xyzTestOutputDeg[0] + "," + xyzTestOutputDeg[1] + "," + xyzTestOutputDeg[2] + "," + xyzTestOutputDeg[3]);
+
 	}
 }

@@ -53,17 +53,17 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	private static final double J1_MAX_ANGLE_DEG = 175.0;
 	private static final double J1_MIN_ANGLE_DEG = -175.0;
-	private static final double J2_MAX_ANGLE_DEG = 105.0;
+	private static final double J2_MAX_ANGLE_DEG = 110.0;
 	private static final double J2_MIN_ANGLE_DEG = -25.0;
 	private static final double J3_MAX_ANGLE_DEG = 27.0;
 	private static final double J3_MIN_ANGLE_DEG = -110.0;
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
-	private static final double Z_MAX_INCHES = 85.0;
+	private static final double Z_MAX_INCHES = 78.0;
 	private static final double Z_MIN_INCHES = 5.0;
 	
-	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -60.0;
+	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -61.3;
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG = 60.0;
 	/*private static final double J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG = 0.0;
 	private static final double J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG = 40.0;
@@ -198,10 +198,14 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		
 		// If you change mode, need to update the set command
 		if (mode == ControlMode.POSITION || mode == ControlMode.POSITION_INCREMENTAL) {			
-			m_positionCommandJ1 = m_j1Motor.setInitPosition();
-			m_positionCommandJ2 = m_j2Motor.setInitPosition();
-			m_positionCommandJ3 = m_j3Motor.setInitPosition();
-			m_positionCommandJ4 = m_j4Motor.setInitPosition();
+//			m_positionCommandJ1 = m_j1Motor.setInitPosition();
+//			m_positionCommandJ2 = m_j2Motor.setInitPosition();
+//			m_positionCommandJ3 = m_j3Motor.setInitPosition();
+//			m_positionCommandJ4 = m_j4Motor.setInitPosition();
+			m_positionCommandJ1 = m_j1Motor.getPositionDeg();
+			m_positionCommandJ2 = m_j2Motor.getPositionDeg();
+			m_positionCommandJ3 = m_j3Motor.getPositionDeg();
+			m_positionCommandJ4 = m_j4Motor.getPositionDeg();
 		}
 		else {
 			m_j1Motor.set(0);
@@ -322,7 +326,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				
 				// Add delta stick command to XYZ coordinate
 				if (Math.abs(throttleLeftY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.05;
+					deltaToolX = -throttleLeftY * JOG_SPEED_INCHES_PER_SEC * 0.04;
 				}
 				
 //	Disable Y control 
@@ -330,7 +334,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 //					deltaToolY = -throttleLeftX * JOG_SPEED_INCHES_PER_SEC * 0.05; 
 //				}
 				if (Math.abs(throttleRightY) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
-					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.05 + xyzToolDeg[2];
+					xyzToolDeg[2] = -throttleRightY  * JOG_SPEED_INCHES_PER_SEC * 0.04 + xyzToolDeg[2];
 				}
 				
 				// Do a quick check for Z limits

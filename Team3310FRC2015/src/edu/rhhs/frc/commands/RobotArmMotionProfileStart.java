@@ -15,6 +15,7 @@ public class RobotArmMotionProfileStart extends Command
 	
 	@Override
 	protected void initialize() {
+		RobotMain.driveTrain.setYawAngleZero();
 		RobotMain.robotArm.startRobotArmCommandList(commandList);
 	}
 
