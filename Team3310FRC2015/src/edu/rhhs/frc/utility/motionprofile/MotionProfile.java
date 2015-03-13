@@ -17,6 +17,7 @@ public class MotionProfile
 	public static final double J2_JOINT_VELOCITY = 90;   							// deg/second
 	public static final double J3_JOINT_VELOCITY = 90;   							// deg/second
 	public static final double J4_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double DEFAULT_JOINT_PERCENT_VELOCITY = 100;				// 0-100 percent
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
 	public static final double DEFAULT_JOINT_ACCEL1 = 400.0/1000.0;   				// seconds
@@ -51,7 +52,7 @@ public class MotionProfile
 
 	protected ProfileOutput profileOutput;
 
-	protected double[] jointPercentVelocity = {100, 100, 100, 100};   
+	protected double[] jointPercentVelocity;    // 0-100 percent  
 	protected double[] jointVelocities = {
 			Math.toRadians(J1_JOINT_VELOCITY), 
 			Math.toRadians(J2_JOINT_VELOCITY), 
@@ -80,6 +81,7 @@ public class MotionProfile
 	private void initInputs() {
 		this.numPaths = taughtPositions.length - 1;
 		updatePathVelocities();
+		updateJointSpeedPercents();
 		updateEndTypes();    	
 	}
 
@@ -88,6 +90,15 @@ public class MotionProfile
 			pathVelocities = new double[numPaths];
 			for (int i = 0; i < numPaths; i++) {
 				pathVelocities[i] = DEFAULT_PATH_VELOCITY;
+			}
+		}
+	}
+
+	private void updateJointSpeedPercents() {
+		if (jointPercentVelocity == null) {
+			jointPercentVelocity = new double[numPaths];
+			for (int i = 0; i < numPaths; i++) {
+				jointPercentVelocity[i] = DEFAULT_JOINT_PERCENT_VELOCITY;
 			}
 		}
 	}
@@ -498,12 +509,20 @@ public class MotionProfile
 		//    	profile.calculatePath(true, 10, 0, new double[] {0, 0, 0, 0});
 		//    	profile.printOutput(10);
 
-		WaypointList wayPoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
-		wayPoints.addWaypoint(18, 0, 23, 0);
-		wayPoints.addWaypoint(4, 24, 23, 0);
-		wayPoints.addWaypoint(-49, 21, 23, 0);
-		wayPoints.addWaypoint(-49, 21, 11, 0);
+//		WaypointList wayPoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
+//		wayPoints.addWaypoint(18, 0, 23, 0);
+//		wayPoints.addWaypoint(4, 24, 23, 0);
+//		wayPoints.addWaypoint(-49, 21, 23, 0);
+//		wayPoints.addWaypoint(-49, 21, 11, 0);
 
+		WaypointList wayPoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
+		wayPoints.addWaypoint(-25, 34, 11, 0);
+		wayPoints.addWaypoint(-25, 34, 39, 0);
+		wayPoints.addWaypoint(-7, 42, 39, 0);
+		wayPoints.addWaypoint(18, 0, 36, 0);
+		wayPoints.addWaypoint(19, 0, 12, 0);
+		wayPoints.addWaypoint(24, 0, 12, 0);
+		
 		MotionProfile motionProfile = new MotionProfile(wayPoints);
 		motionProfile.calculatePath(false, 10);
 		motionProfile.printOutput(10);
