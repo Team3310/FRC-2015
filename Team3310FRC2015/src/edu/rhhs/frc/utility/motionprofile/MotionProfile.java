@@ -368,7 +368,7 @@ public class MotionProfile
 		return jointPercentVelocity;
 	}
 
-	public void setJointPercentVelocity(double[] jointPercentVelocity) {
+	public void setJointVelocityPercents(double[] jointPercentVelocity) {
 		this.jointPercentVelocity = jointPercentVelocity;
 	}
 

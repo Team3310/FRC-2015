@@ -9,6 +9,11 @@ public abstract class RobotArmCommandListGenerator
 	
 	public abstract void calculate();
 	
+	protected void addMotionProfileCommand(WaypointList waypoints, double[] jointSpeeds, double [] jointSpeedPercents) {
+    	RobotArmMotionProfilePath motionProfile = new RobotArmMotionProfilePath(waypoints, jointSpeeds, jointSpeedPercents);
+		commandList.add(motionProfile);
+	}
+	
 	protected void addMotionProfileCommand(WaypointList waypoints, double[] jointSpeeds) {
     	RobotArmMotionProfilePath motionProfile = new RobotArmMotionProfilePath(waypoints, jointSpeeds);
 		commandList.add(motionProfile);

@@ -2,8 +2,10 @@ package edu.rhhs.frc.commands.robotarm;
 
 import java.util.ArrayList;
 
+import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
+import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
 public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
@@ -211,5 +213,21 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
     	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 3, 6);
     	humanLoad.debug = true;
     	humanLoad.calculate();
+    	
+    	RobotArmCommandList commandList = humanLoad.getCommandList();
+    	for (RobotArmCommand command : commandList) {
+    		if (command instanceof  RobotArmMotionProfilePath) {
+    			System.out.println(" ");
+    			System.out.println("Motion Profile Output");
+    			WaypointList waypoints = ((RobotArmMotionProfilePath) command).getWaypoints();
+    	    	if (waypoints != null) {
+    		    	MotionProfile motionProfile = new MotionProfile(waypoints);
+    				motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, MotionProfile.ZERO_OFFSET);
+    				ProfileOutput profileOutput = motionProfile.getProfile();
+    				profileOutput.output(1, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
+    	    	}
+
+    		}
+    	}
     }
 }
