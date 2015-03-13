@@ -30,25 +30,25 @@ public class RobotArmMotionProfileCurrentToPath extends RobotArmMotionProfilePat
          	waypoints.insertWaypoint(currentXYZTool, 0);
          	
          	// If we are sitting at master need to move out
-         	if (isCartesianClose(currentXYZTool[0], RobotArm.X_MASTER_POSITION_IN) &&
-         			isCartesianClose(currentXYZTool[1], RobotArm.Y_MASTER_POSITION_IN) &&
-         			isCartesianClose(currentXYZTool[2], RobotArm.Z_MASTER_POSITION_IN)) {
-         		double[] master = new double[] {RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG};
-         		double[] masterClearance = RobotArmCommandListGenerator.addPositionOffset(master, 4, 0, 4, 0);
-         		waypoints.insertWaypoint(masterClearance, 1);   
-         	}
+//         	if (isCartesianClose(currentXYZTool[0], RobotArm.X_MASTER_POSITION_IN) &&
+//         			isCartesianClose(currentXYZTool[1], RobotArm.Y_MASTER_POSITION_IN) &&
+//         			isCartesianClose(currentXYZTool[2], RobotArm.Z_MASTER_POSITION_IN)) {
+//         		double[] master = new double[] {RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG};
+//         		double[] masterClearance = RobotArmCommandListGenerator.addPositionOffset(master, 4, 0, 4, 0);
+//         		waypoints.insertWaypoint(masterClearance, 1);   
+//         	}
     	}
     	else {
         	// Insert the current point as the first point
          	waypoints.insertWaypoint(jointAngles, 0);   
          	
          	// If we are sitting at master need to move out
-         	if (isAngleClose(jointAngles[1], RobotArm.J2_MASTER_ANGLE_DEG) &&
-         			isAngleClose(jointAngles[2], RobotArm.J3_MASTER_ANGLE_DEG)) {
-         		double[] master = new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG};
-         		double[] masterClearance = RobotArmCommandListGenerator.addPositionOffset(master, 0, -10, 10, 0);
-         		waypoints.insertWaypoint(masterClearance, 1);   
-         	}
+//         	if (isAngleClose(jointAngles[1], RobotArm.J2_MASTER_ANGLE_DEG) &&
+//         			isAngleClose(jointAngles[2], RobotArm.J3_MASTER_ANGLE_DEG)) {
+//         		double[] master = new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG};
+//         		double[] masterClearance = RobotArmCommandListGenerator.addPositionOffset(master, 0, -10, 10, 0);
+//         		waypoints.insertWaypoint(masterClearance, 1);   
+//         	}
     	}
     	
     	motionProfile = new MotionProfile(waypoints);

@@ -16,6 +16,7 @@ public class RobotArmToteGrabberSetPosition extends RobotArmCommand
     }
 
     protected void initialize() {
+    	setTimeout(1.0);
     	RobotMain.robotArm.setToteGrabberPosition(m_position);
     }
 
@@ -23,7 +24,7 @@ public class RobotArmToteGrabberSetPosition extends RobotArmCommand
     }
 
     protected boolean isFinished() {
-        return true;
+        return isTimedOut();
     }
 
     protected void end() {

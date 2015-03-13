@@ -13,14 +13,14 @@ public class MotionProfile
 
 	public static final double DEFAULT_CONTROLLER_UPDATE_RATE = 10.0/1000.0; 		// seconds
 	public static final double DEFAULT_PATH_VELOCITY = 130;   						// inches/second
-	public static final double J1_JOINT_VELOCITY = 160;   							// deg/second
-	public static final double J2_JOINT_VELOCITY = 120;   							// deg/second
-	public static final double J3_JOINT_VELOCITY = 120;   							// deg/second
-	public static final double J4_JOINT_VELOCITY = 150;   							// deg/second
+	public static final double J1_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double J2_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double J3_JOINT_VELOCITY = 90;   							// deg/second
+	public static final double J4_JOINT_VELOCITY = 90;   							// deg/second
 	public static final double DEFAULT_CARTESIAN_ACCEL1 = 400.0/1000.0;   			// seconds
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
-	public static final double DEFAULT_JOINT_ACCEL1 = 200.0/1000.0;   				// seconds
-	public static final double DEFAULT_JOINT_ACCEL2 = 100.0/1000.0;   				// seconds	
+	public static final double DEFAULT_JOINT_ACCEL1 = 400.0/1000.0;   				// seconds
+	public static final double DEFAULT_JOINT_ACCEL2 = 200.0/1000.0;   				// seconds	
 	public static final double DEFAULT_END_TYPE_CNT = 0;   							
 
 	public static final double INNER_ARM_LENGTH = 28.0; 		// inches 
@@ -459,15 +459,15 @@ public class MotionProfile
 		//    	profile.calculatePath();
 		//    	profile.printOutput();
 
-				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
-		    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
-		    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.HOME_STACK_EXIT_COORD);
-		    	waypointsHumanToStack.addWaypoint(new double[] {-35, 36, 17, 0});
-		    	waypointsHumanToStack.addWaypoint(new double[] {-48, 21, 17, 0});
-		    	waypointsHumanToStack.addWaypoint(new double[] {-48, 21, 11, 0});
-		    	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
-		    	profile.calculatePath(false, 10);
-		    	profile.printOutput(10);   	
+//				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
+//		    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
+//		    	waypointsHumanToStack.addWaypoint(HumanLoadCommandListGenerator.HOME_STACK_EXIT_COORD);
+//		    	waypointsHumanToStack.addWaypoint(new double[] {-35, 36, 17, 0});
+//		    	waypointsHumanToStack.addWaypoint(new double[] {-48, 21, 17, 0});
+//		    	waypointsHumanToStack.addWaypoint(new double[] {-48, 21, 11, 0});
+//		    	MotionProfile profile = new MotionProfile(waypointsHumanToStack);
+//		    	profile.calculatePath(false, 10);
+//		    	profile.printOutput(10);   	
 		//    	
 		//		WaypointList waypointsMoveStack = new WaypointList(ProfileMode.CartesianInputLinearMotion);				
 		//		waypointsMoveStack.addWaypoint(HumanLoadCommandListGenerator.LEFT_POSITION_BUILD_STACK_RELEASE_COORD);
@@ -498,16 +498,15 @@ public class MotionProfile
 		//    	profile.calculatePath(true, 10, 0, new double[] {0, 0, 0, 0});
 		//    	profile.printOutput(10);
 
-		WaypointList wayPoints = new WaypointList(ProfileMode.JointInputJointMotion);
-		wayPoints.addWaypoint(0, 0, 0, 0);
-		wayPoints.addWaypoint(60, 60, 0, 0);
+		WaypointList wayPoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
+		wayPoints.addWaypoint(18, 0, 23, 0);
+		wayPoints.addWaypoint(4, 24, 23, 0);
+		wayPoints.addWaypoint(-49, 21, 23, 0);
+		wayPoints.addWaypoint(-49, 21, 11, 0);
 
 		MotionProfile motionProfile = new MotionProfile(wayPoints);
-		motionProfile.setJointVelocities(new double[] {20, 20, 20, 20});
-		motionProfile.setJointAccels1(new double[] {0.2, 0.2, 0.6, 0.6});
-		motionProfile.setJointAccels2(new double[] {0.2, 0.2, 0.6, 0.6});
-		motionProfile.calculatePath(true, 40);
-		motionProfile.printOutput(40);
+		motionProfile.calculatePath(false, 10);
+		motionProfile.printOutput(10);
 
 		//    	WaypointList waypointsM2H = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 		//    	waypointsM2H.addWaypoint(RobotArm.X_MASTER_POSITION_IN, RobotArm.Y_MASTER_POSITION_IN, RobotArm.Z_MASTER_POSITION_IN, RobotArm.GAMMA_MASTER_ANGLE_DEG);
@@ -561,7 +560,7 @@ public class MotionProfile
 		//    	double[] masterAngleOutputDeg = profile.calcInverseKinematicsDeg(masterXYZOutputDeg);
 		//    	System.out.println("Inverse KIN joint angle output deg = " + masterAngleOutputDeg[0] + "," + masterAngleOutputDeg[1] + "," + masterAngleOutputDeg[2] + "," + masterAngleOutputDeg[3]);
 
-//		MotionProfile profile = new MotionProfile();
+		MotionProfile profile = new MotionProfile();
 
 		double[] jointAngleInputDeg = new double[] {0, 89,  -101.7,   0};
 		//    	double[] jointAngleInputDeg = new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG};
@@ -577,7 +576,7 @@ public class MotionProfile
 		double[] humanAngleOutputDeg = profile.calcInverseKinematicsDeg(HUMAN_LOAD_START_COORD);
 		System.out.println("Inverse KIN human angle output deg = " + humanAngleOutputDeg[0] + "," + humanAngleOutputDeg[1] + "," + humanAngleOutputDeg[2] + "," + humanAngleOutputDeg[3]);
 
-		double[] testCoord =  {24.942, 29.7248, 76.6852, 0}; 
+		double[] testCoord =  {4, 24, 23, 0}; 
 		double[] testOutputDeg = profile.calcInverseKinematicsDeg(testCoord);
 		System.out.println("Inverse KIN test output deg = " + testOutputDeg[0] + "," + testOutputDeg[1] + "," + testOutputDeg[2] + "," + testOutputDeg[3]);
 

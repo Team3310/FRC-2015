@@ -34,14 +34,14 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	// Robot arm joint angles when system is powered on (or new code is downloaded)
 	public static final double J1_MASTER_ANGLE_DEG = 0.0;
-	public static final double J2_MASTER_ANGLE_DEG = 97.36;
-	public static final double J3_MASTER_ANGLE_DEG = -109.88;
+	public static final double J2_MASTER_ANGLE_DEG = -40.0;  // 97.36;
+	public static final double J3_MASTER_ANGLE_DEG = -20.0;  // -109.88;
 	public static final double J4_MASTER_ANGLE_DEG = 0.0;
 	
-	public static final double X_MASTER_POSITION_IN = 26.567764225774383;
-	public static final double Y_MASTER_POSITION_IN = 0.0;
-	public static final double Z_MASTER_POSITION_IN = 8.889902513201704;
-	public static final double GAMMA_MASTER_ANGLE_DEG = 0.0;
+//	public static final double X_MASTER_POSITION_IN = 26.567764225774383;
+//	public static final double Y_MASTER_POSITION_IN = 0.0;
+//	public static final double Z_MASTER_POSITION_IN = 8.889902513201704;
+//	public static final double GAMMA_MASTER_ANGLE_DEG = 0.0;
  
 	// J4 raw analog value when J4 is set to 0 deg 
 	private static final int 	J4_ANALOG_ZERO_PRACTICE = 512;
@@ -57,7 +57,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J2_MAX_ANGLE_DEG = 110.0;
 	private static final double J2_MIN_ANGLE_DEG = -25.0;
 	private static final double J3_MAX_ANGLE_DEG = 27.0;
-	private static final double J3_MIN_ANGLE_DEG = -110.0;
+	private static final double J3_MIN_ANGLE_DEG = -120.0;
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
@@ -88,11 +88,11 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private CANTalonEncoderPID m_j3Motor;
 	private CANTalonAnalogPID  m_j4Motor;
 
-	private PIDParams j1PositionPidParams = new PIDParams(1.0, 0.0, 0.2, 0.0, 50, 0);
+	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.2, 0.0, 50, 0);
 //	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.26, 150, 0);
 //	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.22, 150, 0);
 	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.009, 0.15, -0.26, 150, 0);
-	private PIDParams j3PositionPidParams = new PIDParams(3.5, 0.002, 0.15, 0.02, 150, 0);
+	private PIDParams j3PositionPidParams = new PIDParams(3.5, 0.002, 0.15, 0.22, 150, 0);
 	private PIDParams j4PositionPidParams = new PIDParams(10.0, 0.02, 0.0, 0.0, 75, 0);
 
 	private PIDParams j1VelocityPidParams = new PIDParams(0.5, 0.005, 0.0, 0.0, 0, 0);
@@ -187,13 +187,14 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		m_j2Motor.enableBrakeMode(true);
 		m_j3Motor.enableBrakeMode(true);
 		m_j4Motor.enableBrakeMode(true);
+		
+	//	m_robotArmInitialized.set(true);
 	}
 	
 	public void resetMasterPosition() {
 		m_j1Motor.inititializeSensorPosition();
 		m_j2Motor.inititializeSensorPosition();
 		m_j3Motor.inititializeSensorPosition();
-		m_robotArmInitialized.set(true);
 	}
 
 	public void setControlMode(CANTalonEncoderPID.ControlMode mode) {
