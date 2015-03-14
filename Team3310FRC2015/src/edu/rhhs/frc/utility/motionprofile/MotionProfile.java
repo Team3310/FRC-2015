@@ -1,6 +1,5 @@
 package edu.rhhs.frc.utility.motionprofile;
 
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;

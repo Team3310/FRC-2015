@@ -22,10 +22,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	public static final double TRACK_WIDTH_INCHES = 26.425;
 
 	// Talons
-	private CANTalon m_frontLeftMotor;
-	private CANTalon m_frontRightMotor;
-	private CANTalonEncoderPID m_rearLeftMotor;
-	private CANTalonEncoderPID m_rearRightMotor;
+	private CANTalonEncoderPID m_frontLeftMotor;
+	private CANTalonEncoderPID m_frontRightMotor;
+	private CANTalon m_rearLeftMotor;
+	private CANTalon m_rearRightMotor;
 	
 	private CANTalonEncoderPID.ControlMode m_controlMode;
 	
@@ -78,11 +78,11 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     
     public DriveTrain() {
 		try {
-			m_frontLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
-			m_frontRightMotor = new CANTalon(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
+			m_frontLeftMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
+			m_frontRightMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
 			
-			m_rearLeftMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
-			m_rearRightMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
+			m_rearLeftMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+			m_rearRightMotor = new CANTalon(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
 			
 			m_frontLeftMotor.setSafetyEnabled(false);
 			m_frontRightMotor.setSafetyEnabled(false);
@@ -90,33 +90,33 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 			m_rearRightMotor.setSafetyEnabled(false);
 			
 			// The front motors are setup to "follow" the rear motors
-			m_frontLeftMotor.changeControlMode(CANTalon.ControlMode.Follower);
-			m_frontLeftMotor.set(RobotMap.DRIVETRAIN_REAR_LEFT_CAN_ID);
+			m_rearLeftMotor.changeControlMode(CANTalon.ControlMode.Follower);
+			m_rearLeftMotor.set(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
 
-			m_frontRightMotor.changeControlMode(CANTalon.ControlMode.Follower);
-			m_frontRightMotor.set(RobotMap.DRIVETRAIN_REAR_RIGHT_CAN_ID);
+			m_rearRightMotor.changeControlMode(CANTalon.ControlMode.Follower);
+			m_rearRightMotor.set(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
 
 			// The rear motors have encoders attached so they will be used for the main control input
-			m_rearLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearLeftMotor.setPIDParams(positionMovePidParams, CANTalonEncoderPID.POSITION_PROFILE);
-			m_rearLeftMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
-			m_rearLeftMotor.reverseSensor(true);
-			m_rearLeftMotor.reverseOutput(false);
-			m_rearLeftMotor.setPosition(0);
+			m_frontLeftMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
+			m_frontLeftMotor.setPIDParams(positionMovePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_frontLeftMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
+			m_frontLeftMotor.reverseSensor(true);
+			m_frontLeftMotor.reverseOutput(false);
+			m_frontLeftMotor.setPosition(0);
 
-			m_rearRightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-			m_rearRightMotor.setPIDParams(positionMovePidParams, CANTalonEncoderPID.POSITION_PROFILE);
-			m_rearRightMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
-			m_rearRightMotor.reverseSensor(false);
-			m_rearRightMotor.reverseOutput(true);
-			m_rearRightMotor.setPosition(0);
+			m_frontRightMotor.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
+			m_frontRightMotor.setPIDParams(positionMovePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+			m_frontRightMotor.setPIDParams(velocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
+			m_frontRightMotor.reverseSensor(false);
+			m_frontRightMotor.reverseOutput(true);
+			m_frontRightMotor.setPosition(0);
 
 			// Start with the Talons in throttle mode
 			setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
-			m_rearLeftMotor.set(0);
-			m_rearRightMotor.set(0);
+			m_frontLeftMotor.set(0);
+			m_frontRightMotor.set(0);
 			
-			m_drive = new RobotDrive(m_rearLeftMotor, m_rearRightMotor);            
+			m_drive = new RobotDrive(m_frontLeftMotor, m_frontRightMotor);            
             m_drive.setSafetyEnabled(false);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
             m_drive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
@@ -190,32 +190,32 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	}
 
 	public void setControlMode(CANTalonEncoderPID.ControlMode controlMode) {
-		m_rearLeftMotor.setControlMode(controlMode);
-		m_rearRightMotor.setControlMode(controlMode);
+		m_frontLeftMotor.setControlMode(controlMode);
+		m_frontRightMotor.setControlMode(controlMode);
 		m_controlMode = controlMode;
 	}
 		
 	public void startPIDVelocity(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
 		setControlMode(CANTalonEncoderPID.ControlMode.VELOCITY);
-		m_rearLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
-		m_rearRightMotor.setPIDVelocityDegPerSecNoLimits(rightTargetDegPerSec);
+		m_frontLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
+		m_frontRightMotor.setPIDVelocityDegPerSecNoLimits(rightTargetDegPerSec);
 		m_error = errorDegPerSec;
 		isHoldOn = false;
 	}
 	
 	public void startPIDPositionHold() {
-		m_rearLeftMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
-		m_rearRightMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_frontLeftMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_frontRightMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 		startPIDPosition(0, 0, 1);
 		isHoldOn = true;
 	}
 	
 	public void startPIDPosition(double leftTargetInches, double rightTargetInches, double errorInches) {
 		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
-		m_rearLeftMotor.setPosition(0);
-		m_rearRightMotor.setPosition(0);
-		m_rearLeftMotor.setPIDPositionInches(leftTargetInches);
-		m_rearRightMotor.setPIDPositionInches(rightTargetInches);
+		m_frontLeftMotor.setPosition(0);
+		m_frontRightMotor.setPosition(0);
+		m_frontLeftMotor.setPIDPositionInches(leftTargetInches);
+		m_frontRightMotor.setPIDPositionInches(rightTargetInches);
 		m_error = errorInches;
 		isHoldOn = false;
 	}
@@ -227,32 +227,32 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	
 	public void setSpeed(double speed) {
 		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
-		m_rearLeftMotor.set(speed);
-		m_rearRightMotor.set(speed);
+		m_frontLeftMotor.set(speed);
+		m_frontRightMotor.set(speed);
 	}
 	
 	public boolean isAtLeftTarget() {
-		return Math.abs(m_rearLeftMotor.getClosedLoopError()) < m_error;
+		return Math.abs(m_frontLeftMotor.getClosedLoopError()) < m_error;
 	}
 	
 	public boolean isAtRightTarget() {
-		return Math.abs(m_rearRightMotor.getClosedLoopError()) < m_error;
+		return Math.abs(m_frontRightMotor.getClosedLoopError()) < m_error;
 	}
 	
 	public double getLeftDistanceInches() {
-		return m_rearLeftMotor.getPositionInches();
+		return m_frontLeftMotor.getPositionInches();
 	}
 	
 	public double getRightDistanceInches() {
-		return m_rearRightMotor.getPositionInches();
+		return m_frontRightMotor.getPositionInches();
 	}
 	
 	public double getLeftError() {
-		return m_rearLeftMotor.getClosedLoopError();
+		return m_frontLeftMotor.getClosedLoopError();
 	}
 	
 	public double getRightError() {
-		return m_rearRightMotor.getClosedLoopError();
+		return m_frontRightMotor.getClosedLoopError();
 	}
 
 	public void setJoystickControllerMode(int driveMode) {
@@ -266,13 +266,13 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		}
 		m_motionProfile = profile;
 		m_motionProfileIndex = 0;
-		m_rearLeftMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
-		m_rearRightMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_frontLeftMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_frontRightMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
 		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
-		m_rearLeftMotor.setPosition(0);
-		m_rearRightMotor.setPosition(0);
-		m_rearLeftMotor.set(0);
-		m_rearRightMotor.set(0);
+		m_frontLeftMotor.setPosition(0);
+		m_frontRightMotor.setPosition(0);
+		m_frontLeftMotor.set(0);
+		m_frontRightMotor.set(0);
 		isHoldOn = false;
 		enableControlLoop();
 	}
@@ -281,8 +281,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		if (m_motionProfileIndex < m_motionProfile.numPoints) {
 			double distanceLeft = m_motionProfile.jointPos[m_motionProfileIndex][0];    // hack, use J1
 			double distanceRight = m_motionProfile.jointPos[m_motionProfileIndex][1];   // hack, use J2
-			m_rearLeftMotor.setPIDPositionInches(distanceLeft);
-			m_rearRightMotor.setPIDPositionInches(distanceRight);
+			m_frontLeftMotor.setPIDPositionInches(distanceLeft);
+			m_frontRightMotor.setPIDPositionInches(distanceRight);
 			m_motionProfileIndex++;
 		}
 		else {
@@ -386,14 +386,14 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	}
 	
 	public void updateStatus() {
-//		SmartDashboard.putNumber("Rear Left Pos (deg)", m_rearLeftMotor.getPositionDeg());
-//		SmartDashboard.putNumber("Rear Right Pos (deg)", m_rearRightMotor.getPositionDeg());
-//		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", m_rearLeftMotor.getVelocityDegPerSec());
-//		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", m_rearRightMotor.getVelocityDegPerSec());
-//		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", m_rearLeftMotor.getVelocityFtPerSec());
-//		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_rearRightMotor.getVelocityFtPerSec());		
-		SmartDashboard.putNumber("Rear Left Distance (Inches)", m_rearLeftMotor.getPositionInches());
-		SmartDashboard.putNumber("Rear Right Distance (Inches)", m_rearRightMotor.getPositionInches());
+//		SmartDashboard.putNumber("Rear Left Pos (deg)", m_frontLeftMotor.getPositionDeg());
+//		SmartDashboard.putNumber("Rear Right Pos (deg)", m_frontRightMotor.getPositionDeg());
+//		SmartDashboard.putNumber("Rear Left Speed (deg-sec)", m_frontLeftMotor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("Rear Right Speed (deg-sec)", m_frontRightMotor.getVelocityDegPerSec());
+//		SmartDashboard.putNumber("Rear Left Speed (ft-sec)", m_frontLeftMotor.getVelocityFtPerSec());
+//		SmartDashboard.putNumber("Rear Right Speed (ft-sec)", m_frontRightMotor.getVelocityFtPerSec());		
+		SmartDashboard.putNumber("Rear Left Distance (Inches)", m_frontLeftMotor.getPositionInches());
+		SmartDashboard.putNumber("Rear Right Distance (Inches)", m_frontRightMotor.getPositionInches());
 		SmartDashboard.putBoolean("Drivetrain Hold On", isHoldOn);
 		SmartDashboard.putNumber("IMU Yaw (deg)", m_imu.getYaw());
 	}

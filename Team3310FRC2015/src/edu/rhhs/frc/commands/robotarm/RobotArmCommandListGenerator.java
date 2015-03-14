@@ -9,6 +9,11 @@ public abstract class RobotArmCommandListGenerator
 	
 	public abstract void calculate();
 	
+	protected void addMotionProfileCommand(WaypointList waypoints, double[] jointSpeeds, double [] jointSpeedPercents, double [] endTypeCnt) {
+    	RobotArmMotionProfilePath motionProfile = new RobotArmMotionProfilePath(waypoints, jointSpeeds, jointSpeedPercents, endTypeCnt);
+		commandList.add(motionProfile);
+	}
+	
 	protected void addMotionProfileCommand(WaypointList waypoints, double[] jointSpeeds, double [] jointSpeedPercents) {
     	RobotArmMotionProfilePath motionProfile = new RobotArmMotionProfilePath(waypoints, jointSpeeds, jointSpeedPercents);
 		commandList.add(motionProfile);
@@ -29,6 +34,11 @@ public abstract class RobotArmCommandListGenerator
 		commandList.add(motionProfile);
 	}
 	
+	protected void addMotionProfileCurrentToPathCommand(WaypointList waypoints, double[] jointSpeeds, double [] jointSpeedPercents, double [] endTypeCnt) {
+    	RobotArmMotionProfileCurrentToPath motionProfile = new RobotArmMotionProfileCurrentToPath(waypoints, jointSpeeds, jointSpeedPercents, endTypeCnt);
+		commandList.add(motionProfile);
+	}
+
 	protected void addToteGrabberAutoCloseCommand() {
 		commandList.add(new RobotArmToteGrabberAutoClose());
 	}

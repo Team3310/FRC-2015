@@ -14,6 +14,7 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 	protected WaypointList waypoints;
 	protected double[] jointVelocities; 
 	protected double[] jointPercentVelocities; 
+	protected double[] endTypeCnt; 
 	
     public RobotArmMotionProfilePath(WaypointList waypoints) {
     	this.waypoints = waypoints;
@@ -30,6 +31,13 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
        	this.jointPercentVelocities = jointPercentVelocities;
     }
     
+    public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointVelocities, double[] jointPercentVelocities, double[] endTypeCnt) {
+       	this.waypoints = waypoints;
+       	this.jointVelocities = jointVelocities;
+       	this.jointPercentVelocities = jointPercentVelocities;
+       	this.endTypeCnt = endTypeCnt;
+    }
+    
     protected void initialize() {    	
     	if (waypoints != null) {
 	    	MotionProfile motionProfile = new MotionProfile(waypoints);
@@ -38,6 +46,9 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 	    	}
 	    	if (jointPercentVelocities != null) {
 	    		motionProfile.setJointVelocityPercents(jointPercentVelocities);
+	    	}
+	    	if (endTypeCnt != null) {
+	    		motionProfile.setEndTypeCNT(endTypeCnt);
 	    	}
 			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, RobotMain.driveTrain.getYawAngleDeg(), RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
 			profileOutput = motionProfile.getProfile();

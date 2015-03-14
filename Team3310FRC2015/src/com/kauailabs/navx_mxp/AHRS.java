@@ -11,7 +11,6 @@
 package com.kauailabs.navx_mxp;
 
 import com.kauailabs.nav6.frc.IMU;
-
 import edu.wpi.first.wpilibj.SerialPort;
 
 /**

@@ -10,13 +10,23 @@ public class RobotArmMotionProfileCurrentToPath extends RobotArmMotionProfilePat
 {
 	private static final double CLOSE_DELTA_ANGLE_DEG = 2.0;
 	private static final double CLOSE_DELTA_POSITION_IN = 2.0;
-	private WaypointList waypoints;
+	protected double[] jointVelocities; 
+	protected double[] jointPercentVelocities; 
+	protected double[] endTypeCnt; 
 	
+    public RobotArmMotionProfileCurrentToPath(WaypointList waypoints, double[] jointVelocities, double[] jointPercentVelocities, double[] endTypeCnt) {
+       	super(null);
+    	this.waypoints = waypoints;
+       	this.jointVelocities = jointVelocities;
+       	this.jointPercentVelocities = jointPercentVelocities;
+       	this.endTypeCnt = endTypeCnt;
+    }
+
     public RobotArmMotionProfileCurrentToPath(WaypointList waypoints) {
     	super(null);
     	this.waypoints = waypoints;
     }
-
+ 
     protected void initialize() {
     	// Need to calculate the path on the fly
     	MotionProfile motionProfile = new MotionProfile();
@@ -52,6 +62,15 @@ public class RobotArmMotionProfileCurrentToPath extends RobotArmMotionProfilePat
     	}
     	
     	motionProfile = new MotionProfile(waypoints);
+    	if (jointVelocities != null) {
+    		motionProfile.setJointVelocities(jointVelocities);
+    	}
+    	if (jointPercentVelocities != null) {
+    		motionProfile.setJointVelocityPercents(jointPercentVelocities);
+    	}
+    	if (endTypeCnt != null) {
+    		motionProfile.setEndTypeCNT(endTypeCnt);
+    	}
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, RobotMain.driveTrain.getYawAngleDeg(), RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
     	profileOutput = motionProfile.getProfile();
 

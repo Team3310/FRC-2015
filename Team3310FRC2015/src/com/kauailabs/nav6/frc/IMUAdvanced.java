@@ -10,9 +10,7 @@
 
 package com.kauailabs.nav6.frc;
 import java.util.Arrays;
-
 import com.kauailabs.nav6.IMUProtocol;
-
 import edu.wpi.first.wpilibj.SerialPort;
 
 /**

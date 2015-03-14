@@ -11,9 +11,7 @@
 package com.kauailabs.nav6.frc;
 
 import java.util.Arrays;
-
 import com.kauailabs.nav6.IMUProtocol;
-
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.SensorBase;
 import edu.wpi.first.wpilibj.SerialPort;

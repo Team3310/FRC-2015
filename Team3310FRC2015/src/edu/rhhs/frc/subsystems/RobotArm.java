@@ -34,8 +34,8 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	// Robot arm joint angles when system is powered on (or new code is downloaded)
 	public static final double J1_MASTER_ANGLE_DEG = 0.0;
-	public static final double J2_MASTER_ANGLE_DEG = -40.0;  // 97.36;
-	public static final double J3_MASTER_ANGLE_DEG = -20.0;  // -109.88;
+	public static final double J2_MASTER_ANGLE_DEG = -35;  
+	public static final double J3_MASTER_ANGLE_DEG = -25;  
 	public static final double J4_MASTER_ANGLE_DEG = 0.0;
 	
 //	public static final double X_MASTER_POSITION_IN = 26.567764225774383;
@@ -88,7 +88,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private CANTalonEncoderPID m_j3Motor;
 	private CANTalonAnalogPID  m_j4Motor;
 
-	private PIDParams j1PositionPidParams = new PIDParams(3.0, 0.0, 0.2, 0.0, 50, 0);
+	private PIDParams j1PositionPidParams = new PIDParams(4.0, 0.0, 0.2, 0.0, 50, 0);
 //	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.0006, 0.15, -0.26, 150, 0);
 //	private PIDParams j3PositionPidParams = new PIDParams(1.5, 0.0006, 0.15, 0.22, 150, 0);
 	private PIDParams j2PositionPidParams = new PIDParams(3.5, 0.009, 0.15, -0.26, 150, 0);

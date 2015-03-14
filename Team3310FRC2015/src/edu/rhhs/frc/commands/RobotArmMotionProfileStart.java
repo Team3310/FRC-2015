@@ -25,7 +25,7 @@ public class RobotArmMotionProfileStart extends Command
 
 	@Override
 	protected boolean isFinished() {
-		return RobotMain.robotArm.isControlLoopEnabled();
+		return !RobotMain.robotArm.isControlLoopEnabled();
 	}
 
 	@Override
