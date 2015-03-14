@@ -11,6 +11,7 @@ import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
 import edu.rhhs.frc.commands.BinGrabberSetLeftSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetRightSpeed;
 import edu.rhhs.frc.commands.BinGrabberStopPID;
+import edu.rhhs.frc.commands.DriveTrainGyroTurn;
 import edu.rhhs.frc.commands.DriveTrainMotionProfileStraight;
 import edu.rhhs.frc.commands.DriveTrainMotionProfileTurn;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
@@ -238,6 +239,14 @@ public class OI
 		InternalButton driveTankTurnRightTest = new InternalButton();
 		driveTankTurnRightTest.whenPressed(new DriveTrainMotionProfileTurn(-45, 60, true));
 		SmartDashboard.putData("Drive Tank Turn -45 Test", driveTankTurnRightTest);
+		
+		InternalButton driveGyroTurnLeftTest = new InternalButton();
+		driveGyroTurnLeftTest.whenPressed(new DriveTrainGyroTurn(45, 1, 0.5));
+		SmartDashboard.putData("Drive Gyro Turn  45 Test", driveGyroTurnLeftTest);
+		
+		InternalButton driveGyroTurnRightTest = new InternalButton();
+		driveGyroTurnRightTest.whenPressed(new DriveTrainGyroTurn(-45, 1, 0.5));
+		SmartDashboard.putData("Drive Gyro Turn -45 Test", driveGyroTurnRightTest);
 
 		//    	WaypointList waypoints0 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
 //    	waypoints0.addWaypoint(RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG);
