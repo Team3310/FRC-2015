@@ -4,20 +4,26 @@ import com.kauailabs.navx_mxp.AHRS;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
+import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.ControlLoopable;
 import edu.rhhs.frc.utility.ControlLooper;
 import edu.rhhs.frc.utility.PIDParams;
 import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.PIDController.Tolerance;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem implements ControlLoopable
 {	
+	public static enum PIDMode {SOFTWARE_TURN, TALON_MOTION_PROFILE, TALON_MOTION_PROFILE_WITH_GYRO};
+	public static enum ToteSledPosition {UP, DOWN};
+
 	public static final long OUTER_LOOP_UPDATE_RATE_MS = 10;
 	public static final double TRACK_WIDTH_INCHES = 26.425;
 
@@ -33,11 +39,16 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	private PIDParams positionHoldPidParams = new PIDParams(10, 0, 0.0, 0, 50, 0);   
 	private PIDParams positionMotionProfilePidParams = new PIDParams(3, 0, 0.0, 0, 50, 0);   
 	private PIDParams velocityPidParams = new PIDParams(0.15, 0.007, 0.0, 1.8, 50, 0);
+	
+	private double m_kPGyroCorrection = 0.005;
+	private double m_gyroPathOffset;
 
 	private double m_error;
 	private boolean isHoldOn = false;
 	 
     private RobotDrive m_drive;
+    
+	private DoubleSolenoid m_toteSledSolenoid;
     
     // Controllers
     public static final int CONTROLLER_JOYSTICK_ARCADE = 0;
@@ -54,8 +65,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
  	private int m_moveNonLinear = 0;
     private int m_steerNonLinear = 0;
     
-    private double m_moveScale = 0.75;
-    private double m_steerScale = 0.75;
+    private double m_moveScale = 0.85;
+    private double m_steerScale = 0.85;
     
     private double m_moveInput = 0.0;
     private double m_steerInput = 0.0;
@@ -68,6 +79,19 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     
 	private int m_controllerMode;
 
+	private PIDMode m_pidMode = PIDMode.TALON_MOTION_PROFILE;
+    private double m_P = 0.028;    
+    private double m_I = 0.00002; // 0.00015;     
+    private double m_D = 0.0;     
+    private double m_F = 0.0;                 
+    private double m_maximumOutput = 1.0; // |maximum output|
+    private double m_minimumOutput = -1.0;  // |minimum output|
+    private double m_prevError = 0.0; // the prior sensor input (used to compute velocity)
+    private double m_totalError = 0.0; //the sum of the errors for use in the integral calc
+    private double m_tolerance;  //the tolerance object used to check if on target
+    private double m_setpoint = 0.0;
+    private double m_result = 0.0;
+	
 	private ControlLooper m_controlLoop;
 	private ProfileOutput m_motionProfile;
 	private int m_motionProfileIndex;
@@ -78,6 +102,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     
     public DriveTrain() {
 		try {
+			m_toteSledSolenoid = new DoubleSolenoid(RobotMap.TOTE_SLED_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_SLED_RETRACT_PNEUMATIC_MODULE_ID);
+
 			m_frontLeftMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
 			m_frontRightMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
 			
@@ -189,6 +215,15 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		m_rearRightMotor.enableBrakeMode(true);
 	}
 
+	public void setToteSledPosition(ToteSledPosition position) {
+		if (position == ToteSledPosition.DOWN) {
+			m_toteSledSolenoid.set(DoubleSolenoid.Value.kForward);
+    	}
+		else {
+			m_toteSledSolenoid.set(DoubleSolenoid.Value.kReverse);
+		}
+	}
+
 	public void setControlMode(CANTalonEncoderPID.ControlMode controlMode) {
 		m_frontLeftMotor.setControlMode(controlMode);
 		m_frontRightMotor.setControlMode(controlMode);
@@ -221,7 +256,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	}
 	
 	public void stopPID() {
-		setSpeed(0);
+		disableControlLoop();
+		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+		m_frontLeftMotor.set(0);
+		m_frontRightMotor.set(0);
 		isHoldOn = false;
 	}
 	
@@ -264,6 +302,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		if (isControlLoopEnabled()) {
 			disableControlLoop();
 		}
+		m_pidMode = PIDMode.TALON_MOTION_PROFILE;
 		m_motionProfile = profile;
 		m_motionProfileIndex = 0;
 		m_frontLeftMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
@@ -277,17 +316,96 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		enableControlLoop();
 	}
 
-	public void controlLoopUpdate() {
-		if (m_motionProfileIndex < m_motionProfile.numPoints) {
-			double distanceLeft = m_motionProfile.jointPos[m_motionProfileIndex][0];    // hack, use J1
-			double distanceRight = m_motionProfile.jointPos[m_motionProfileIndex][1];   // hack, use J2
-			m_frontLeftMotor.setPIDPositionInches(distanceLeft);
-			m_frontRightMotor.setPIDPositionInches(distanceRight);
-			m_motionProfileIndex++;
-		}
-		else {
+	public void startMotionProfileWithGyro(ProfileOutput profile, boolean resetGyro) {
+		if (isControlLoopEnabled()) {
 			disableControlLoop();
-			return;
+		}
+		m_pidMode = PIDMode.TALON_MOTION_PROFILE_WITH_GYRO;
+		m_motionProfile = profile;
+		m_motionProfileIndex = 0;
+		m_frontLeftMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		m_frontRightMotor.setPIDParams(positionMotionProfilePidParams, CANTalonEncoderPID.POSITION_PROFILE);
+		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
+		m_frontLeftMotor.setPosition(0);
+		m_frontRightMotor.setPosition(0);
+		m_frontLeftMotor.set(0);
+		m_frontRightMotor.set(0);
+		if (resetGyro) {
+			setYawAngleZero();
+		}
+		isHoldOn = false;
+		enableControlLoop();
+	}
+
+	public void startGyroTurn(double deltaAngleDeg, double toleranceDeg, double maxThrottle) {
+		if (isControlLoopEnabled()) {
+			disableControlLoop();
+		}
+		m_pidMode = PIDMode.SOFTWARE_TURN;
+		m_setpoint = deltaAngleDeg;
+		m_tolerance = toleranceDeg;
+		m_maximumOutput = maxThrottle;
+		setYawAngleZero();
+		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+		m_frontLeftMotor.set(0);
+		m_frontRightMotor.set(0);
+		m_error = m_setpoint - getYawAngleDeg();
+		isHoldOn = false;
+		enableControlLoop();
+	}
+
+	public double getGyroTurnError() {
+		return m_error;
+	}
+
+	public void controlLoopUpdate() {
+		if (m_pidMode == PIDMode.TALON_MOTION_PROFILE || m_pidMode == PIDMode.TALON_MOTION_PROFILE_WITH_GYRO) {
+			if (m_motionProfileIndex < m_motionProfile.numPoints) {
+				double distanceLeft = m_motionProfile.jointPos[m_motionProfileIndex][0];    // hack, use J1
+				double distanceRight = m_motionProfile.jointPos[m_motionProfileIndex][1];   // hack, use J2
+				
+				if ( m_pidMode == PIDMode.TALON_MOTION_PROFILE_WITH_GYRO) {
+					m_gyroPathOffset += getYawAngleDeg() * m_kPGyroCorrection;
+					distanceLeft += m_gyroPathOffset;
+					distanceRight -= m_gyroPathOffset;
+				}
+				
+				m_frontLeftMotor.setPIDPositionInches(distanceLeft);
+				m_frontRightMotor.setPIDPositionInches(distanceRight);
+				m_motionProfileIndex++;
+			}
+			else {
+				disableControlLoop();
+				return;
+			}
+		}
+
+		else if (m_pidMode == PIDMode.SOFTWARE_TURN) {
+			m_error = m_setpoint - getYawAngleDeg();
+	        if (m_I != 0) {
+	            double potentialIGain = (m_totalError + m_error) * m_I;
+	            if (potentialIGain < m_maximumOutput) {
+	                if (potentialIGain > m_minimumOutput) {
+	                    m_totalError += m_error;
+	                } else {
+	                    m_totalError = m_minimumOutput / m_I;
+	                }
+	            } else {
+	                m_totalError = m_maximumOutput / m_I;
+	            }
+	        }
+	
+	        m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
+	        m_prevError = m_error;
+	
+	        if (m_result > m_maximumOutput) {
+	            m_result = m_maximumOutput;
+	        } else if (m_result < m_minimumOutput) {
+	            m_result = m_minimumOutput;
+	        }
+	        
+	        m_frontLeftMotor.set(-m_result);
+	        m_frontRightMotor.set(-m_result);
 		}
 	}
 

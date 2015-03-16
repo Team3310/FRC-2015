@@ -11,11 +11,13 @@ import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
 import edu.rhhs.frc.commands.BinGrabberSetLeftSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetRightSpeed;
 import edu.rhhs.frc.commands.BinGrabberStopPID;
+import edu.rhhs.frc.commands.DriveTrainGyroTurn;
 import edu.rhhs.frc.commands.DriveTrainMotionProfileStraight;
 import edu.rhhs.frc.commands.DriveTrainMotionProfileTurn;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
 import edu.rhhs.frc.commands.DriveTrainStopPID;
+import edu.rhhs.frc.commands.DriveTrainToteSledPosition;
 import edu.rhhs.frc.commands.RobotArmMotionProfileCurrentToPosition;
 import edu.rhhs.frc.commands.RobotArmMotionProfileNext;
 import edu.rhhs.frc.commands.RobotArmMotionProfilePause;
@@ -30,6 +32,7 @@ import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileJ1ToZero;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
+import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
@@ -94,11 +97,17 @@ public class OI
         JoystickButton binGrabberPivotLockRelease = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.BACK_BUTTON);
         binGrabberPivotLockRelease.whenPressed(new BinGrabberPivotLockPosition(BinGrabber.BinGrabberState.RETRACTED));
 
-        JoystickButton binGrabberClawOpen = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.RIGHT_JOYSTICK_BUTTON);
+        XBoxDPadTriggerButton binGrabberClawOpen = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.UP);
         binGrabberClawOpen.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.EXTENDED));
 
-        JoystickButton binGrabberClawClose = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
-        binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));
+        XBoxDPadTriggerButton binGrabberClawClose = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.DOWN);
+        binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));    
+        
+        JoystickButton toteSledUp = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
+        toteSledUp.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.UP));
+
+        JoystickButton toteSledDown = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
+        toteSledDown.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.DOWN));
         
         XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT);
         driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
@@ -136,12 +145,18 @@ public class OI
         JoystickButton toteGrabberClose = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.RIGHT_BUMPER_BUTTON);
         toteGrabberClose.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
 
-        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
-        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 81, MotionProfile.ProfileMode.CartesianInputJointMotion));
+//        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+//        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 81, MotionProfile.ProfileMode.CartesianInputJointMotion));
+//        
+//        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
+//        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 75, MotionProfile.ProfileMode.CartesianInputJointMotion));
         
-        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
-        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 75, MotionProfile.ProfileMode.CartesianInputJointMotion));
-        
+    	RobotArmCommandList commandListJ1ToZero = new RobotArmCommandList();
+    	commandListJ1ToZero.add(new RobotArmMotionProfileJ1ToZero());
+
+        XBoxDPadTriggerButton j1ToZero = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+        j1ToZero.whenPressed(new RobotArmMotionProfileStart(commandListJ1ToZero));
+       
         // Testing
 //        InternalButton binGrabberDeployTimedTest = new InternalButton();
 //        binGrabberDeployTimedTest.whenReleased(new BinGrabberDeployTimed(1.0, 300));
@@ -238,6 +253,14 @@ public class OI
 		InternalButton driveTankTurnRightTest = new InternalButton();
 		driveTankTurnRightTest.whenPressed(new DriveTrainMotionProfileTurn(-45, 60, true));
 		SmartDashboard.putData("Drive Tank Turn -45 Test", driveTankTurnRightTest);
+		
+		InternalButton driveGyroTurnLeftTest = new InternalButton();
+		driveGyroTurnLeftTest.whenPressed(new DriveTrainGyroTurn(20, 1, 0.6));
+		SmartDashboard.putData("Drive Gyro Turn  45 Test", driveGyroTurnLeftTest);
+		
+		InternalButton driveGyroTurnRightTest = new InternalButton();
+		driveGyroTurnRightTest.whenPressed(new DriveTrainGyroTurn(-20, 1, 0.6));
+		SmartDashboard.putData("Drive Gyro Turn -45 Test", driveGyroTurnRightTest);
 
 		//    	WaypointList waypoints0 = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
 //    	waypoints0.addWaypoint(RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG);
@@ -430,9 +453,6 @@ public class OI
 		motionProfileReset.whenPressed(new RobotArmMotionProfileReset());
 		SmartDashboard.putData("Motion Profile Reset", motionProfileReset);
 		
-    	RobotArmCommandList commandListJ1ToZero = new RobotArmCommandList();
-    	commandListJ1ToZero.add(new RobotArmMotionProfileJ1ToZero());
-
         InternalButton motionProfileJ1Zero = new InternalButton();
 		motionProfileJ1Zero.whenPressed(new RobotArmMotionProfileStart(commandListJ1ToZero));
 		SmartDashboard.putData("Motion Profile J1 To Zero", motionProfileJ1Zero);

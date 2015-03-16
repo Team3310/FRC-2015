@@ -50,7 +50,7 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 	    	if (endTypeCnt != null) {
 	    		motionProfile.setEndTypeCNT(endTypeCnt);
 	    	}
-			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, RobotMain.driveTrain.getYawAngleDeg(), RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
+			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
 			profileOutput = motionProfile.getProfile();
     	}
     	

@@ -1,10 +1,12 @@
 package edu.rhhs.frc;
 
+import edu.rhhs.frc.commands.AutonGet3TotesTip3Bins;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
@@ -32,7 +34,7 @@ public class RobotMain extends IterativeRobot
 	public static final BinGrabber binGrabber = new BinGrabber();
 	public static final DriveTrain driveTrain = new DriveTrain();
 	public static final RobotArm robotArm = new RobotArm();
-	public static final HumanLoadCommandListGenerator commandListGenerator = new HumanLoadCommandListGenerator();
+	public static final HumanLoadCommandListGeneratorOptimal commandListGenerator = new HumanLoadCommandListGeneratorOptimal();
 
 	private Command m_autonomousCommand;
 	private SendableChooser m_autonomousChooser;
@@ -101,6 +103,7 @@ public class RobotMain extends IterativeRobot
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
 			m_autonomousChooser.addObject ("Do nothing", null);
 			m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
+			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3Bins());
 			SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 		} catch( Exception ex ) {
 
@@ -149,6 +152,7 @@ public class RobotMain extends IterativeRobot
 		}
 		binGrabber.teleopInit();
 		driveTrain.teleopInit();
+		robotArm.teleopInit();
 		//driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
 		driveTrain.setJoystickControllerMode(DriveTrain.CONTROLLER_JOYSTICK_CHEESY);
 		robotArm.setControlMode((CANTalonEncoderPID.ControlMode)m_robotArmControlModeChooser.getSelected());

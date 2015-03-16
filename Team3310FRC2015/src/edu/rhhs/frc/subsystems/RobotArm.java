@@ -55,7 +55,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J1_MAX_ANGLE_DEG = 175.0;
 	private static final double J1_MIN_ANGLE_DEG = -175.0;
 	private static final double J2_MAX_ANGLE_DEG = 110.0;
-	private static final double J2_MIN_ANGLE_DEG = -25.0;
+	private static final double J2_MIN_ANGLE_DEG = -38.0;
 	private static final double J3_MAX_ANGLE_DEG = 27.0;
 	private static final double J3_MIN_ANGLE_DEG = -120.0;
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
@@ -64,7 +64,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double Z_MAX_INCHES = 78.0;
 	private static final double Z_MIN_INCHES = 5.0;
 	
-	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -61.3;
+	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -65.0;
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG = 60.0;
 	/*private static final double J3_HEIGHT_LIMIT_J2_MIN_ANGLE_DEG = 0.0;
 	private static final double J3_HEIGHT_LIMIT_J2_MAX_ANGLE_DEG = 40.0;
@@ -189,6 +189,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		m_j4Motor.enableBrakeMode(true);
 		
 	//	m_robotArmInitialized.set(true);
+	}
+	
+	public void teleopInit() {
+		disableControlLoop();
 	}
 	
 	public void resetMasterPosition() {

@@ -1,5 +1,6 @@
 package edu.rhhs.frc.utility.motionprofile;
 
+import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
@@ -601,6 +602,9 @@ public class MotionProfile
 		double[] testJointAngleInputDeg = new double[] {50, 10,  20, 0};
 		double[] xyzTestOutputDeg = profile.calcForwardKinematicsDeg(testJointAngleInputDeg);
 		System.out.println("Forward KIN test output inches and deg = " + xyzTestOutputDeg[0] + "," + xyzTestOutputDeg[1] + "," + xyzTestOutputDeg[2] + "," + xyzTestOutputDeg[3]);
+
+		double[] masterOutputDeg = profile.calcForwardKinematicsDeg(new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG});
+		System.out.println("Master position output = " + masterOutputDeg[0] + "," + masterOutputDeg[1] + "," + masterOutputDeg[2] + "," + masterOutputDeg[3]);
 
 	}
 }

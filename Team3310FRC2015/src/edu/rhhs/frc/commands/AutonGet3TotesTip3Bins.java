@@ -1,7 +1,6 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
-import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
@@ -32,9 +31,9 @@ public class AutonGet3TotesTip3Bins extends CommandGroup
     	addSequential(new RobotArmMotionProfileStart(commandListKnockOverFirstTote));
   
     	// Move forward, turn, go forward to second bin
-    	addSequential(new DriveTrainMotionProfileStraight(30, 60));
-    	addSequential(new DriveTrainMotionProfileTurn(-40, 100, false));
-    	addSequential(new DriveTrainMotionProfileStraight(42, 60));
+    	addSequential(new DriveTrainMotionProfileStraight(36, 60));
+    	addSequential(new DriveTrainGyroTurn(-23, 1, 0.6));
+    	addSequential(new DriveTrainMotionProfileStraight(48, 60));
 
     	// Move arm up, over and knock over second bin
     	WaypointList waypointsKnockOverSecondBin = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
@@ -47,11 +46,11 @@ public class AutonGet3TotesTip3Bins extends CommandGroup
     	commandListKnockOverSecondBin.add(new RobotArmMotionProfilePath(waypointsKnockOverSecondBin));	
     	addSequential(new RobotArmMotionProfileStart(commandListKnockOverSecondBin));   	
 
-    	// Move forward to third bin
-    	addSequential(new DriveTrainMotionProfileStraight(45, 60));
-    	addSequential(new DriveTrainMotionProfileStraight(-6, 80));
-    	
     	// Open grabber to release first tote while on top of second tote
+    	addSequential(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
+       	addSequential(new WaitCommand(1));
+    	addSequential(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
+       	addSequential(new WaitCommand(1));
     	addSequential(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
     	addSequential(new WaitCommand(1));
     	
@@ -75,7 +74,8 @@ public class AutonGet3TotesTip3Bins extends CommandGroup
     	commandListMoveWithSecondTote.add(new RobotArmMotionProfilePath(waypointsMoveWithSecondTote));
     	addSequential(new RobotArmMotionProfileStart(commandListMoveWithSecondTote));
     	
-    	addSequential(new DriveTrainMotionProfileStraight(27, 60));
+    	// Move forward to third bin
+    	addSequential(new DriveTrainMotionProfileStraight(77, 60));
 
     	// Move arm up, over and knock over third bin
     	WaypointList waypointsKnockOverThirdBin = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
