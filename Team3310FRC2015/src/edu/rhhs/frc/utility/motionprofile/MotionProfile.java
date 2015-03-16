@@ -606,5 +606,7 @@ public class MotionProfile
 		double[] masterOutputDeg = profile.calcForwardKinematicsDeg(new double[] {RobotArm.J1_MASTER_ANGLE_DEG, RobotArm.J2_MASTER_ANGLE_DEG, RobotArm.J3_MASTER_ANGLE_DEG, RobotArm.J4_MASTER_ANGLE_DEG});
 		System.out.println("Master position output = " + masterOutputDeg[0] + "," + masterOutputDeg[1] + "," + masterOutputDeg[2] + "," + masterOutputDeg[3]);
 
+		double[] newMasterOutputDeg = profile.calcForwardKinematicsDeg(new double[] {0, 97.548, -97.572, 0});
+		System.out.println("New Master position output = " + newMasterOutputDeg[0] + "," + newMasterOutputDeg[1] + "," + newMasterOutputDeg[2] + "," + newMasterOutputDeg[3]);
 	}
 }

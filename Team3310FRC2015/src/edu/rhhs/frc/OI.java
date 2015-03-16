@@ -36,6 +36,7 @@ import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -50,18 +51,31 @@ public class OI
 
 	private XboxController m_drivetrainController;
 	private XboxController m_robotArmController;
-//	private Joystick m_joystick1;
-//  private Joystick m_joystick2;
+	private Joystick m_joystick1;
+    private Joystick m_joystick2;
 	
 	private OI() {
 		m_drivetrainController = new XboxController(RobotMap.XBOX_1_USB_ID);
 		m_robotArmController = new XboxController(RobotMap.XBOX_2_USB_ID);
-//      m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
-//      m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
+		m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
+		m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
 	    
-		// Drivetrain controller
-        JoystickButton binGrabberStowPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
-        binGrabberStowPID.whenPressed(new BinGrabberPositionStowedPID());
+		// Joystick controller
+        JoystickButton toteSledUpJoystick = new JoystickButton(m_joystick1, 3);
+        toteSledUpJoystick.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.UP));
+
+        JoystickButton toteSledDownJoystick = new JoystickButton(m_joystick1, 2);
+        toteSledDownJoystick.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.DOWN));
+  
+        JoystickButton driveTrainHoldOnJoystick = new JoystickButton(m_joystick1, 5);
+        driveTrainHoldOnJoystick.whenPressed(new DriveTrainPositionHoldOn());
+
+        JoystickButton driveTrainHoldOffJoystick = new JoystickButton(m_joystick1, 4);
+        driveTrainHoldOffJoystick.whenPressed(new DriveTrainStopPID());
+
+		// Drivetrain XBox controller
+//        JoystickButton binGrabberStowPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
+//        binGrabberStowPID.whenPressed(new BinGrabberPositionStowedPID());
         
 //        JoystickButton binGrabberCancelPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.X_BUTTON);
 //        binGrabberCancelPID.whenPressed(new BinGrabberStopPID());
@@ -69,6 +83,12 @@ public class OI
 //        JoystickButton binGrabberDragPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.B_BUTTON);
 //        binGrabberDragPID.whenPressed(new BinGrabberPositionDownPID(BinGrabber.DRAG_BIN_POSITION_DEG, BinGrabber.DRAG_BIN_POSITION_DEG));
  
+        JoystickButton toteSledUp = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
+        toteSledUp.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.UP));
+
+        JoystickButton toteSledDown = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
+        toteSledDown.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.DOWN));
+        
         JoystickButton driveTrainHoldOnButton = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.B_BUTTON);
         driveTrainHoldOnButton.whenPressed(new DriveTrainPositionHoldOn());
 
@@ -102,12 +122,6 @@ public class OI
 
         XBoxDPadTriggerButton binGrabberClawClose = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.DOWN);
         binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));    
-        
-        JoystickButton toteSledUp = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
-        toteSledUp.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.UP));
-
-        JoystickButton toteSledDown = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.A_BUTTON);
-        toteSledDown.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.DOWN));
         
         XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT);
         driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
@@ -145,16 +159,16 @@ public class OI
         JoystickButton toteGrabberClose = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.RIGHT_BUMPER_BUTTON);
         toteGrabberClose.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
 
-//        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
-//        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 81, MotionProfile.ProfileMode.CartesianInputJointMotion));
-//        
-//        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
-//        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 75, MotionProfile.ProfileMode.CartesianInputJointMotion));
+        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 78, MotionProfile.ProfileMode.CartesianInputJointMotion));
+        
+        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
+        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 6, MotionProfile.ProfileMode.CartesianInputJointMotion));
         
     	RobotArmCommandList commandListJ1ToZero = new RobotArmCommandList();
     	commandListJ1ToZero.add(new RobotArmMotionProfileJ1ToZero());
 
-        XBoxDPadTriggerButton j1ToZero = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+        XBoxDPadTriggerButton j1ToZero = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.RIGHT);
         j1ToZero.whenPressed(new RobotArmMotionProfileStart(commandListJ1ToZero));
        
         // Testing
@@ -477,13 +491,13 @@ public class OI
 		return instance;
 	}
 	
-//    public Joystick getJoystick1() {
-//        return m_joystick1;
-//    }
-//    
-//    public Joystick getJoystick2() {
-//        return m_joystick2;
-//    }
+    public Joystick getJoystick1() {
+        return m_joystick1;
+    }
+    
+    public Joystick getJoystick2() {
+        return m_joystick2;
+    }
    
 	public XboxController getDrivetrainController() {
         return m_drivetrainController;
