@@ -1,5 +1,17 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Autonomous Turn To Huamn Position" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="625" y="622"/>
+	</widget>
+	<widget field="Drive Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="963" y="28"/>
+	</widget>
+	<widget field="Drive Gyro Turn -45 Test" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="649"/>
+	</widget>
+	<widget field="Drive Gyro Turn  45 Test" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="0" y="625"/>
+	</widget>
 	<widget field="Autonomous 3 Totes Tip 3 Bins Test" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
 		<location x="625" y="601"/>
 	</widget>
@@ -7,7 +19,7 @@
 		<location x="624" y="574"/>
 	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="10" y="209"/>
+		<location x="10" y="228"/>
 		<width>166</width>
 		<height>34</height>
 		<property name="Text" value="Stacking Preferences"/>
@@ -44,10 +56,10 @@
 		<width>120</width>
 	</widget>
 	<widget field="Num Stacks Chooser" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="83" y="230"/>
+		<location x="83" y="245"/>
 	</widget>
 	<widget field="Num Totes Per Stack Chooser" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="21" y="229"/>
+		<location x="21" y="246"/>
 	</widget>
 	<widget field="Drivetrain Hold On" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="576" y="493"/>
@@ -58,7 +70,7 @@
 		<width>163</width>
 	</widget>
 	<widget field="Stack Priority Chooser" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="83" y="321"/>
+		<location x="32" y="321"/>
 	</widget>
 	<widget field="Stack Priority Verify" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="410" y="315"/>
