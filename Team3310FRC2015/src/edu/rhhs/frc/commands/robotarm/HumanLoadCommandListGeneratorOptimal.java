@@ -12,7 +12,7 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 {
 //	public enum StackPriority {VERTICAL, HORIZONTAL};
 	
-	public static final double[] DEFAULT_HOME_COORD =     {22, 0.0, 12, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] DEFAULT_HOME_COORD =     {22, 0.0, 14, 0};  // Gripper position for bottom tote in stacker tray
 	public static final double[] HOME_LOAD_COORD =        {22, 0.0, 22, 0};  // Gripper position for bottom tote in stacker tray
 	public static final double[] HOME_STACK_EXIT_COORD =  {20, 0.0, 24, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
 	public static final double[] HOME_STACK_CLEAR_COORD = {18, 0.0, 36, 0};  // Gripper position to clear top tote in stacker tray on return to home gripper open

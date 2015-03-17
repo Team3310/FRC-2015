@@ -2,7 +2,8 @@ package edu.rhhs.frc;
 
 import edu.rhhs.frc.buttons.XBoxDPadTriggerButton;
 import edu.rhhs.frc.buttons.XBoxTriggerButton;
-import edu.rhhs.frc.commands.AutonGet3TotesTip3Bins;
+import edu.rhhs.frc.commands.AutonGet3TotesTip3BinsNew;
+import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
@@ -51,27 +52,27 @@ public class OI
 
 	private XboxController m_drivetrainController;
 	private XboxController m_robotArmController;
-	private Joystick m_joystick1;
-    private Joystick m_joystick2;
+//	private Joystick m_joystick1;
+//    private Joystick m_joystick2;
 	
 	private OI() {
 		m_drivetrainController = new XboxController(RobotMap.XBOX_1_USB_ID);
 		m_robotArmController = new XboxController(RobotMap.XBOX_2_USB_ID);
-		m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
-		m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
-	    
-		// Joystick controller
-        JoystickButton toteSledUpJoystick = new JoystickButton(m_joystick1, 3);
-        toteSledUpJoystick.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.UP));
-
-        JoystickButton toteSledDownJoystick = new JoystickButton(m_joystick1, 2);
-        toteSledDownJoystick.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.DOWN));
-  
-        JoystickButton driveTrainHoldOnJoystick = new JoystickButton(m_joystick1, 5);
-        driveTrainHoldOnJoystick.whenPressed(new DriveTrainPositionHoldOn());
-
-        JoystickButton driveTrainHoldOffJoystick = new JoystickButton(m_joystick1, 4);
-        driveTrainHoldOffJoystick.whenPressed(new DriveTrainStopPID());
+//		m_joystick1 = new Joystick(RobotMap.JOYSTICK_1_USB_ID);
+//		m_joystick2 = new Joystick(RobotMap.JOYSTICK_2_USB_ID);
+//	    
+//		// Joystick controller
+//        JoystickButton toteSledUpJoystick = new JoystickButton(m_joystick1, 3);
+//        toteSledUpJoystick.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.UP));
+//
+//        JoystickButton toteSledDownJoystick = new JoystickButton(m_joystick1, 2);
+//        toteSledDownJoystick.whenPressed(new DriveTrainToteSledPosition(DriveTrain.ToteSledPosition.DOWN));
+//  
+//        JoystickButton driveTrainHoldOnJoystick = new JoystickButton(m_joystick1, 5);
+//        driveTrainHoldOnJoystick.whenPressed(new DriveTrainPositionHoldOn());
+//
+//        JoystickButton driveTrainHoldOffJoystick = new JoystickButton(m_joystick1, 4);
+//        driveTrainHoldOffJoystick.whenPressed(new DriveTrainStopPID());
 
 		// Drivetrain XBox controller
 //        JoystickButton binGrabberStowPID = new JoystickButton(m_drivetrainController.getJoyStick(), XboxController.Y_BUTTON);
@@ -480,8 +481,12 @@ public class OI
 		SmartDashboard.putData("Drivetrain Hold Off", driveTrainHoldOffTest);
 		
 		InternalButton autonGet3TotesTip3Bins = new InternalButton();
-		autonGet3TotesTip3Bins.whenPressed(new AutonGet3TotesTip3Bins());
+		autonGet3TotesTip3Bins.whenPressed(new AutonGet3TotesTip3BinsNew());
 		SmartDashboard.putData("Autonomous 3 Totes Tip 3 Bins Test", autonGet3TotesTip3Bins);
+		
+		InternalButton autonTurnToHumanPosition = new InternalButton();
+		autonTurnToHumanPosition.whenPressed(new AutonTurnToHumanPosition());
+		SmartDashboard.putData("Autonomous Turn To Huamn Position", autonTurnToHumanPosition);
 	}
 	
 	public static OI getInstance() {
@@ -491,14 +496,14 @@ public class OI
 		return instance;
 	}
 	
-    public Joystick getJoystick1() {
-        return m_joystick1;
-    }
-    
-    public Joystick getJoystick2() {
-        return m_joystick2;
-    }
-   
+//    public Joystick getJoystick1() {
+//        return m_joystick1;
+//    }
+//    
+//    public Joystick getJoystick2() {
+//        return m_joystick2;
+//    }
+//   
 	public XboxController getDrivetrainController() {
         return m_drivetrainController;
     }

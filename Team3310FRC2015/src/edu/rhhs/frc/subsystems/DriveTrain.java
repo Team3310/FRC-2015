@@ -80,8 +80,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	private int m_controllerMode;
 
 	private PIDMode m_pidMode = PIDMode.TALON_MOTION_PROFILE;
-    private double m_P = 0.028;    
-    private double m_I = 0.00002; // 0.00015;     
+    private double m_P = 0.03;    
+    private double m_I = 0.00003; // 0.00015;     
     private double m_D = 0.0;     
     private double m_F = 0.0;                 
     private double m_maximumOutput = 1.0; // |maximum output|
@@ -423,50 +423,50 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 
 	public void driveWithJoystick() {
 		if (m_drive != null && m_controlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
-			switch(m_controllerMode) {
-			case CONTROLLER_JOYSTICK_ARCADE:
-				m_moveInput = OI.getInstance().getJoystick1().getY();
-				m_steerInput = OI.getInstance().getJoystick1().getX();
-				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
-				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
-				break;
-			case CONTROLLER_JOYSTICK_TANK:
-				m_moveInput = OI.getInstance().getJoystick1().getY();
-				m_steerInput = OI.getInstance().getJoystick2().getY();
-				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_steerInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_drive.tankDrive(m_moveOutput, m_steerOutput);
-				break;
-			case CONTROLLER_JOYSTICK_CHEESY:
-				m_moveInput = OI.getInstance().getJoystick1().getY();
-				m_steerInput = OI.getInstance().getJoystick2().getX();
-				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
-				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
-				break;
-			case CONTROLLER_XBOX_CHEESY:
+//			switch(m_controllerMode) {
+//			case CONTROLLER_JOYSTICK_ARCADE:
+//				m_moveInput = OI.getInstance().getJoystick1().getY();
+//				m_steerInput = OI.getInstance().getJoystick1().getX();
+//				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+//				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
+//				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
+//				break;
+//			case CONTROLLER_JOYSTICK_TANK:
+//				m_moveInput = OI.getInstance().getJoystick1().getY();
+//				m_steerInput = OI.getInstance().getJoystick2().getY();
+//				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+//				m_steerOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_steerInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+//				m_drive.tankDrive(m_moveOutput, m_steerOutput);
+//				break;
+//			case CONTROLLER_JOYSTICK_CHEESY:
+//				m_moveInput = OI.getInstance().getJoystick1().getY();
+//				m_steerInput = OI.getInstance().getJoystick2().getX();
+//				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+//				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
+//				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
+//				break;
+//			case CONTROLLER_XBOX_CHEESY:
 				m_moveInput = OI.getInstance().getDrivetrainController().getLeftYAxis();
 				m_steerInput = OI.getInstance().getDrivetrainController().getRightXAxis();
 				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
 				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
-				break;
-			case CONTROLLER_XBOX_ARCADE_RIGHT:
-				m_moveInput = OI.getInstance().getDrivetrainController().getRightYAxis();
-				m_steerInput = OI.getInstance().getDrivetrainController().getRightXAxis();
-				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
-				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
-				break;
-			case CONTROLLER_XBOX_ARCADE_LEFT:
-				m_moveInput = OI.getInstance().getDrivetrainController().getLeftYAxis();
-				m_steerInput = OI.getInstance().getDrivetrainController().getLeftXAxis();
-				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
-				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
-				break;
-			}
+//				break;
+//			case CONTROLLER_XBOX_ARCADE_RIGHT:
+//				m_moveInput = OI.getInstance().getDrivetrainController().getRightYAxis();
+//				m_steerInput = OI.getInstance().getDrivetrainController().getRightXAxis();
+//				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+//				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
+//				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
+//				break;
+//			case CONTROLLER_XBOX_ARCADE_LEFT:
+//				m_moveInput = OI.getInstance().getDrivetrainController().getLeftYAxis();
+//				m_steerInput = OI.getInstance().getDrivetrainController().getLeftXAxis();
+//				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+//				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
+//				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
+//				break;
+//			}
 		}
 	}
 	

@@ -34,8 +34,8 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	// Robot arm joint angles when system is powered on (or new code is downloaded)
 	public static final double J1_MASTER_ANGLE_DEG = 0.0;
-	public static final double J2_MASTER_ANGLE_DEG = -35;  
-	public static final double J3_MASTER_ANGLE_DEG = -25;  
+	public static final double J2_MASTER_ANGLE_DEG = 97.548; // -35;  
+	public static final double J3_MASTER_ANGLE_DEG = -97.572; // -25;  
 	public static final double J4_MASTER_ANGLE_DEG = 0.0;
 	
 //	public static final double X_MASTER_POSITION_IN = 26.567764225774383;
@@ -61,7 +61,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
-	private static final double Z_MAX_INCHES = 78.0;
+	private static final double Z_MAX_INCHES = 72.0;
 	private static final double Z_MIN_INCHES = 5.0;
 	
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -65.0;

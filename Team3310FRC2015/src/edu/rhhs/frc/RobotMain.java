@@ -1,6 +1,7 @@
 package edu.rhhs.frc;
 
-import edu.rhhs.frc.commands.AutonGet3TotesTip3Bins;
+import edu.rhhs.frc.commands.AutonGet3TotesTip3BinsNew;
+import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
@@ -38,7 +39,7 @@ public class RobotMain extends IterativeRobot
 
 	private Command m_autonomousCommand;
 	private SendableChooser m_autonomousChooser;
-	private SendableChooser m_driveModeChooser;
+//	private SendableChooser m_driveModeChooser;
 	private SendableChooser m_robotArmControlModeChooser;
 	private SendableChooser m_numStacksChooser;
 	private SendableChooser m_numTotesPerStackChooser;
@@ -59,14 +60,14 @@ public class RobotMain extends IterativeRobot
 
 			commandListGenerator.setStackPriority(StackPriority.VERTICAL);
 
-			m_driveModeChooser = new SendableChooser();
-			m_driveModeChooser.addObject ("XBox Arcade Left", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
-			m_driveModeChooser.addObject ("XBox Arcade Right", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
-			m_driveModeChooser.addDefault("XBox Cheesy",		new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
-			m_driveModeChooser.addObject ("Joystick Arcade", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
-			m_driveModeChooser.addObject ("Joystick Cheesy", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
-			m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
-			SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
+//			m_driveModeChooser = new SendableChooser();
+//			m_driveModeChooser.addObject ("XBox Arcade Left", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_LEFT));
+//			m_driveModeChooser.addObject ("XBox Arcade Right", 	new Integer(DriveTrain.CONTROLLER_XBOX_ARCADE_RIGHT));
+//			m_driveModeChooser.addDefault("XBox Cheesy",		new Integer(DriveTrain.CONTROLLER_XBOX_CHEESY));
+//			m_driveModeChooser.addObject ("Joystick Arcade", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_ARCADE));
+//			m_driveModeChooser.addObject ("Joystick Cheesy", 	new Integer(DriveTrain.CONTROLLER_JOYSTICK_CHEESY));
+//			m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
+//			SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
 
 			m_stackPriorityChooser = new SendableChooser();
 			m_stackPriorityChooser.addDefault("Vertical Priority", StackPriority.VERTICAL);
@@ -103,7 +104,8 @@ public class RobotMain extends IterativeRobot
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
 			m_autonomousChooser.addObject ("Do nothing", null);
 			m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
-			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3Bins());
+			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3BinsNew());
+			m_autonomousChooser.addObject ("Turn to Human Position", new AutonTurnToHumanPosition());
 			SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 		} catch( Exception ex ) {
 
@@ -153,7 +155,7 @@ public class RobotMain extends IterativeRobot
 		binGrabber.teleopInit();
 		driveTrain.teleopInit();
 		robotArm.teleopInit();
-		driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
+//		driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
 		driveTrain.setJoystickControllerMode(DriveTrain.CONTROLLER_JOYSTICK_CHEESY);
 		robotArm.setControlMode((CANTalonEncoderPID.ControlMode)m_robotArmControlModeChooser.getSelected());
 		commandListGenerator.setNumStacks(numStacks);
