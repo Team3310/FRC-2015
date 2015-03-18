@@ -16,12 +16,11 @@ public class AutonTurnToHumanPosition extends CommandGroup
 {
 	public AutonTurnToHumanPosition() {
 		addSequential(new DriveTrainMotionProfileStraight(-32.7, 60));
-		//addSequential(new DriveTrainGyroTurn(37, 3, 1.0));
+		addSequential(new DriveTrainPositionHoldOn());
 
 		// Start position clamp tote
 		addSequential(new DriveTrainToteSledPosition(ToteSledPosition.DOWN));
 		addSequential(new WaitCommand(4));
-		//	addSequential(new DriveTrainMotionProfileStraight(2, 60));
 
 		// Move arm up, over and knock over first bin
 		WaypointList armDown = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);

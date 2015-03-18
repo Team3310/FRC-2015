@@ -591,7 +591,7 @@ public class MotionProfile
 		double[] jointAngleOutputDeg = profile.calcInverseKinematicsDeg(xyzToolOutputDeg);
 		System.out.println("Inverse KIN joint angle output deg = " + jointAngleOutputDeg[0] + "," + jointAngleOutputDeg[1] + "," + jointAngleOutputDeg[2] + "," + jointAngleOutputDeg[3]);
 
-		double[] HUMAN_LOAD_START_COORD =  {-36.4, -44.9, 28.5, -129.0}; 
+		double[] HUMAN_LOAD_START_COORD =  {19, 0, 12, 0}; 
 		double[] humanAngleOutputDeg = profile.calcInverseKinematicsDeg(HUMAN_LOAD_START_COORD);
 		System.out.println("Inverse KIN human angle output deg = " + humanAngleOutputDeg[0] + "," + humanAngleOutputDeg[1] + "," + humanAngleOutputDeg[2] + "," + humanAngleOutputDeg[3]);
 

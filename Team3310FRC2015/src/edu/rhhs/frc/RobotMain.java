@@ -5,9 +5,8 @@ import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal.StackPriority;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
@@ -95,17 +94,17 @@ public class RobotMain extends IterativeRobot
 			SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
 
 			WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
-			waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
+			waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGeneratorOptimal.DEFAULT_HOME_COORD);
 			RobotArmCommandList commandListCurrentToHome = new RobotArmCommandList();
 			commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 
 			m_autonomousChooser = new SendableChooser();
-			m_autonomousChooser.addDefault("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
+			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
 			m_autonomousChooser.addObject ("Do nothing", null);
 			m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
 			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3BinsNew());
-			m_autonomousChooser.addObject ("Turn to Human Position", new AutonTurnToHumanPosition());
+			m_autonomousChooser.addDefault("Turn to Human Position", new AutonTurnToHumanPosition());
 			SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 		} catch( Exception ex ) {
 

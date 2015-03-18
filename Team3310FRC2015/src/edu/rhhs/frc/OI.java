@@ -27,7 +27,7 @@ import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.RobotArmSetHome;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileJ1ToZero;
@@ -37,7 +37,6 @@ import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -144,7 +143,7 @@ public class OI
         motionProfileStart.whenPressed(new RobotArmMotionProfileStart(RobotMain.commandListGenerator.getCommandList()));
 
     	WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
-    	waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
+    	waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGeneratorOptimal.DEFAULT_HOME_COORD);
     	RobotArmCommandList commandListCurrentToHome = new RobotArmCommandList();
     	commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 

@@ -7,10 +7,10 @@
 		<location x="963" y="28"/>
 	</widget>
 	<widget field="Drive Gyro Turn -45 Test" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="0" y="649"/>
+		<location x="841" y="627"/>
 	</widget>
 	<widget field="Drive Gyro Turn  45 Test" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
-		<location x="0" y="625"/>
+		<location x="840" y="603"/>
 	</widget>
 	<widget field="Autonomous 3 Totes Tip 3 Bins Test" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
 		<location x="625" y="601"/>

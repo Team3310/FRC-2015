@@ -1,7 +1,7 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -15,7 +15,7 @@ public class RobotArmSetHome extends Command
 	protected void initialize() {
 		MotionProfile motionProfile = new MotionProfile();
 		double[] currentRobotPosition = motionProfile.calcForwardKinematicsDeg(RobotMain.robotArm.getJointAngles());
-		RobotMain.commandListGenerator.updateWorldToRobotOffset(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD, currentRobotPosition, RobotMain.driveTrain.getYawAngleDeg());
+		RobotMain.commandListGenerator.updateWorldToRobotOffset(HumanLoadCommandListGeneratorOptimal.DEFAULT_HOME_COORD, currentRobotPosition, RobotMain.driveTrain.getYawAngleDeg());
 	}
 
 	@Override

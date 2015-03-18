@@ -1,7 +1,6 @@
 package edu.rhhs.frc.commands.robotarm;
 
 import java.util.ArrayList;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
@@ -10,11 +9,11 @@ import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
 public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGenerator 
 {
-//	public enum StackPriority {VERTICAL, HORIZONTAL};
+	public enum StackPriority {VERTICAL, HORIZONTAL};
 	
-	public static final double[] DEFAULT_HOME_COORD =     {22, 0.0, 14, 0};  // Gripper position for bottom tote in stacker tray
-	public static final double[] HOME_LOAD_COORD =        {22, 0.0, 22, 0};  // Gripper position for bottom tote in stacker tray
-	public static final double[] HOME_STACK_EXIT_COORD =  {20, 0.0, 24, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
+	public static final double[] DEFAULT_HOME_COORD =     {19, 0.0, 13, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] HOME_LOAD_COORD =        {19, 0.0, 22, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] HOME_STACK_EXIT_COORD =  {18, 0.0, 24, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
 	public static final double[] HOME_STACK_CLEAR_COORD = {18, 0.0, 36, 0};  // Gripper position to clear top tote in stacker tray on return to home gripper open
 	public static final double[] WALL_CLEAR_COORD = 	  {11, 15.5, 36, 0};  // Gripper position to clear wall
 
