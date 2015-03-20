@@ -19,7 +19,7 @@
 		<location x="624" y="574"/>
 	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="10" y="228"/>
+		<location x="4" y="223"/>
 		<width>166</width>
 		<height>34</height>
 		<property name="Text" value="Stacking Preferences"/>
@@ -56,10 +56,10 @@
 		<width>120</width>
 	</widget>
 	<widget field="Num Stacks Chooser" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="83" y="245"/>
+		<location x="1" y="242"/>
 	</widget>
 	<widget field="Num Totes Per Stack Chooser" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="21" y="246"/>
+		<location x="80" y="240"/>
 	</widget>
 	<widget field="Drivetrain Hold On" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="576" y="493"/>
@@ -70,7 +70,7 @@
 		<width>163</width>
 	</widget>
 	<widget field="Stack Priority Chooser" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="32" y="321"/>
+		<location x="28" y="316"/>
 	</widget>
 	<widget field="Stack Priority Verify" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="410" y="315"/>
@@ -96,14 +96,14 @@
 		<location x="236" y="242"/>
 	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="1431" y="22"/>
+		<location x="61" y="68"/>
 		<property name="Text" value="Autonomous"/>
 	</static-widget>
 	<widget field="Bin Grabber Cancel PID" type="Button" class="edu.wpi.first.smartdashboard.gui.elements.Button">
 		<location x="417" y="576"/>
 	</widget>
 	<widget field="Autonomous Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="15" y="86"/>
+		<location x="1" y="75"/>
 	</widget>
 	<widget field="J3 Position (deg)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="603" y="238"/>
@@ -175,13 +175,7 @@
 		<height>23</height>
 	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="28" y="75"/>
-		<width>154</width>
-		<height>18</height>
-		<property name="Text" value="Drive Mode"/>
-	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Label">
-		<location x="27" y="394"/>
+		<location x="25" y="392"/>
 		<property name="Text" value="Robot Arm Control Mode"/>
 	</static-widget>
 	<widget field="Robot Arm Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">

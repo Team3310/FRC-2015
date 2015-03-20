@@ -11,9 +11,9 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 {
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 	
-	public static final double[] DEFAULT_HOME_COORD =     {19, 0.0, 13, 0};  // Gripper position for bottom tote in stacker tray
-	public static final double[] HOME_LOAD_COORD =        {19, 0.0, 22, 0};  // Gripper position for bottom tote in stacker tray
-	public static final double[] HOME_STACK_EXIT_COORD =  {18, 0.0, 24, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
+	public static final double[] DEFAULT_HOME_COORD =     {21, 0.0, 14, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] HOME_LOAD_COORD =        {21, 0.0, 22, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] HOME_STACK_EXIT_COORD =  {18, 0.0, 26, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
 	public static final double[] HOME_STACK_CLEAR_COORD = {18, 0.0, 36, 0};  // Gripper position to clear top tote in stacker tray on return to home gripper open
 	public static final double[] WALL_CLEAR_COORD = 	  {11, 15.5, 36, 0};  // Gripper position to clear wall
 
@@ -26,8 +26,11 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 	public static final double STACK_DELTA_Z_SPACING = 24.0; 
 	
 	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;   
+	
+	
+	
 	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 11; 
+	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 12; 
 	
 	public static final double STACK_X_POST_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
@@ -43,7 +46,7 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 	private double[] worldToRobotOffsetInches = {0, 0, 0};
 	
 	public HumanLoadCommandListGeneratorOptimal() {	
-		stackStartPositions.add(new double[]  {-44, 17, 8, 0});
+		stackStartPositions.add(new double[]  {-44, 17, 9, 0});
 		stackPreReleaseOffsetPositions.add(new double[] {-24, 24,  0, 0});
 		stackExtractOffsetPositions.add(new double[] {-30, 30,  0, 0});
 		stackPullBackOffsetPositions.add(new double[] { -22, 9,  0, 0});
