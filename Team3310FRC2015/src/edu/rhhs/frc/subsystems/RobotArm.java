@@ -164,7 +164,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 			m_j4Motor.setPIDParams(j4VelocityPidParams, CANTalonEncoderPID.VELOCITY_PROFILE);
 
 			resetMasterPosition();
-			setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
+//			setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH_DIO_ID);	
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
@@ -218,6 +218,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 			m_positionCommandJ2 = m_j2Motor.getPositionDeg();
 			m_positionCommandJ3 = m_j3Motor.getPositionDeg();
 			m_positionCommandJ4 = m_j4Motor.getPositionDeg();
+			setPIDPosition(m_positionCommandJ1, m_positionCommandJ2, m_positionCommandJ3, m_positionCommandJ4);
 		}
 		else {
 			m_j1Motor.set(0);

@@ -75,8 +75,8 @@ public class RobotMain extends IterativeRobot
 
 			m_numStacksChooser = new SendableChooser();
 			m_numStacksChooser.addObject ("1 Stack", 	new Integer(1));
-			m_numStacksChooser.addObject ("2 Stacks", 	new Integer(2));
-			m_numStacksChooser.addDefault("3 Stacks", 	new Integer(3));
+			m_numStacksChooser.addDefault ("2 Stacks", 	new Integer(2));
+			m_numStacksChooser.addObject("3 Stacks", 	new Integer(3));
 			SmartDashboard.putData("Num Stacks Chooser", m_numStacksChooser);
 
 			m_numTotesPerStackChooser = new SendableChooser();
@@ -135,6 +135,8 @@ public class RobotMain extends IterativeRobot
 	}
 
 	public void autonomousInit() {
+		robotArm.resetMasterPosition();
+		robotArm.setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
 		}
