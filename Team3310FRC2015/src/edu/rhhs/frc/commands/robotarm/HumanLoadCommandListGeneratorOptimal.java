@@ -131,8 +131,8 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 				addWaitForNextCommand();
 				
 				// Grab tote
-				addToteGrabberCloseCommand();
-				addToteGrabberOpenCommand();
+//				addToteGrabberCloseCommand();
+//				addToteGrabberOpenCommand();
 				
 				// Pull away from human load station
 				WaypointList waypointsGetTote = new WaypointList(ProfileMode.CartesianInputJointMotion);	

@@ -21,6 +21,7 @@ public class DriveTrainPositionControl extends Command
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	setTimeout(3);
     	RobotMain.driveTrain.startPIDPosition(leftTargetInches, rightTargetInches, avgFinishedInches);
     }
 
@@ -30,8 +31,12 @@ public class DriveTrainPositionControl extends Command
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
+    	if (isTimedOut()) {
+    		return true;
+    	}
+    	double error = 5;
     	if (isFinishedByInches) {
-    		if ((RobotMain.driveTrain.getLeftDistanceInches() + RobotMain.driveTrain.getRightDistanceInches()) / 2 > avgFinishedInches) {
+    		if (Math.abs((RobotMain.driveTrain.getLeftDistanceInches() + RobotMain.driveTrain.getRightDistanceInches()) / 2 - avgFinishedInches) < error) {
     			return true;
     		}
     		return false;

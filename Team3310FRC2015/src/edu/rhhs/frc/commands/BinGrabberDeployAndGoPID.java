@@ -14,7 +14,7 @@ public class BinGrabberDeployAndGoPID extends CommandGroup
         addSequential(new DriveTrainPositionControl(108, 108, true, 108));
         addSequential(new BinGrabberPivotLockPosition(BinGrabberState.RETRACTED)); 
         addSequential(new BinGrabberClawPosition(BinGrabberState.RETRACTED));  
-        addSequential(new DriveTrainSpeedTimeout(0.4, 3));
+        addSequential(new DriveTrainMotionProfileStraight(30, 50));
         addSequential(new BinGrabberPositionStowedPID());
         addSequential(new DriveTrainStopPID());
     }

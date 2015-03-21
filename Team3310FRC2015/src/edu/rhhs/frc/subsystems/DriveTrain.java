@@ -209,10 +209,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     }
     
 	public void keepAlive() {
-		m_frontLeftMotor.enableBrakeMode(true);
-		m_frontRightMotor.enableBrakeMode(true);
-		m_rearLeftMotor.enableBrakeMode(true);
-		m_rearRightMotor.enableBrakeMode(true);
+		m_frontLeftMotor.enableBrakeMode(false);
+		m_frontRightMotor.enableBrakeMode(false);
+		m_rearLeftMotor.enableBrakeMode(false);
+		m_rearRightMotor.enableBrakeMode(false);
 	}
 
 	public void setToteSledPosition(ToteSledPosition position) {
