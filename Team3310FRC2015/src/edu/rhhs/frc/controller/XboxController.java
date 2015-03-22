@@ -146,7 +146,7 @@ public class XboxController
 		return getAxisWithDeadZoneCheck(stick.getRawAxis(RIGHT_TRIGGER_AXIS)); 
 	}
 
-	// Returns -1 if nothing is pressed, or the angle of the button pressed 0 = up, 90 = right, etc.
+	/**Returns -1 if nothing is pressed, or the angle of the button pressed 0 = up, 90 = right, etc.*/
 	public int getDpadAngle() {
 		return stick.getPOV();
 	}

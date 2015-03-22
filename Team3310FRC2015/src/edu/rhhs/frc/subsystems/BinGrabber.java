@@ -185,7 +185,7 @@ public class BinGrabber extends Subsystem
 	}
 	
 	public void controlWithJoystick() {
-		setSpeed(-OI.getInstance().getDrivetrainController().getRightYAxis(), -OI.getInstance().getDrivetrainController().getLeftYAxis());
+		setSpeed(-OI.getInstance().getDriveTrainController().getRightYAxis(), -OI.getInstance().getDriveTrainController().getLeftYAxis());
 	}
 
 	public void updateStatus() {

@@ -5,8 +5,8 @@ import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal.StackPriority;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriority;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
@@ -34,7 +34,7 @@ public class RobotMain extends IterativeRobot
 	public static final BinGrabber binGrabber = new BinGrabber();
 	public static final DriveTrain driveTrain = new DriveTrain();
 	public static final RobotArm robotArm = new RobotArm();
-	public static final HumanLoadCommandListGeneratorOptimal commandListGenerator = new HumanLoadCommandListGeneratorOptimal();
+	public static final HumanLoadCommandListGenerator commandListGenerator = new HumanLoadCommandListGenerator();
 
 	private Command m_autonomousCommand;
 	private SendableChooser m_autonomousChooser;
@@ -94,7 +94,7 @@ public class RobotMain extends IterativeRobot
 			SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
 
 			WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
-			waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGeneratorOptimal.DEFAULT_HOME_COORD);
+			waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
 			RobotArmCommandList commandListCurrentToHome = new RobotArmCommandList();
 			commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 

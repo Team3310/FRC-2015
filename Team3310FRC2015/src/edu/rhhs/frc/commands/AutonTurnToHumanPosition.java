@@ -1,6 +1,6 @@
 package edu.rhhs.frc.commands;
 
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
 import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
@@ -26,7 +26,7 @@ public class AutonTurnToHumanPosition extends CommandGroup
 		WaypointList armDown = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 		armDown.addWaypoint(0,   15, 47, 0);
 		armDown.addWaypoint(16, 0, 48, 0);
-		armDown.addWaypoint(HumanLoadCommandListGeneratorOptimal.HOME_LOAD_COORD);
+		armDown.addWaypoint(HumanLoadCommandListGenerator.HOME_LOAD_COORD);
 		RobotArmCommandList armDownCommandList = new RobotArmCommandList();
 		armDownCommandList.add(new RobotArmMotionProfilePath(armDown, new double[] {120, 120, 120, 120}, new double[] {100, 100, 100}, new double[] {100, 100, 100})); 	
 		addSequential(new RobotArmMotionProfileStart(armDownCommandList));

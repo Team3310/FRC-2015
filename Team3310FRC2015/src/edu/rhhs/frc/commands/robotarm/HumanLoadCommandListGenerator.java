@@ -7,12 +7,12 @@ import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
 import edu.rhhs.frc.utility.motionprofile.ProfileOutput;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
 
-public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGenerator 
+public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator 
 {
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 	
 	public static final double[] DEFAULT_HOME_COORD =     {21, 0.0, 14, 0};  // Gripper position for bottom tote in stacker tray
-	public static final double[] HOME_LOAD_COORD =        {21, 0.0, 22, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] HOME_LOAD_COORD =        {21, 0.0, 22, 0};  // Gripper position for second tote to seat it in bottom tote
 	public static final double[] HOME_STACK_EXIT_COORD =  {18, 0.0, 26, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
 	public static final double[] HOME_STACK_CLEAR_COORD = {18, 0.0, 36, 0};  // Gripper position to clear top tote in stacker tray on return to home gripper open
 	public static final double[] WALL_CLEAR_COORD = 	  {11, 15.5, 36, 0};  // Gripper position to clear wall
@@ -22,15 +22,12 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 	public ArrayList<double[]> stackExtractOffsetPositions = new ArrayList<double[]>();
 	public ArrayList<double[]> stackPullBackOffsetPositions = new ArrayList<double[]>();
 	
-	public static final double STACK_DELTA_Y_SPACING = 0.0; 
-	public static final double STACK_DELTA_Z_SPACING = 24.0; 
+	public static final double STACK_DELTA_Y_SPACING = 0.0;
+	public static final double STACK_DELTA_Z_SPACING = 24.0;
 	
-	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;   
-	
-	
-	
-	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 12; 
+	public static final double STACK_X_PRE_UNLOAD_OFFSET = 0;
+	public static final double STACK_Y_PRE_UNLOAD_OFFSET = 0;  
+	public static final double STACK_Z_PRE_UNLOAD_OFFSET = 12;
 	
 	public static final double STACK_X_POST_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
@@ -45,18 +42,18 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 	private double[] homePosition = DEFAULT_HOME_COORD;
 	private double[] worldToRobotOffsetInches = {0, 0, 0};
 	
-	public HumanLoadCommandListGeneratorOptimal() {	
-		stackStartPositions.add(new double[]  {-44, 17, 9, 0});
+	public HumanLoadCommandListGenerator() {	
+		stackStartPositions.add(new double[] {-44, 17, 9, 0});
 		stackPreReleaseOffsetPositions.add(new double[] {-24, 24,  0, 0});
 		stackExtractOffsetPositions.add(new double[] {-30, 30,  0, 0});
 		stackPullBackOffsetPositions.add(new double[] { -22, 9,  0, 0});
 
-		stackStartPositions.add(new double[]  {-25, 34, 8, 0});
+		stackStartPositions.add(new double[] {-25, 34, 8, 0});
 		stackPreReleaseOffsetPositions.add(new double[] {-5, 29,  0, 0});
 		stackExtractOffsetPositions.add(new double[] {-7, 42,  0, 0});
 		stackPullBackOffsetPositions.add(new double[] { -11, 15,  0, 0});
 
-		stackStartPositions.add(new double[]  { -4, 47, 8, 0});
+		stackStartPositions.add(new double[] { -4, 47, 8, 0});
 		stackPreReleaseOffsetPositions.add(new double[] { 9, 26,  0, 0});
 		stackExtractOffsetPositions.add(new double[] { 16, 44,  0, 0});
 		stackPullBackOffsetPositions.add(new double[] { -2, 24,  0, 0});
@@ -64,7 +61,7 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 		maxStacks = 3;
 	}
 
-	public HumanLoadCommandListGeneratorOptimal(StackPriority stackPriority, int numStacks, int numTotesPerStack) {
+	public HumanLoadCommandListGenerator(StackPriority stackPriority, int numStacks, int numTotesPerStack) {
 		this();
 		this.stackPriority = stackPriority;
 		this.numStacks = numStacks;
@@ -88,7 +85,7 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 	
 	public synchronized void updateWorldToRobotOffset(double[] nominalWorldPosition, double[] currentRobotPosition, double worldToRobotAngleDeg) {
 		MotionProfile motionProfile = new MotionProfile();
-		double[] currentWorldPosition = motionProfile.xformRobotToWorld(currentRobotPosition, worldToRobotAngleDeg, MotionProfile.ZERO_OFFSET);
+		double[] currentWorldPosition = motionProfile.xfromRobotToWorld(currentRobotPosition, worldToRobotAngleDeg, MotionProfile.ZERO_OFFSET);
 		worldToRobotOffsetInches[0] = nominalWorldPosition[0] - currentWorldPosition[0];
 		worldToRobotOffsetInches[1] = nominalWorldPosition[1] - currentWorldPosition[1];
 		worldToRobotOffsetInches[2] = nominalWorldPosition[2] - currentWorldPosition[2];
@@ -173,6 +170,7 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 
 		    	// Move tote to offset position
 				if (i < 2) {
+					//Rise above the stack to return
 			    	double[] toteReleaseOffsetPosition1 = addPositionOffset(toteReleasePosition, STACK_X_POST_UNLOAD_OFFSET, STACK_Y_POST_UNLOAD_OFFSET, STACK_Z_POST_UNLOAD_OFFSET, 0);
 			    	waypointsReturnToHuman.addWaypoint(toteReleaseOffsetPosition1);
 	
@@ -180,6 +178,7 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 			    	waypointsReturnToHuman.addWaypoint(toteReleaseOffsetPosition2);
 				}
 				else {
+					//Account for height limit (pull back rather than go above the stack)
 			    	double[] toteReleaseOffsetPosition1 = new double[] {totePullBackOffsetPosition[0], totePullBackOffsetPosition[1], toteReleasePosition[2],  0};
 			    	waypointsReturnToHuman.addWaypoint(toteReleaseOffsetPosition1);
 				}
@@ -228,11 +227,11 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
 	}
 
 	public void setNumTotesPerStack(int numTotesPerStack) {
-		this.numTotesPerStack = numTotesPerStack / 2;
+		this.numTotesPerStack = numTotesPerStack / 2; //TODO: Verify
 	}
 	
     public static void main(String[] args) {
-    	HumanLoadCommandListGeneratorOptimal humanLoad = new HumanLoadCommandListGeneratorOptimal(StackPriority.VERTICAL, 3, 6);
+    	HumanLoadCommandListGenerator humanLoad = new HumanLoadCommandListGenerator(StackPriority.VERTICAL, 3, 6);
     	humanLoad.debug = true;
     	humanLoad.calculate();
     	
@@ -248,7 +247,6 @@ public class HumanLoadCommandListGeneratorOptimal extends RobotArmCommandListGen
     				ProfileOutput profileOutput = motionProfile.getProfile();
     				profileOutput.output(1, RobotArm.OUTER_LOOP_UPDATE_RATE_MS);
     	    	}
-
     		}
     	}
     }

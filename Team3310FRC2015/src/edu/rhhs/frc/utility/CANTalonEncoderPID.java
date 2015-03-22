@@ -77,7 +77,7 @@ public class CANTalonEncoderPID extends CANTalon
 		this.setPID(params.kP, params.kI, params.kD, params.kF, params.iZone, params.rampRatePID, profile); 
 	}
 	
-	public void inititializeSensorPosition() {
+	public void initializeSensorPosition() {
 		this.setPosition(RobotUtility.convertDegToEncoderPosition(initAngleDeg + offsetAngleDeg, sensorToOutputGearRatio));
 	}
 	

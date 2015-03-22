@@ -4,7 +4,6 @@ import com.kauailabs.navx_mxp.AHRS;
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
-import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.ControlLoopable;
 import edu.rhhs.frc.utility.ControlLooper;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.PIDController.Tolerance;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -67,6 +65,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     
     private double m_moveScale = 0.75;
     private double m_steerScale = 0.75;
+    private double m_moveScaleTurbo = 1.0;
+    private double m_steerScaleTurbo = 1.0;
     
     private double m_moveInput = 0.0;
     private double m_steerInput = 0.0;
@@ -421,7 +421,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		return m_controlLoop.isEnabled();
 	}
 
-	public void driveWithJoystick() {
+	public void driveWithJoystick(boolean turbo) {
 		if (m_drive != null && m_controlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
 //			switch(m_controllerMode) {
 //			case CONTROLLER_JOYSTICK_ARCADE:
@@ -446,10 +446,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 //				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 //				break;
 //			case CONTROLLER_XBOX_CHEESY:
-				m_moveInput = OI.getInstance().getDrivetrainController().getLeftYAxis();
-				m_steerInput = OI.getInstance().getDrivetrainController().getRightXAxis();
-				m_moveOutput = adjustForSensitivity(m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
+				m_moveInput = OI.getInstance().getDriveTrainController().getLeftYAxis();
+				m_steerInput = OI.getInstance().getDriveTrainController().getRightXAxis();
+				m_moveOutput = adjustForSensitivity(turbo ? m_moveScaleTurbo : m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+				m_steerOutput = adjustForSensitivity(turbo ? m_steerScaleTurbo : m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 //				break;
 //			case CONTROLLER_XBOX_ARCADE_RIGHT:

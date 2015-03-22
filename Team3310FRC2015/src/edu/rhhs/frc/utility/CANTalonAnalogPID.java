@@ -17,7 +17,7 @@ public class CANTalonAnalogPID extends CANTalonEncoderPID
 	}
 	
 	@Override
-	public void inititializeSensorPosition() {
+	public void initializeSensorPosition() {
 	}
 	
 	@Override

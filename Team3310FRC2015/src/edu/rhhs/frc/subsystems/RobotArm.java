@@ -32,11 +32,19 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J3_ENCODER_OFFSET_DEG = 90.0;
 	private static final double J4_ENCODER_OFFSET_DEG = 0.0;
 
-	// Robot arm joint angles when system is powered on (or new code is downloaded)
+	// Robot arm joint angles when system is powered on (or new code is downloaded, OR if you restart robot code in DS)
+	//Robot Master for rotated transport config
 	public static final double J1_MASTER_ANGLE_DEG = 90.0;
 	public static final double J2_MASTER_ANGLE_DEG = -27.0; //  97.548; // -35;  -30
 	public static final double J3_MASTER_ANGLE_DEG = -34.3; // -97.572; // -25;  -31\
 	public static final double J4_MASTER_ANGLE_DEG = 0.0;
+	
+	/*Robot Master put down in block
+	public static final double J1_MASTER_ANGLE_DEG = 0.0;
+	public static final double J2_MASTER_ANGLE_DEG = 97.548;
+	public static final double J3_MASTER_ANGLE_DEG = -97.572;
+	public static final double J4_MASTER_ANGLE_DEG = 0.0;
+	*/
 	
 //	public static final double X_MASTER_POSITION_IN = 26.567764225774383;
 //	public static final double Y_MASTER_POSITION_IN = 0.0;
@@ -196,9 +204,9 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	}
 	
 	public void resetMasterPosition() {
-		m_j1Motor.inititializeSensorPosition();
-		m_j2Motor.inititializeSensorPosition();
-		m_j3Motor.inititializeSensorPosition();
+		m_j1Motor.initializeSensorPosition();
+		m_j2Motor.initializeSensorPosition();
+		m_j3Motor.initializeSensorPosition();
 	}
 
 	public void setControlMode(CANTalonEncoderPID.ControlMode mode) {
@@ -373,7 +381,6 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				double[] jointAngles = motionProfileForOutput.calcInverseKinematicsDeg(xyzToolDeg);
 
 				// Add in the J1 position jog
-// Disable J1 control
 				if (Math.abs(triggerLeft) > JOYSTICK_DEADBAND_THROTTLE_POSITION) {
 					jointAngles[0] += triggerLeft * J1_MAX_SPEED_DEG_PER_SEC * 0.01;
 				}

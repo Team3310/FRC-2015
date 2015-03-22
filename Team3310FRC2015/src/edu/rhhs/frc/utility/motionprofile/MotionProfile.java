@@ -144,7 +144,7 @@ public class MotionProfile
 		else { 
 			taughtPositionsConverted = new double[taughtPositions.length][];
 			for (int i = 0; i < taughtPositions.length; i++) {
-				taughtPositionsConverted[i] = xformWorldToRobot(taughtPositions[i], worldToRobotAngleDeg, worldToRobotOffsetInches);
+				taughtPositionsConverted[i] = xfromWorldToRobot(taughtPositions[i], worldToRobotAngleDeg, worldToRobotOffsetInches);
 				taughtPositionsConverted[i][3] = Math.toRadians(taughtPositionsConverted[i][3]);
 			}
 		}
@@ -247,8 +247,7 @@ public class MotionProfile
 		return true;
 	} 
 
-	public double[] xformWorldToRobot(double[] xyzGammaPosition, double worldToRobotAngleDeg, double[] worldToRobotOffset) {
-
+	public double[] xfromWorldToRobot(double[] xyzGammaPosition, double worldToRobotAngleDeg, double[] worldToRobotOffset) {
 		double xWorld = xyzGammaPosition[0] - worldToRobotOffset[0];
 		double yWorld = xyzGammaPosition[1] - worldToRobotOffset[1];
 
@@ -266,7 +265,7 @@ public class MotionProfile
 		return xyzPositionOutput;
 	}
 
-	public double[] xformRobotToWorld(double[] xyzGammaPosition, double worldToRobotAngleDeg, double[] worldToRobotOffset) {
+	public double[] xfromRobotToWorld(double[] xyzGammaPosition, double worldToRobotAngleDeg, double[] worldToRobotOffset) {
 
 		double worldToRobotAngleRad = Math.toRadians(worldToRobotAngleDeg);
 

@@ -27,7 +27,7 @@ import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.RobotArmSetHome;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGeneratorOptimal;
+import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileJ1ToZero;
@@ -143,7 +143,7 @@ public class OI
         motionProfileStart.whenPressed(new RobotArmMotionProfileStart(RobotMain.commandListGenerator.getCommandList()));
 
     	WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
-    	waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGeneratorOptimal.DEFAULT_HOME_COORD);
+    	waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
     	RobotArmCommandList commandListCurrentToHome = new RobotArmCommandList();
     	commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 
@@ -485,7 +485,7 @@ public class OI
 		
 		InternalButton autonTurnToHumanPosition = new InternalButton();
 		autonTurnToHumanPosition.whenPressed(new AutonTurnToHumanPosition());
-		SmartDashboard.putData("Autonomous Turn To Huamn Position", autonTurnToHumanPosition);
+		SmartDashboard.putData("Autonomous Turn To Human Position", autonTurnToHumanPosition);
 	}
 	
 	public static OI getInstance() {
@@ -495,6 +495,7 @@ public class OI
 		return instance;
 	}
 	
+	//URGENT/TODO: Erroneous by some account for some reason.
 //    public Joystick getJoystick1() {
 //        return m_joystick1;
 //    }
@@ -503,7 +504,7 @@ public class OI
 //        return m_joystick2;
 //    }
 //   
-	public XboxController getDrivetrainController() {
+	public XboxController getDriveTrainController() {
         return m_drivetrainController;
     }
 
