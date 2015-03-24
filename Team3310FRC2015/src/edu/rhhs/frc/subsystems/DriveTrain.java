@@ -421,7 +421,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		return m_controlLoop.isEnabled();
 	}
 
-	public void driveWithJoystick(boolean turbo) {
+	public void driveWithJoystick() {
 		if (m_drive != null && m_controlMode == CANTalonEncoderPID.ControlMode.PERCENT_VBUS) {
 //			switch(m_controllerMode) {
 //			case CONTROLLER_JOYSTICK_ARCADE:
@@ -446,6 +446,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 //				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 //				break;
 //			case CONTROLLER_XBOX_CHEESY:
+				boolean turbo = OI.getInstance().getDriveTrainController().getLeftJoystickButton();
 				m_moveInput = OI.getInstance().getDriveTrainController().getLeftYAxis();
 				m_steerInput = OI.getInstance().getDriveTrainController().getRightXAxis();
 				m_moveOutput = adjustForSensitivity(turbo ? m_moveScaleTurbo : m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);

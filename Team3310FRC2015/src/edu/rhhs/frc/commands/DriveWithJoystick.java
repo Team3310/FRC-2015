@@ -1,6 +1,5 @@
 package edu.rhhs.frc.commands;
 
-import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -16,7 +15,7 @@ public class DriveWithJoystick extends Command
 
 	@Override
 	protected void execute() {
-		RobotMain.driveTrain.driveWithJoystick(OI.getInstance().getDriveTrainController().getLeftJoystickButton());
+		RobotMain.driveTrain.driveWithJoystick();
 	}
 
 	@Override

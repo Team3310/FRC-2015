@@ -69,6 +69,8 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
+	private static final double X_MIN_INCHES = 30.0;
+	
 	private static final double Z_MAX_INCHES = 73.0;
 	private static final double Z_MIN_INCHES = 4.0;
 	
