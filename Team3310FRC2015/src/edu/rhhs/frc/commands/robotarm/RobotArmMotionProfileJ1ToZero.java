@@ -14,13 +14,21 @@ public class RobotArmMotionProfileJ1ToZero extends RobotArmMotionProfilePath
 
     protected void initialize() {
     	// Need to calculate the path on the fly
-    	double[] jointAngles = RobotMain.robotArm.getJointAngles();
-    	
-    	WaypointList waypoints = new WaypointList(ProfileMode.JointInputJointMotion);
-    	waypoints.addWaypoint(jointAngles);
-    	waypoints.addWaypoint(0, jointAngles[1], jointAngles[2], jointAngles[3]);
-    	
     	MotionProfile motionProfile = new MotionProfile();
+    	double[] jointAngles = RobotMain.robotArm.getJointAngles();
+		double[] currentXYZTool = motionProfile.calcForwardKinematicsDeg(jointAngles);
+   	
+    	WaypointList waypoints = new WaypointList(ProfileMode.CartesianInputJointMotion);
+    	waypoints.addWaypoint(currentXYZTool);
+    	
+    	if (currentXYZTool[0] < -10) {
+    		waypoints.addWaypoint(new double[] { -11, 15, 50, 0});  // middle stack
+    	}
+    	else {
+	    	waypoints.addWaypoint(new double[] { -2, 24, 50, 0});  // last stack
+    	}
+    	waypoints.addWaypoint(RobotArm.X_MIN_INCHES, 0, 40, 0);
+    	
     	motionProfile = new MotionProfile(waypoints);
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, MotionProfile.ZERO_OFFSET);
     	profileOutput = motionProfile.getProfile();
@@ -32,5 +40,8 @@ public class RobotArmMotionProfileJ1ToZero extends RobotArmMotionProfilePath
     	}
     	currentProfileIndex = 0;
     	isFinished = false;
+    }
+    
+    protected void end() {
     }
 }

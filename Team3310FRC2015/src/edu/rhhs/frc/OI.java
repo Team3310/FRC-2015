@@ -26,11 +26,13 @@ import edu.rhhs.frc.commands.RobotArmMotionProfileReset;
 import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.RobotArmSetHome;
+import edu.rhhs.frc.commands.RobotArmSetXLock;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileJ1ToZero;
+import edu.rhhs.frc.commands.robotarm.RobotArmToteGrabberSetPosition;
 import edu.rhhs.frc.controller.XboxController;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
@@ -166,12 +168,17 @@ public class OI
         moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 6, MotionProfile.ProfileMode.CartesianInputJointMotion));
         
     	RobotArmCommandList commandListJ1ToZero = new RobotArmCommandList();
+    	commandListJ1ToZero.add(new RobotArmToteGrabberSetPosition(RobotArm.ToteGrabberPosition.OPEN));
+    	commandListJ1ToZero.add(new edu.rhhs.frc.commands.robotarm.RobotArmSetXLock(true));
     	commandListJ1ToZero.add(new RobotArmMotionProfileJ1ToZero());
 
         XBoxDPadTriggerButton j1ToZero = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.RIGHT);
         j1ToZero.whenPressed(new RobotArmMotionProfileStart(commandListJ1ToZero));
        
-        // Testing
+        XBoxDPadTriggerButton cancelXLock = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.LEFT);
+        cancelXLock.whenPressed(new RobotArmSetXLock(false));
+
+// Testing
 //        InternalButton binGrabberDeployTimedTest = new InternalButton();
 //        binGrabberDeployTimedTest.whenReleased(new BinGrabberDeployTimed(1.0, 300));
 //		SmartDashboard.putData("Bin Grabber Deploy Timed", binGrabberDeployTimedTest);

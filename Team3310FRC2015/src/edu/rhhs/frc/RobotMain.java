@@ -3,6 +3,7 @@ package edu.rhhs.frc;
 import edu.rhhs.frc.commands.AutonGet3TotesTip3BinsNew;
 import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
+import edu.rhhs.frc.commands.BinGrabberDeployAndGoPIDLong;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
@@ -100,11 +101,12 @@ public class RobotMain extends IterativeRobot
 
 			m_autonomousChooser = new SendableChooser();
 			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
+			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Long", 	new BinGrabberDeployAndGoPIDLong());
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
 			m_autonomousChooser.addObject ("Do nothing", null);
 			m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
-			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3BinsNew());
-			m_autonomousChooser.addDefault("Turn to Human Position", new AutonTurnToHumanPosition());
+//			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3BinsNew());
+			m_autonomousChooser.addDefault("Back up from Human Position", new AutonTurnToHumanPosition());
 			SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
 		} catch( Exception ex ) {
 
@@ -139,6 +141,7 @@ public class RobotMain extends IterativeRobot
 		robotArm.setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
+			Scheduler.getInstance().run();
 		}
 	}
 

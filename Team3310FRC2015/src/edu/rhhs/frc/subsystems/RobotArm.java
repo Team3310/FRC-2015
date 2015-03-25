@@ -69,7 +69,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private static final double J4_MAX_ANGLE_DEG = 70.0;
 	private static final double J4_MIN_ANGLE_DEG = -60.0;
 	
-	private static final double X_MIN_INCHES = 30.0;
+	public static final double X_MIN_INCHES = 33.0;
 	
 	private static final double Z_MAX_INCHES = 73.0;
 	private static final double Z_MIN_INCHES = 4.0;
@@ -127,6 +127,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	private ControlLooper m_controlLoop;
 	private boolean m_waitForNext;
+	private boolean m_isXLock = false;
 	
 	private MotionProfile motionProfileForOutput = new MotionProfile();
 	
@@ -199,6 +200,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		m_j4Motor.enableBrakeMode(true);
 		
 	//	m_robotArmInitialized.set(true);
+	}
+	
+	public void setXLock(boolean isXLock) {
+		m_isXLock = isXLock;
 	}
 	
 	public void teleopInit() {
@@ -366,6 +371,13 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 				}
 				else if (xyzToolDeg[2] < Z_MIN_INCHES) {
 					xyzToolDeg[2] = Z_MIN_INCHES;
+				}
+				
+				// Check for X limits
+				if (m_isXLock) {
+					if (xyzToolDeg[0] < X_MIN_INCHES) {
+						xyzToolDeg[0] = X_MIN_INCHES;
+					}					
 				}
 				
 // Disable gamma control

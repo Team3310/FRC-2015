@@ -266,7 +266,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	public void setSpeed(double speed) {
 		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
 		m_frontLeftMotor.set(speed);
-		m_frontRightMotor.set(speed);
+		m_frontRightMotor.set(-speed);
 	}
 	
 	public boolean isAtLeftTarget() {
