@@ -5,9 +5,6 @@ import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitForChildren;
 
-/**
- *
- */
 public class BinGrabberDeployAndGoPID extends CommandGroup 
 {
     public BinGrabberDeployAndGoPID() {

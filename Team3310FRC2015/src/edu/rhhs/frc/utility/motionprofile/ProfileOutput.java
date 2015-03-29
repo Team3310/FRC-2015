@@ -15,17 +15,17 @@ public class ProfileOutput
 	public double [] maxJVel = new double[4];
 	public double [] averageJVel = new double[4];
 
-	public double avePathVel ;
+	public double avePathVel;
 	public double maxPathVel;
 	public double minPathVel;
 
-	public ProfileOutput(int Npts, boolean allocateArrays) {
-		this.numPoints = Npts;
+	public ProfileOutput(int numPoints, boolean allocateArrays) {
+		this.numPoints = numPoints;
 		if (allocateArrays) {
-			jointVel = new double[Npts+1][4];
-			jointAccel = new double[Npts+1][4];
-			cartVel = new double[Npts+1][4];
-			cartAccel = new double[Npts+1][4];
+			jointVel = new double[numPoints+1][4];
+			jointAccel = new double[numPoints+1][4];
+			cartVel = new double[numPoints+1][4];
+			cartAccel = new double[numPoints+1][4];
 		}
 	}
 

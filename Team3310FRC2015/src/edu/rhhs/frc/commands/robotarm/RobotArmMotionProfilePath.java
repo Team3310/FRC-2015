@@ -48,7 +48,7 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 	    		motionProfile.setJointVelocityPercents(jointPercentVelocities);
 	    	}
 	    	if (endTypeCnt != null) {
-	    		motionProfile.setEndTypeCNT(endTypeCnt);
+	    		motionProfile.setEndTypeCont(endTypeCnt);
 	    	}
 			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
 			profileOutput = motionProfile.getProfile();

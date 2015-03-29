@@ -1,6 +1,5 @@
 package edu.rhhs.frc;
 
-import edu.rhhs.frc.commands.AutonGet3TotesTip3BinsNew;
 import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPIDLong;
@@ -19,7 +18,6 @@ import edu.rhhs.frc.utility.motionprofile.WaypointList;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -188,7 +186,6 @@ public class RobotMain extends IterativeRobot
 	 * This function is called periodically during test mode
 	 */
 	public void testPeriodic() {
-		LiveWindow.run();
 		updateStatus();
 	}
 

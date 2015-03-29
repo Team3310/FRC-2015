@@ -18,105 +18,104 @@ public class Kinematics
 	 *    [1] userAngles() - J1, J2, J3 position data
 	 * ----------------------------------------------------------------------------*/
 
-	public class IKINOutput 
+	public class IKinematicsOutput 
 	{
 		double[][] userAngles;
 		boolean errorFlag;
 
-		public IKINOutput(int NumPoints) {
-			userAngles = new double[NumPoints + 1][4];
+		public IKinematicsOutput(int numPoints) {
+			userAngles = new double[numPoints + 1][4]; // 4 Array Elements in the second dimension due to arm angles
 			errorFlag = false;
 		}
 	}
 
-	public IKINOutput getInstanceIKINOutput(int NumPoints) {
-		return new IKINOutput(NumPoints);
+	public IKinematicsOutput getInstanceIKINOutput(int numPoints) {
+		return new IKinematicsOutput(numPoints);
 	}
 
-	public IKINOutput iKIN(double[][] Pos, int NumPoints, double[] L, double[] D, boolean ElbowUp, boolean Front) {
+	public IKinematicsOutput inverseKinematics(double[][] pos, int numPoints, double[] armLengths, double[] d, boolean elbowUp, boolean front) {
 
-		IKINOutput out = new IKINOutput(NumPoints);
+		IKinematicsOutput out = new IKinematicsOutput(numPoints);
 
-		double Kappa, px1, py1, px1py1sqrd, gamma;
-		double C1, S1;
-		double Den, ThetaT, T2Num;
-		double[] Theta = new double[4];    
+		double kappa, px1, py1, px1py1sqrd/*, gamma*/;
+		double c1, s1;
+		double den, thetaT, t2Num;
+		double[] theta = new double[4];    
 
 		// Loop through each ITP and calculate the IKIN
-		for (int i = 0; i < NumPoints + 1; i++) {
-
-			gamma = Pos[i][3];
-			if (Front == true) { // Front reach solution
-				if (isZero(Pos[i][0]) && isZero(Pos[i][1])) {
-					Theta[0] = 0;
-				} 
+		for (int i = 0; i < numPoints + 1; i++) {
+			//gamma = pos[i][3]; - For J4, but removed.
+			if (front) { // Front reach solution
+				if (isZero(pos[i][0]) && isZero(pos[i][1])) {
+					theta[0] = 0;
+				}
 				else {					
 //					Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma));  // 4 axis robot					
-					Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]);  // 3 axis robot
+					theta[0] = Math.atan2(pos[i][1], pos[i][0]);  // 3 axis robot
 				}
 
 			} 
 			else { // Back reach solution
-				if (Pos[i][0] == 0 && Pos[i][1] == 0 ) {
-					Theta[0] = Math.PI;
+				if (pos[i][0] == 0 && pos[i][1] == 0 ) {
+					theta[0] = Math.PI;
 				} 
 				else {					
 //					Theta[0] = Math.atan2(Pos[i][1] - L[5] * Math.sin(gamma), Pos[i][0] - L[5] * Math.cos(gamma)) + Math.PI;  // 4 axis robot					
-					Theta[0] = Math.atan2(Pos[i][1], Pos[i][0]) + Math.PI;  // 3 axis robot
+					theta[0] = Math.atan2(pos[i][1], pos[i][0]) + Math.PI;  // 3 axis robot
 				}
 			}
 
-			// --Define cos and sin of theta1 
-			C1 = Math.cos(Theta[0]);
-			S1 = Math.sin(Theta[0]);
+			// Define cos and sin of theta1 
+			c1 = Math.cos(theta[0]);
+			s1 = Math.sin(theta[0]);
 
 			// Where Theta[2]=asin(Kappa)
 //			Theta[3] = Pos[i][3] - Theta[0];  // 4 axis
 //			px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5] * Math.cos(Theta[3]);   // 4 axis
-			px1 = Pos[i][0] * C1 + Pos[i][1] * S1 - L[3] - L[5];  // 3 axis
+			px1 = pos[i][0] * c1 + pos[i][1] * s1 - armLengths[3] - armLengths[5];  // 3 axis
 //			py1 = D[0] - Pos[i][2] + D[4];
-			py1 = D[0] - Pos[i][2];
+			py1 = d[0] - pos[i][2];
 			px1py1sqrd = px1*px1 + py1*py1;
-			Kappa = (px1py1sqrd - L[1]*L[1] - L[2]*L[2]) / (2 * L[1] * L[2]);
+			kappa = (px1py1sqrd - armLengths[1]*armLengths[1] - armLengths[2]*armLengths[2]) / (2 * armLengths[1] * armLengths[2]);
 
 			// Check to see if position is reachable & Calculate Theta3
-			if (Math.abs(Kappa) > 1 ) {
-				System.out.println("Position = " +  Pos[i][0] + ", " +  Pos[i][1]  + ", " +  Pos[i][2]+ " at time = " + i * 0.001 + " seconds is unreachable");
+			if (Math.abs(kappa) > 1 ) {
+				System.out.println("Position = " +  pos[i][0] + ", " +  pos[i][1]  + ", " +  pos[i][2]+ " at time = " + i * 0.001 + " seconds is unreachable");
 				out.errorFlag = true;
 				return out;
 			} 
-			else if (Math.abs(Kappa) == 1) {
-				Theta[2] = -Math.acos(Kappa);
+			else if (Math.abs(kappa) == 1) {
+				theta[2] = -Math.acos(kappa);
 			} 
-			else if (ElbowUp == true) {
-				Theta[2] = -Math.acos(Kappa);
+			else if (elbowUp) {
+				theta[2] = -Math.acos(kappa);
 			} 
 			else {
-				Theta[2] = Math.PI + Math.acos(Kappa);
+				theta[2] = Math.PI + Math.acos(kappa);
 			}
 
 			// Calculate Theta2	        
 			// --Calculate the denominator in the S2 and C2 equations
-			Den = 2.0 * L[1] * Math.sqrt(px1py1sqrd); 
+			den = 2.0 * armLengths[1] * Math.sqrt(px1py1sqrd); 
 
 			// --Determine if in Singularity
-			if (isZero(Den)) {
-				System.out.println("Position at time = " + NumPoints * 0.001 + " seconds causes singularity");
+			if (isZero(den)) {
+				System.out.println("Position at time = " + numPoints * 0.001 + " seconds causes singularity");
 				out.errorFlag = true;
 				return null;
 			} 
 			else {
-				ThetaT = Math.atan2(-py1, px1);
-				T2Num = L[1]*L[1] - L[2]*L[2] + px1py1sqrd;
+				thetaT = Math.atan2(-py1, px1);
+				t2Num = armLengths[1]*armLengths[1] - armLengths[2]*armLengths[2] + px1py1sqrd;
 			}
 
 			// --Calculate Theta2
-			Theta[1] = -ThetaT - Math.acos(T2Num/Den);
+			theta[1] = -thetaT - Math.acos(t2Num/den);
 
 			// Calculate User Angles and reallocate them to pos(i,?)
-			out.userAngles[i][0] = Theta[0];
-			out.userAngles[i][1]  = Math.PI / 2 + Theta[1];
-			out.userAngles[i][2] = Theta[2] - Theta[1];
+			out.userAngles[i][0] = theta[0];
+			out.userAngles[i][1]  = Math.PI / 2 + theta[1];
+			out.userAngles[i][2] = theta[2] - theta[1];
 //			out.userAngles[i][3] = Theta[3];   // 4 axis
 			out.userAngles[i][3] = 0;
 		}
@@ -129,43 +128,43 @@ public class Kinematics
 	// This subroutine takes the Joint(User) angles and converts them to Kinematic
 	// angles.  It is necessary to do this to calculate Newton-Euler Dynamics.
 
-	public static double[][] userToKin(double[][] JointPos, int NumPoints) {
+	public static double[][] userToKin(double[][] jointPos, int numPoints) {
 
-		for (int i = 0; i < NumPoints; i++) { 
+		for (int i = 0; i < numPoints; i++) { 
 			// Theta1 and J1 are the same
 
 			// Theta2 = 90 - J2
-			JointPos[i][1] = Math.PI / 2 - JointPos[i][1]; // JointPos(I,2) is now Theta2
+			jointPos[i][1] = Math.PI / 2 - jointPos[i][1]; // JointPos(I,2) is now Theta2
 
 			// Theta3 = J3 - Theta2 + 90
-			JointPos[i][2] = JointPos[i][2] - JointPos[i][1] + Math.PI / 2;
+			jointPos[i][2] = jointPos[i][2] - jointPos[i][1] + Math.PI / 2;
 		}
 
-		return JointPos;
+		return jointPos;
 	}
 
 	public static boolean isZero(double value) {
 		return Math.abs(value) < 3 * Double.MIN_VALUE;
 	}
 
-	// Subroutine KinToUser:
-	// 
-	// This subroutine takes the Kinematic angles and converts them to Joint
-	// (User) angles. JointPos() starts as Theta(I) and Leaves as J(I)
+	/** Subroutine KinToUser:
+	 <br></br>
+	 This subroutine takes the Kinematic angles and converts them to Joint
+	 (User) angles. JointPos() starts as Theta(I) and Leaves as J(I)
+	*/
+	public static double[][] kinToUser(double[][] jointPos, int numPoints) {
 
-	public static double[][] kinToUser(double[][] JointPos, int NumPoints) {
-
-		for (int i = 0; i < NumPoints; i++) {
+		for (int i = 0; i < numPoints; i++) {
 			// Theta1 and J1 are the same
 
 			//  J2 = 90 - Theta2
-			JointPos[i][1] = Math.PI / 2 - JointPos[i][1];
+			jointPos[i][1] = Math.PI / 2 - jointPos[i][1];
 
 			//  J3 = Theta3 - J2
-			JointPos[i][2] = JointPos[i][2] - JointPos[i][1];
+			jointPos[i][2] = jointPos[i][2] - jointPos[i][1];
 		}
 
-		return JointPos;
+		return jointPos;
 	}
 
 	// ---------------------------------------------------------------------------
@@ -186,11 +185,10 @@ public class Kinematics
 	//    [0] Pos() is enters as servo output, but exits as actual joint
 	// ----------------------------------------------------------------------------
 
-	public static double[][] fKIN(double[][] Pos, int NumPoints, double[] L, double[] D) {
+	public static double[][] forwardKinematics(double[][] pos, int numPoints, double[] l, double[] d) {
+		double[][] cartPos = new double[numPoints + 1][4]; //Cartesian Position Array
 
-		double[][] CartPos = new double[NumPoints + 1][4];
-
-		for (int i = 0; i < NumPoints + 1; i++) {
+		for (int i = 0; i < numPoints + 1; i++) {
 
 			// -------THE FOLLOWING CODE HAS BEEN MOVED TO THE MAIN SUBASSEMBLY
 			// -------RIGHT AFTER THE SERVO FILTER SUBROUTINE -----------------
@@ -237,18 +235,18 @@ public class Kinematics
 			
 			
 			// Removed J4 so 3 axis robot w/ grounding link
-			double j2j3Term = L[3] + L[2] * Math.cos(Pos[i][2]) + L[1] * Math.sin(Pos[i][1]) + L[5];
+			double j2j3Term = l[3] + l[2] * Math.cos(pos[i][2]) + l[1] * Math.sin(pos[i][1]) + l[5];
 			
 			// X position
-			CartPos[i][0] = Math.cos(Pos[i][0]) * j2j3Term;
+			cartPos[i][0] = Math.cos(pos[i][0]) * j2j3Term;
 
 			// Y position
-			CartPos[i][1] = Math.sin(Pos[i][0]) * j2j3Term;
+			cartPos[i][1] = Math.sin(pos[i][0]) * j2j3Term;
 
 			// Z position
-			CartPos[i][2] = D[0] + L[1] * Math.cos(Pos[i][1]) + L[2] * Math.sin(Pos[i][2]);
-			CartPos[i][3] = 0.0;
+			cartPos[i][2] = d[0] + l[1] * Math.cos(pos[i][1]) + l[2] * Math.sin(pos[i][2]);
+			cartPos[i][3] = 0.0;
 		}  
-		return CartPos;
+		return cartPos;
 	}
 }

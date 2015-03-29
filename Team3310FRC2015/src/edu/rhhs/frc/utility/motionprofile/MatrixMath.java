@@ -13,128 +13,128 @@ public class MatrixMath
 	*                 -The number of columns of the 1st matrix must equal
 	*                  the number of rows of the second matrix.
 	*------------------------------------------------------------------------------*/
-	public static double[][] mMult(double[][] M1, double[][] M2) {
+	public static double[][] matrixMult(double[][] matrix1, double[][] matrix2) {
 	   
-	    int[] Element1 = new int[2];
-	    int[] Element2 = new int[2];
+	    int[] element1 = new int[2];
+	    int[] element2 = new int[2];
 	   
 	    // Determine the number of elements in each dimension of each matrix
-	    Element1[0] = M1.length;
-	    Element1[1] = M1[0].length;
-	    Element2[0] = M2.length;
-	    Element2[1] = M2[0].length;
+	    element1[0] = matrix1.length;
+	    element1[1] = matrix1[0].length;
+	    element2[0] = matrix2.length;
+	    element2[1] = matrix2[0].length;
 	   
-	    if(Element1[1] != Element2[0]) {
+	    if(element1[1] != element2[0]) {
 	        System.out.println("Matrix 1 # of columns must equal Matrix 2 # of rows");
 	        return null;
 	    }
 	    
 	    // The new matrix has the same # of rows of M1 and the same # of columns as M2.
-	    double[][] M12 = new double[Element1[0]][Element2[1]];
+	    double[][] toReturn = new double[element1[0]][element2[1]];
 	    
 	    // Initialize M12 matrix
-	    for (int i = 0; i < Element1[0]; i++ ) {
-	        for (int j = 0; j < Element2[1]; j++) {
-	            M12[i][j] = 0;
+	    for (int i = 0; i < element1[0]; i++ ) {
+	        for (int j = 0; j < element2[1]; j++) {
+	            toReturn[i][j] = 0;
 	    	}
 	    }
 	   
 	    // Multiply the matrices together
-	    for (int i = 0; i < Element1[0]; i++ ) {
-	        for (int j = 0; j < Element2[1]; j++) {
-		        for (int k = 0; k < Element1[1]; k++) {
-	                M12[i][j] = M12[i][j] + M1[i][k] * M2[k][j];
+	    for (int i = 0; i < element1[0]; i++ ) {
+	        for (int j = 0; j < element2[1]; j++) {
+		        for (int k = 0; k < element1[1]; k++) {
+	                toReturn[i][j] = toReturn[i][j] + matrix1[i][k] * matrix2[k][j];
 		        }
 	        }
 	    }
 	    
-	    return M12; 
+	    return toReturn; 
 	}
 
 	// -------------------------------------------------------------------------
-	// Sub MatrixVectorMult:
-	// 
-	// This subroutine takes a matrix and multiplies it by a vector.
-	// The dimension of the vector must equal the # of Matrix columns.
-	// 
-	// -------------------------------------------------------------------------
+	/**
+	Sub MatrixVectorMult:
+	<br></br>
+	This subroutine takes a matrix and multiplies it by a vector.
+	The dimension of the vector must equal the # of Matrix columns.
+	*/
 
-	public static double[] mVecMult(double[][] Min, double[] Vin) {
+	public static double[] matrixVectorMult(double[][] matrix, double[] vector) {
 
-	    int[] Element1 = new int[2];
-	    int Element2;
+	    int[] element1 = new int[2];
+	    int element2;
 	   
 	    // Determine the number of elements in each dimension of each matrix
-	    Element1[0] = Min.length;
-	    Element1[1] = Min[0].length;
-	    Element2 = Vin.length;
+	    element1[0] = matrix.length;
+	    element1[1] = matrix[0].length;
+	    element2 = vector.length;
 	    
-	    if(Element1[1] != Element2) {
+	    if(element1[1] != element2) {
 	        System.out.println("Matrix 1 # of columns must equal Matrix 2 # of rows");
 	        return null;
 	    }
 	    
 	    // The new matrix has the same # of rows of M1 and 1 column.
-	    double[] Vout = new double[Element1[0]];
+	    double[] vectorOut = new double[element1[0]];
 	    
 	    // Initialize Vout matrix
-	    for (int i = 0; i < Element1[0]; i++) {
-	        Vout[i] = 0;
+	    for (int i = 0; i < element1[0]; i++) {
+	        vectorOut[i] = 0;
 	    }
 	   
 	    // Multiply the matrices together
-	    for (int i = 0; i < Element1[0]; i++) {
-	        for (int k = 0; k < Element1[1]; k++) {
-	            Vout[i] = Vout[i] + Min[i][k] * Vin[k];
+	    for (int i = 0; i < element1[0]; i++) {
+	        for (int k = 0; k < element1[1]; k++) {
+	            vectorOut[i] = vectorOut[i] + matrix[i][k] * vector[k];
 			}
 		}
 	    
-	    return Vout;
+	    return vectorOut;
 	}
 
 
 	//  Returns the cross product of two 3-dimensional vectors.
-	public static double[] crossProd(double[] V1, double[] V2) {
+	public static double[] crossProduct(double[] vector1, double[] vector2) {
 
-	    double[] V3 = new double[3];
+	    double[] toReturn = new double[3];
 	    
-	    V3[0] = (V1[1] * V2[2] - V2[1] * V1[2]);
-	    V3[1] = (V1[2] * V2[0] - V2[2] * V1[0]);
-	    V3[2] = (V1[0] * V2[1] - V2[0] * V1[1]);
+	    toReturn[0] = (vector1[1] * vector2[2] - vector2[1] * vector1[2]);
+	    toReturn[1] = (vector1[2] * vector2[0] - vector2[2] * vector1[0]);
+	    toReturn[2] = (vector1[0] * vector2[1] - vector2[0] * vector1[1]);
 	   
-	    return V3;   
+	    return toReturn;   
 	}
 
-	public static double[] vecAdd(double[] V1, double[] V2) {
+	public static double[] addVectors(double[] vector1, double[] vector2) {
 	    
-	    double[] V3 = new double[3];
+	    double[] toReturn = new double[3];
 	    
 	    for (int i = 0; i < 3; i++) {
-	        V3[i] = V1[i] + V2[i];
+	        toReturn[i] = vector1[i] + vector2[i];
 	    }
 	    
-	    return V3;   
+	    return toReturn;   
 	}
 
-	public static double[] vecSub(double[] V1, double[] V2) {
+	public static double[] subtractVectors(double[] vector1, double[] vector2) {
 	    
-	    double[] V3 = new double[3];
+	    double[] toReturn = new double[3];
 	    
 	    for (int i = 0; i < 3; i++) {
-	        V3[i] = V1[i] - V2[i];
+	        toReturn[i] = vector1[i] - vector2[i];
 	    }
 	    
-	    return V3;   
+	    return toReturn;   
 	}
 
-	public static double[] mVecByScalar(double ScalarIn, double[] Vin) {
+	public static double[] multiplyVectorByScalar(double scalar, double[] vector) {
 
-	    double[] V3 = new double[3];
+	    double[] toReturn = new double[3];
 	    
 	    for (int i = 0; i < 3; i++) {
-	        V3[i] = ScalarIn * Vin[i];
+	        toReturn[i] = scalar * vector[i];
 	    }
 	   
-	    return V3;   
+	    return toReturn;   
 	}
 }

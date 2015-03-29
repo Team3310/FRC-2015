@@ -6,8 +6,8 @@ public class CoordinatedMotion
 {
 	// -------------------------------------------------------------------------
 	// | Sub CoMotion:
-	// |     INPUTS  - Npts, dJoint, VpathIn, JointSpeed, Tacc1, Tacc2, IsLinear
-	// |     OUTPUTS - ActualPathSpeed, T4, PathLength, Tcnt
+	// |     INPUTS  - numPoints, dJoint, vPathIn, jointSpeed, jointAccels, jointDecels, isLinear
+	// |     OUTPUTS - actualPathSpeed, tSeg, pathLength, tCnt
 	// |
 	// |  Description:
 	// |          Takes input parameters and determines each joint speed
@@ -18,59 +18,59 @@ public class CoordinatedMotion
 
 	public class CoMotionOutput 
 	{
-		public double[][] Tseg;
-		public double[] PathLength;
-		public double[][] ActualPathSpeed;
-		public double[][] Tcnt;
+		public double[][] tSeg;
+		public double[] pathLength;
+		public double[][] actualPathSpeed;
+		public double[][] tCnt;
 
 		public CoMotionOutput(int Npts) {
-			Tseg = new double[Npts][4];
-			PathLength = new double[Npts]; 
-			ActualPathSpeed = new double[Npts][4];
-			Tcnt= new double[Npts][4];
+			tSeg = new double[Npts][4];
+			pathLength = new double[Npts]; 
+			actualPathSpeed = new double[Npts][4];
+			tCnt= new double[Npts][4];
 		}
 	}
 
-	public CoMotionOutput coMotion(int Npts, double[][] dJoint, double[] VpathIn, double[] JointSpeedPercent, 
-			double[] JointSpeed, double[] Tacc1, double[] Tacc2, 
-			ProfileMode profileMode, double[] CNT, 
-			double CartAcc1, double CartAcc2, double itp) {
+	public CoMotionOutput coMotion(int numPoints, double[][] dJoint, double[] vPathIn, double[] jointSpeedPercent, 
+			double[] jointSpeed, double[] jointAccels, double[] jointDecels, 
+			ProfileMode profileMode, double[] continuity, 
+			double cartAccels, double cartDecels, double itp) {
 
-		CoMotionOutput out = new CoMotionOutput(Npts);
+		CoMotionOutput out = new CoMotionOutput(numPoints);
 
-		if ( profileMode != ProfileMode.CartesianInputLinearMotion ) {
+		if (profileMode != ProfileMode.CartesianInputLinearMotion) {
 
-			double[] Tmax = new double[Npts];
-			double[][] Ttemp = new double[Npts][4];
+			double[] tMax = new double[numPoints];
+			double[][] tTemp = new double[numPoints][4];
 
 			// Calculate each joint speed based on percent speed			
-			for (int i = 0; i < Npts; i++) {
-				Tmax[i] = 0.0;	            
+			for (int i = 0; i < numPoints; i++) {
+				tMax[i] = 0.0;	            
 
 				for (int j = 0; j < 4; j++) {
-					out.ActualPathSpeed[i][j] = JointSpeedPercent[i] / 100.0 * JointSpeed[j];
-					out.Tseg[i][j] = Math.abs(dJoint[i][j]) / out.ActualPathSpeed[i][j];
-					out.Tseg[i][j] = Math.ceil(out.Tseg[i][j] / itp);
+					out.actualPathSpeed[i][j] = jointSpeedPercent[i] / 100.0 * jointSpeed[j];
+					out.tSeg[i][j] = Math.abs(dJoint[i][j]) / out.actualPathSpeed[i][j];
+					out.tSeg[i][j] = Math.ceil(out.tSeg[i][j] / itp);
 
 
 					// Determines the itp number for the end condition
-					if ( i < Npts - 1) {
-						out.Tcnt[i][j] = Math.round((1 - Math.sqrt(CNT[i] / 100.0)) * (Tacc1[j] + Tacc2[j]));
+					if (i < numPoints - 1) {
+						out.tCnt[i][j] = Math.round((1 - Math.sqrt(continuity[i] / 100.0)) * (jointAccels[j] + jointDecels[j]));
 					} 
 					else {
-						out.Tcnt[i][j] = Tacc1[j] + Tacc2[j];
+						out.tCnt[i][j] = jointAccels[j] + jointDecels[j];
 					}
 
 
-					if ( Math.abs(dJoint[i][j]) > 0 ) {
-						Ttemp[i][j] = out.Tseg[i][j] + out.Tcnt[i][j];
+					if (Math.abs(dJoint[i][j]) > 0 ) {
+						tTemp[i][j] = out.tSeg[i][j] + out.tCnt[i][j];
 					} 
 					else {
-						Ttemp[i][j] = out.Tseg[i][j];
+						tTemp[i][j] = out.tSeg[i][j];
 					}
 
-					if ( Ttemp[i][j] > Tmax[i] ) {
-						Tmax[i] = Ttemp[i][j];
+					if (tTemp[i][j] > tMax[i] ) {
+						tMax[i] = tTemp[i][j];
 					}
 
 				}
@@ -78,12 +78,12 @@ public class CoordinatedMotion
 				// Use longest joint time for every joint speed
 				for (int j = 0; j < 4; j++) {
 					// T4 is in integration points, NOT seconds
-					out.Tseg[i][j] = Tmax[i] - out.Tcnt[i][j];
-					if ( out.Tseg[i][j] != 0 ) {
-						out.ActualPathSpeed[i][j] = dJoint[i][j] / (out.Tseg[i][j] * itp);
+					out.tSeg[i][j] = tMax[i] - out.tCnt[i][j];
+					if (out.tSeg[i][j] != 0) {
+						out.actualPathSpeed[i][j] = dJoint[i][j] / (out.tSeg[i][j] * itp);
 					} 
 					else {
-						out.ActualPathSpeed[i][j] = 0.0;
+						out.actualPathSpeed[i][j] = 0.0;
 					}
 				}
 			}
@@ -91,95 +91,94 @@ public class CoordinatedMotion
 		else {
 
 			// Calculate linear speed based on Input Speed
-			for (int i = 0; i < Npts; i++) {
+			for (int i = 0; i < numPoints; i++) {
 				for (int j = 0; j < 3; j++) {
-					out.ActualPathSpeed[i][j] = VpathIn[i];
+					out.actualPathSpeed[i][j] = vPathIn[i];
 				}
 			}
 
 			// Calculate T4 for linear moves
-			for (int i = 0; i < Npts; i++) {
-				out.PathLength[i] = Math.sqrt(dJoint[i][0]*dJoint[i][0] + dJoint[i][1]*dJoint[i][1] + dJoint[i][2]*dJoint[i][2]);
+			for (int i = 0; i < numPoints; i++) {
+				out.pathLength[i] = Math.sqrt(dJoint[i][0]*dJoint[i][0] + dJoint[i][1]*dJoint[i][1] + dJoint[i][2]*dJoint[i][2]);
 				for (int j = 0; j < 3; j++) {
-					out.Tseg[i][j] = Math.abs(out.PathLength[i] / out.ActualPathSpeed[i][j]);
-					out.Tseg[i][j] = Math.ceil(out.Tseg[i][j] / itp);
-					if ( i < Npts - 1 ) {
-						out.Tcnt[i][j] = Math.round((1 - Math.sqrt(CNT[i] / 100.0)) * (CartAcc1 + CartAcc2));
+					out.tSeg[i][j] = Math.abs(out.pathLength[i] / out.actualPathSpeed[i][j]);
+					out.tSeg[i][j] = Math.ceil(out.tSeg[i][j] / itp);
+					if (i < numPoints - 1) {
+						out.tCnt[i][j] = Math.round((1 - Math.sqrt(continuity[i] / 100.0)) * (cartAccels + cartDecels));
 					} else {
-						out.Tcnt[i][j] = CartAcc1 + CartAcc2;
+						out.tCnt[i][j] = cartAccels + cartDecels;
 					}
 				}
 			}
 
 			// Calculate each joint speed based on percent speed			
-			for (int i = 0; i < Npts; i++) {
-				out.Tseg[i][3] = out.Tseg[i][0];
-				out.Tcnt[i][3] = out.Tcnt[i][0];
+			for (int i = 0; i < numPoints; i++) {
+				out.tSeg[i][3] = out.tSeg[i][0];
+				out.tCnt[i][3] = out.tCnt[i][0];
 
-				if ( out.Tseg[i][3] != 0 ) {
-					out.ActualPathSpeed[i][3] = dJoint[i][3] / (out.Tseg[i][3] * itp);
+				if (out.tSeg[i][3] != 0) {
+					out.actualPathSpeed[i][3] = dJoint[i][3] / (out.tSeg[i][3] * itp);
 				} 
 				else {
-					out.ActualPathSpeed[i][3] = 0.0;
+					out.actualPathSpeed[i][3] = 0.0;
 				}
 			}
 		}
-
 		return out;
 	}
 
 
 	public class CoMotionFilterOutput 
 	{
-		public int NumITPs;
-		public double[][] PosFilter;
-		public double[][] dDisStep;
+		public int numITPs;
+		public double[][] posFilter;
+		public double[][] deltaDisStep;
 
-		public CoMotionFilterOutput(int NumPaths, double[][] Tseg, double[][] Tcnt) {
-			NumITPs = 0;
-			for (int i = 0; i < NumPaths; i++) {
-				NumITPs = (int)(NumITPs + Math.round(Tseg[i][0] + Tcnt[i][0]));
+		public CoMotionFilterOutput(int numPaths, double[][] tSeg, double[][] tCnt) {
+			numITPs = 0;
+			for (int i = 0; i < numPaths; i++) {
+				numITPs = (int)(numITPs + Math.round(tSeg[i][0] + tCnt[i][0]));
 			}
 
-			PosFilter = new double[NumITPs + 1][4];
-			dDisStep = new double[NumPaths][4];	    
+			posFilter = new double[numITPs + 1][4];
+			deltaDisStep = new double[numPaths][4];	    
 		}
 	}
 
-	public CoMotionFilterOutput filterInput(double[][] dDis, double[][] Tseg, double[][] Tcnt, double[][] Ptaught, int NumPaths) {
-		CoMotionFilterOutput out = new CoMotionFilterOutput(NumPaths, Tseg, Tcnt);
+	public CoMotionFilterOutput filterInput(double[][] deltaDis, double[][] tSeg, double[][] tCnt, double[][] pTaught, int numPaths) {
+		CoMotionFilterOutput out = new CoMotionFilterOutput(numPaths, tSeg, tCnt);
 
 		// Calculate the input position vs. time for the entire path
-		// NOTE: Each axis NumITPs should be the same, that is why we can have a constant
+		// NOTE: Each axis numITPs should be the same, that is why we can have a constant
 		for (int j = 0; j < 4; j++) {
 			int k = 0;
-			out.NumITPs = 0;
-			int Counter1 = 0;
+			out.numITPs = 0;
+			int counter1 = 0;
 			// Set the position at time 0 to the 1st taught position
-			out.PosFilter[k][j] = Ptaught[k][j];
+			out.posFilter[k][j] = pTaught[k][j];
 			k = 1;
-			for (int i = 0; i < NumPaths; i++) {
-				Counter1 = (int)(out.NumITPs + Math.round(Tseg[i][j]));
-				out.NumITPs = (int)(Counter1 + Math.round(Tcnt[i][j]));
-				if ( Tseg[i][j] != 0.0 ) {
-					out.dDisStep[i][j] = dDis[i][j] / Tseg[i][j];
+			for (int i = 0; i < numPaths; i++) {
+				counter1 = (int)(out.numITPs + Math.round(tSeg[i][j]));
+				out.numITPs = (int)(counter1 + Math.round(tCnt[i][j]));
+				if (tSeg[i][j] != 0.0) {
+					out.deltaDisStep[i][j] = deltaDis[i][j] / tSeg[i][j];
 				} 
 				else {
-					out.dDisStep[i][j] = 0.0;
+					out.deltaDisStep[i][j] = 0.0;
 				}
 
 				// The following loop determines the filter input position
 				// at each ITP. If using joint filter for linear motion,
 				// then IKIN can be called after this Subroutine.
 
-				while( k < out.NumITPs + 1) {
-					if ( k <= Counter1 ) {
-						out.PosFilter[k][j] = out.PosFilter[k-1][j] + out.dDisStep[i][j];
-						k = k + 1;
+				while(k < out.numITPs + 1) {
+					if (k <= counter1) {
+						out.posFilter[k][j] = out.posFilter[k-1][j] + out.deltaDisStep[i][j];
+						k++;
 					} 
 					else {
-						out.PosFilter[k][j] = out.PosFilter[k-1][j];
-						k = k + 1;
+						out.posFilter[k][j] = out.posFilter[k-1][j];
+						k++;
 					}
 				}
 			}

@@ -63,6 +63,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
  	private int m_moveNonLinear = 0;
     private int m_steerNonLinear = 0;
     
+    private double m_moveScaleSlow = 0.35;
+    private double m_steerScaleSlow = 0.35;
     private double m_moveScale = 0.75;
     private double m_steerScale = 0.75;
     private double m_moveScaleTurbo = 1.0;
@@ -447,10 +449,24 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 //				break;
 //			case CONTROLLER_XBOX_CHEESY:
 				boolean turbo = OI.getInstance().getDriveTrainController().getLeftJoystickButton();
+				boolean slow = OI.getInstance().getDriveTrainController().getRightJoystickButton();
+				double speedToUseMove, speedToUseSteer;
+				if(turbo && !slow) {
+					speedToUseMove = m_moveScaleTurbo;
+					speedToUseSteer = m_steerScaleTurbo;
+				}
+				else if(!turbo && slow) {
+					speedToUseMove = m_moveScaleSlow;
+					speedToUseSteer = m_steerScaleSlow;
+				}
+				else {
+					speedToUseMove = m_moveScale;
+					speedToUseSteer = m_steerScale;
+				}
 				m_moveInput = OI.getInstance().getDriveTrainController().getLeftYAxis();
 				m_steerInput = OI.getInstance().getDriveTrainController().getRightXAxis();
-				m_moveOutput = adjustForSensitivity(turbo ? m_moveScaleTurbo : m_moveScale, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
-				m_steerOutput = adjustForSensitivity(turbo ? m_steerScaleTurbo : m_steerScale, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
+				m_moveOutput = adjustForSensitivity(speedToUseMove, m_moveTrim, m_moveInput, m_moveNonLinear, MOVE_NON_LINEARITY);
+				m_steerOutput = adjustForSensitivity(speedToUseSteer, m_steerTrim, m_steerInput, m_steerNonLinear, STEER_NON_LINEARITY);
 				m_drive.arcadeDrive(m_moveOutput, m_steerOutput);
 //				break;
 //			case CONTROLLER_XBOX_ARCADE_RIGHT:

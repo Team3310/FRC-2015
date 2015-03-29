@@ -20,8 +20,8 @@ public class DriveTrainMotionProfileStraight extends Command
     	
     	MotionProfile motionProfile = new MotionProfile(wayPoints);
     	motionProfile.setJointVelocities(new double[] {maxSpeedInchesPerSecond, maxSpeedInchesPerSecond, maxSpeedInchesPerSecond, maxSpeedInchesPerSecond});
-    	motionProfile.setJointAccels1(new double[] {0.8, 0.8, 0.8, 0.8});
-    	motionProfile.setJointAccels2(new double[] {0.4, 0.4, 0.4, 0.4});
+    	motionProfile.setJointAccels(new double[] {0.8, 0.8, 0.8, 0.8});
+    	motionProfile.setJointDecels(new double[] {0.4, 0.4, 0.4, 0.4});
 		motionProfile.calculatePath(false, DriveTrain.OUTER_LOOP_UPDATE_RATE_MS);
     	profileOutput = motionProfile.getProfile();
 

@@ -31,7 +31,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 	
 	public static final double STACK_X_POST_UNLOAD_OFFSET = 0;   
 	public static final double STACK_Y_POST_UNLOAD_OFFSET = 0;   
-	public static final double STACK_Z_POST_UNLOAD_OFFSET = 25; 
+	public static final double STACK_Z_POST_UNLOAD_OFFSET = 26; 
 
 	public boolean debug = false;
 	

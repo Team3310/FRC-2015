@@ -1,8 +1,6 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.RobotMain;
-import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
-import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class RobotArmSetXLock extends Command 

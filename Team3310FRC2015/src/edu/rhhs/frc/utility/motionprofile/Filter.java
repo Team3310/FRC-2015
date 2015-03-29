@@ -21,79 +21,79 @@ public class Filter
 	 *******************************************************************************************
 	 */
 
-	public static double[][] filter(ProfileMode profileMode, double[] Tacc1, double[] Tacc2, double CartAcc1,
-			double CartAcc2, int NumITPs, double[][] PosIn) {
+	public static double[][] filter(ProfileMode profileMode, double[] jointAccels, double[] jointDecels, double cartAccels,
+			double cartDecels, int numITPs, double[][] posIn) {
 
-		double[] Fil1 = null;
-		double[] Fil2 = null;
-		double Out1In2;
-		int FL1 = 0;
-		int FL2 = 0;
+		double[] fil1 = null;
+		double[] fil2 = null;
+		double out1In2;
+		int fL1 = 0;
+		int fL2 = 0;
 
-		double[][] Out2 = new double[NumITPs + 1][4];
+		double[][] out2 = new double[numITPs + 1][4];
 
 		if (profileMode == ProfileMode.CartesianInputLinearMotion) {
-			FL1 = (int)Math.round(CartAcc1);
-			FL2 = (int)Math.round(CartAcc2);
-			Fil1 = new double[FL1]; 
-			Fil2 = new double[FL2];
+			fL1 = (int)Math.round(cartAccels);
+			fL2 = (int)Math.round(cartDecels);
+			fil1 = new double[fL1]; 
+			fil2 = new double[fL2];
 		}
 
 		for (int k = 0; k < 4; k++) {
 
 			if (profileMode != ProfileMode.CartesianInputLinearMotion == true || (profileMode == ProfileMode.CartesianInputLinearMotion == true && k == 3)) {
-				FL1 = (int)Math.round(Tacc1[k]);
-				FL2 = (int)Math.round(Tacc2[k]);
-				Fil1 = new double[FL1]; 
-				Fil2 = new double[FL2];
+				fL1 = (int)Math.round(jointAccels[k]);
+				fL2 = (int)Math.round(jointDecels[k]);
+				fil1 = new double[fL1]; 
+				fil2 = new double[fL2];
 			}
 
 			// -------INITIALIZE FILTERS TO ZERO---------
-			for (int i = 0; i < FL1; i++) { 
-				Fil1[i] = 0.0;
+			for (int i = 0; i < fL1; i++) { 
+				fil1[i] = 0.0;
 			}
 
-			for (int i = 0; i < FL2; i++) { 
-				Fil2[i] = 0.0;
+			for (int i = 0; i < fL2; i++) { 
+				fil2[i] = 0.0;
 			}
 
-			Out2[0][k] = 0.0;
+			out2[0][k] = 0.0;
 
 			// LOOP UNTIL FILTERS ARE CLEAR (NumITPs)
-			for (int i = 0; i < NumITPs; i++) {
-				Out1In2 = 0.0;
+			for (int i = 0; i < numITPs; i++) {
+				out1In2 = 0.0;
 				// MOVE FILTER 1 FILTER VALUES TO THE NEXT STEP
-				for (int j = FL1-1; j > 0; j--) {
-					Fil1[j] = Fil1[j - 1];
-					Out1In2 = Out1In2 + Fil1[j];
+				for (int j = fL1-1; j > 0; j--) {
+					fil1[j] = fil1[j - 1];
+					out1In2 = out1In2 + fil1[j];
 				}
 
 				// ADD DeltaPos TO FILTER 1'S FIRST STEP
-				Fil1[0] = PosIn[i + 1][k] - PosIn[i][k];
+				fil1[0] = posIn[i + 1][k] - posIn[i][k];
 
 				// DEFINE THE OUTPUT FROM FILTER 1
-				Out1In2 = Out1In2 + Fil1[0];
-				Out1In2 = Out1In2 / FL1;
-				Out2[i + 1][k] = 0.0;
+				out1In2 = out1In2 + fil1[0];
+				out1In2 = out1In2 / fL1;
+				out2[i + 1][k] = 0.0;
 
 				// MOVE FILTER 2 FILTER VALUES TO THE NEXT STEP
-				for (int j = FL2-1; j > 0; j--) {
-					Fil2[j] = Fil2[j - 1];
-					Out2[i + 1][k] = Out2[i + 1][k] + Fil2[j];
+				for (int j = fL2-1; j > 0; j--) {
+					fil2[j] = fil2[j - 1];
+					out2[i + 1][k] = out2[i + 1][k] + fil2[j];
 				}
 
 				// FILTER 2 1st value set to FILTER 1 out
-				Fil2[0] = Out1In2;
-				Out2[i + 1][k] = Out2[i + 1][k] + Fil2[0];
-				Out2[i + 1][k] = Out2[i + 1][k] / FL2;	            
+				fil2[0] = out1In2;
+				out2[i + 1][k] = out2[i + 1][k] + fil2[0];
+				out2[i + 1][k] = out2[i + 1][k] / fL2;	            
 			}
 		}
 
-		return Out2;
+		return out2;
 	}
 
 	public class ServoFilterOutput {
-		public double[][] ServoOut;
+		public double[][] servoOut;
 		int pointCount;
 
 		public ServoFilterOutput() {
@@ -101,15 +101,15 @@ public class Filter
 
 		public void output(int outPts) {
 			System.out.println("Time (sec), J1 (deg), J2 (deg), J3 (deg), J4 (deg)");
-			for (int i = 0; i < ServoOut.length; i+=outPts) {
+			for (int i = 0; i < servoOut.length; i+=outPts) {
 				System.out.println(i/1000.0 + "," + 
-						ServoOut[i][0] + "," + ServoOut[i][1] + "," + ServoOut[i][2]  + "," + ServoOut[i][3] );
+						servoOut[i][0] + "," + servoOut[i][1] + "," + servoOut[i][2]  + "," + servoOut[i][3] );
 			}
 		}		
 
 	}
 
-	public ServoFilterOutput servoFilter(double servoFilterOutputSec, double itp, double Ted, double[][] ControlOut, int TotalPts, boolean ExpEnable) {
+	public ServoFilterOutput servoFilter(double servoFilterOutputSec, double itp, double ted, double[][] controlOut, int totalPoints, boolean expEnable) {
 
 		ServoFilterOutput out = new ServoFilterOutput();
 
@@ -117,16 +117,16 @@ public class Filter
 		//	    int SFL2 = (int)Math.round(Ted * 1000);
 		//	    int SFL1 = (int)Math.round(itp * 100);
 		//	    int SFL1 = 1;
-		int SFL1 = (int)Math.round(itp / servoFilterOutputSec);
-		int SFL2 = (int)Math.round(Ted / servoFilterOutputSec);
-		double[] SFIL1 = new double[SFL1];
-		double[] SFIL2 = new double[SFL2];
-		double[] Weight = new double[SFL2];
-		double Sout;
-		double TotalWeight;
-		double Out1In2;
+		int SFL1 = (int) Math.round(itp / servoFilterOutputSec);
+		int SFL2 = (int) Math.round(ted / servoFilterOutputSec);
+		double[] sFil1 = new double[SFL1];
+		double[] sFil2 = new double[SFL2];
+		double[] weight = new double[SFL2];
+		//double Sout;
+		double totalWeight;
+		double out1In2;
 
-		out.ServoOut = new double[4][TotalPts * SFL1 + SFL2 + 1];
+		out.servoOut = new double[4][totalPoints * SFL1 + SFL2 + 1];
 
 		/* ServoOut is dimensioned backwards, because we need to redimension
 	    'the number of points.  That can only be done if the number of points
@@ -144,73 +144,73 @@ public class Filter
 
 		for (int k = 0; k < 4; k++) {
 			// Set servo output to 0 at time 0
-			out.ServoOut[k][0] = 0.0;
-			Sout = 1.0;
+			out.servoOut[k][0] = 0.0;
+			//Sout = 1.0;
 
 			// If the second stage is exponential, then we need a weight factor
-			if (ExpEnable) {	        
-				TotalWeight = 0.0;
+			if (expEnable) {	        
+				totalWeight = 0.0;
 
 				for (int j = 0; j < SFL2; j++) {
-					Weight[j] = Math.exp(-(double)(j+1) / (double)SFL2);
-					TotalWeight = TotalWeight + Weight[j];
+					weight[j] = Math.exp(-(double)(j+1) / (double)SFL2);
+					totalWeight = totalWeight + weight[j];
 				}
 			} 
 			else {
-				TotalWeight = SFL2;
+				totalWeight = SFL2;
 
 				for (int j = 0; j < SFL2; j++) {
-					Weight[j] = 1.0;
+					weight[j] = 1.0;
 				}
 			}
 
 			// Loop until all servo filters are clear
 			int i = 0;
-			while (i < TotalPts * SFL1 + SFL2) {
+			while (i < totalPoints * SFL1 + SFL2) {
 				i = i + 1;
-				Out1In2 = 0.0;
+				out1In2 = 0.0;
 
 				// Move filter 1 values to the next step
 				for (int L = SFL1 - 1; L > 0; L--) {
-					SFIL1[L] = SFIL1[L - 1];
-					Out1In2 = Out1In2 + SFIL1[L];
+					sFil1[L] = sFil1[L - 1];
+					out1In2 = out1In2 + sFil1[L];
 				}
 
 				// When the delay causes a longer time, add 0s to the filter
-				if (i / SFL1 > TotalPts) {
-					SFIL1[0] = 0.0;
+				if (i / SFL1 > totalPoints) {
+					sFil1[0] = 0.0;
 				} 
 				else {
 					// Determine which ITP input is used for each millisecond
 					// Must go backwards to catch the right input
-					for (int M = TotalPts - 1; M >= 0; M--) {
+					for (int M = totalPoints - 1; M >= 0; M--) {
 						if (i / SFL1 < (M + 1)) {
 							//	                        SFIL1[0] = ControlOut[M][k] / (itp * 1000);
-							SFIL1[0] = ControlOut[M][k] / (itp / servoFilterOutputSec);
+							sFil1[0] = controlOut[M][k] / (itp / servoFilterOutputSec);
 						}
 					}
 				}
 
 				// Redefine filter 1 output
-				Out1In2 = Out1In2 + SFIL1[0];
-				Out1In2 = Out1In2 / SFL1;
-				out.ServoOut[k][i] = 0.0;
+				out1In2 = out1In2 + sFil1[0];
+				out1In2 = out1In2 / SFL1;
+				out.servoOut[k][i] = 0.0;
 
 				// Move filter 2 values to next step
 
 				for (int L = SFL2-1; L >= 0; L--) {
 					if (L != 0) {
-						SFIL2[L] = SFIL2[L - 1];
+						sFil2[L] = sFil2[L - 1];
 					} 
 					else {
-						SFIL2[L] = Out1In2;
+						sFil2[L] = out1In2;
 					}
 
-					out.ServoOut[k][i] = out.ServoOut[k][i] + Weight[L] * SFIL2[L];
+					out.servoOut[k][i] = out.servoOut[k][i] + weight[L] * sFil2[L];
 				}
 
-				out.ServoOut[k][i] = out.ServoOut[k][i] / TotalWeight;
-				Sout = Math.abs(out.ServoOut[k][i]);
+				out.servoOut[k][i] = out.servoOut[k][i] / totalWeight;
+				//Sout = Math.abs(out.servoOut[k][i]);
 				if (k == 0) {
 					out.pointCount = i;
 				}
@@ -218,17 +218,17 @@ public class Filter
 		}
 
 		// Transpose the ServoOut array to be the same as the other arrays.
-		double[][] ServoOutTranspose = new double[out.pointCount + 1][4];
+		double[][] servoOutTranspose = new double[out.pointCount + 1][4];
 
 		// ---Transpose ServoOut and save the contents to a temporary array
 		for (int i = 0;  i < out.pointCount + 1; i++) {
 			for (int j = 0; j < 4; j++) {
-				ServoOutTranspose[i][j] = out.ServoOut[j][i];
+				servoOutTranspose[i][j] = out.servoOut[j][i];
 			}
 		}
 
 		// ---save ServoOut with its original data transposed.
-		out.ServoOut = ServoOutTranspose;
+		out.servoOut = servoOutTranspose;
 
 		return out;
 	}

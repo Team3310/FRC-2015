@@ -3,7 +3,7 @@ package edu.rhhs.frc.utility.motionprofile;
 import edu.rhhs.frc.subsystems.RobotArm;
 import edu.rhhs.frc.utility.motionprofile.CoordinatedMotion.CoMotionFilterOutput;
 import edu.rhhs.frc.utility.motionprofile.Filter.ServoFilterOutput;
-import edu.rhhs.frc.utility.motionprofile.Kinematics.IKINOutput;
+import edu.rhhs.frc.utility.motionprofile.Kinematics.IKinematicsOutput;
 
 public class MotionProfile 
 {
@@ -22,15 +22,21 @@ public class MotionProfile
 	public static final double DEFAULT_CARTESIAN_ACCEL2 = 200.0/1000.0;   			// seconds	
 	public static final double DEFAULT_JOINT_ACCEL1 = 400.0/1000.0;   				// seconds
 	public static final double DEFAULT_JOINT_ACCEL2 = 200.0/1000.0;   				// seconds	
-	public static final double DEFAULT_END_TYPE_CNT = 0;   							
-
+	//TODO:
+	public static final double[] DEFAULT_ARM_CARTESIAN_ACCELS = {(400.0 / 1000.0), (400.0 / 1000.0), (400.0 / 1000.0), (400.0 / 1000.0)};
+	public static final double[] DEFAULT_ARM_CARTESIAN_DECELS = {(200.0 / 1000.0), (200.0 / 1000.0), (200.0 / 1000.0), (200.0 / 1000.0)};
+	public static final double[] DEFAULT_ARM_JOINT_ACCELS = {(400.0 / 1000.0), (400.0 / 1000.0), (400.0 / 1000.0), (400.0 / 1000.0)};
+	public static final double[] DEFAULT_ARM_JOINT_DECELS = {(200.0 / 1000.0), (200.0 / 1000.0), (200.0 / 1000.0), (200.0 / 1000.0)};
+	
+	public static final double DEFAULT_END_TYPE_CONT = 0;   							
+	
 	public static final double INNER_ARM_LENGTH = 28.0; 		// inches 
 	public static final double OUTER_ARM_LENGTH = 30.0; 		// inches	
 	public static final double GROUNDING_LINK_LENGTH = 5.868; 	// inches 	
 	public static final double TOOL_LENGTH = 0.0; 				// inches 	
 
 	protected double[] armLengths = {0, INNER_ARM_LENGTH, OUTER_ARM_LENGTH, GROUNDING_LINK_LENGTH, 0, TOOL_LENGTH};   // arm lengths in inches
-	protected double[] dHLengths = {38.85, 0, 0, 0, 0, 0};   // DH lengths in inches
+	protected double[] dHLengths = {38.85, 0, 0, 0, 0, 0};   // DH lengths in inches TODO: Redefine Name?
 
 	protected boolean isElbowUp = true; 
 	protected boolean isFront = true; 
@@ -40,10 +46,10 @@ public class MotionProfile
 	protected int numPaths;  				// Number of paths = number of taught points - 1
 	protected double[][] taughtPositions; 	// path taught xyz positions in meters and toolAngle in degs
 	protected double[] pathVelocities;  	// in/sec, entry for each path segment
-	protected double cartesianAccel1 = DEFAULT_CARTESIAN_ACCEL1;   // linear accel in seconds
-	protected double cartesianAccel2 = DEFAULT_CARTESIAN_ACCEL2;   // linear accel in seconds 
+	protected double cartesianAccels = DEFAULT_CARTESIAN_ACCEL1;   // linear accel in seconds
+	protected double cartesianDecels = DEFAULT_CARTESIAN_ACCEL2;   // linear accel in seconds 
 
-	protected double[] endTypeCNT; 
+	protected double[] endTypeContinuity; 
 
 	protected double controllerUpdateRateSec = DEFAULT_CONTROLLER_UPDATE_RATE;  // Controller update rate seconds 
 	protected int outputRateMs = 1;   //  Output rate factor (1 = every point)
@@ -58,16 +64,16 @@ public class MotionProfile
 			Math.toRadians(J2_JOINT_VELOCITY), 
 			Math.toRadians(J3_JOINT_VELOCITY), 
 			Math.toRadians(J4_JOINT_VELOCITY)};   
-	protected double[] jointAccels1 = {
-			DEFAULT_JOINT_ACCEL1, 
-			DEFAULT_JOINT_ACCEL1, 
-			DEFAULT_JOINT_ACCEL1, 
-			DEFAULT_JOINT_ACCEL1};  		
-	protected double[] jointAccels2 = {
-			DEFAULT_JOINT_ACCEL2, 
-			DEFAULT_JOINT_ACCEL2, 
-			DEFAULT_JOINT_ACCEL2, 
-			DEFAULT_JOINT_ACCEL2};    
+	protected double[] jointAccels = {
+			DEFAULT_ARM_JOINT_ACCELS[0], 
+			DEFAULT_ARM_JOINT_ACCELS[1], 
+			DEFAULT_ARM_JOINT_ACCELS[2], 
+			DEFAULT_ARM_JOINT_ACCELS[3]};  		
+	protected double[] jointDecels = {
+			DEFAULT_ARM_JOINT_DECELS[0], 
+			DEFAULT_ARM_JOINT_DECELS[1], 
+			DEFAULT_ARM_JOINT_DECELS[2], 
+			DEFAULT_ARM_JOINT_DECELS[3]};    
 
 	public MotionProfile() {
 	}
@@ -104,10 +110,10 @@ public class MotionProfile
 	}
 
 	private void updateEndTypes() {
-		if (endTypeCNT == null) {
-			endTypeCNT = new double[numPaths - 1];
+		if (endTypeContinuity == null) {
+			endTypeContinuity = new double[numPaths - 1];
 			for (int i = 0; i < numPaths - 1; i++) {
-				endTypeCNT[i] = DEFAULT_END_TYPE_CNT;
+				endTypeContinuity[i] = DEFAULT_END_TYPE_CONT;
 			}
 		}
 	}
@@ -125,7 +131,7 @@ public class MotionProfile
 		controllerUpdateRateSec = controllerAndServoFilterOutputMs / 1000.0;
 		servoExponentialFilterDecayTime = controllerUpdateRateSec;
 
-		IKINOutput iKINOutput = null;
+		IKinematicsOutput iKINOutput = null;
 		Kinematics kinematics = new Kinematics();
 
 		// Convert all angles to radians
@@ -151,9 +157,9 @@ public class MotionProfile
 
 		// Convert input xyz taught point coordinates into joint angles
 		if (profileMode == ProfileMode.CartesianInputJointMotion) { 
-			iKINOutput = kinematics.iKIN(taughtPositionsConverted, taughtPositionsConverted.length - 1, armLengths, dHLengths, isElbowUp, isFront);
+			iKINOutput = kinematics.inverseKinematics(taughtPositionsConverted, taughtPositionsConverted.length - 1, armLengths, dHLengths, isElbowUp, isFront);
 
-			if (iKINOutput.errorFlag == true) { 
+			if (iKINOutput.errorFlag) { 
 				System.out.println("XYZ Taught Point Unreachable. Reteach!");
 				return false;
 			}
@@ -163,54 +169,54 @@ public class MotionProfile
 		}	
 
 		// Calculate the x(J1), y(J2), & z(J3) distance for each path.
-		double[][] dDis = new double[numPaths][4];
+		double[][] deltaDis = new double[numPaths][4];
 		for (int i = 0; i < numPaths; i++) {
 			for (int j = 0; j < 4; j++) {
-				dDis[i][j] = taughtPositionsConverted[i+1][j] - taughtPositionsConverted[i][j];
+				deltaDis[i][j] = taughtPositionsConverted[i+1][j] - taughtPositionsConverted[i][j];
 			}
 		}
 
 		// Convert cartesian acceleration filters to integration points
 		for (int j = 0; j < 4; j++) {
-			jointAccels1[j] = Math.ceil(jointAccels1[j] / controllerUpdateRateSec);
-			jointAccels2[j] = Math.ceil(jointAccels2[j] / controllerUpdateRateSec);
+			jointAccels[j] = Math.ceil(jointAccels[j] / controllerUpdateRateSec);
+			jointDecels[j] = Math.ceil(jointDecels[j] / controllerUpdateRateSec);
 		}
 
-		cartesianAccel1 = Math.ceil(cartesianAccel1 / controllerUpdateRateSec);
-		cartesianAccel2 = Math.ceil(cartesianAccel2 / controllerUpdateRateSec);
+		cartesianAccels = Math.ceil(cartesianAccels / controllerUpdateRateSec);
+		cartesianDecels = Math.ceil(cartesianDecels / controllerUpdateRateSec);
 
 		// Call procedure to determine coordinated motion.
 		CoordinatedMotion coordinatedMotion = new CoordinatedMotion();
 		CoordinatedMotion.CoMotionOutput coMotionOutput = coordinatedMotion.coMotion(	
-				numPaths, dDis, pathVelocities, jointPercentVelocity, jointVelocities, jointAccels1, jointAccels2, profileMode, endTypeCNT, 
-				cartesianAccel1, cartesianAccel2, controllerUpdateRateSec);
+				numPaths, deltaDis, pathVelocities, jointPercentVelocity, jointVelocities, jointAccels, jointDecels, profileMode, endTypeContinuity, 
+				cartesianAccels, cartesianDecels, controllerUpdateRateSec);
 
 		// Procedure calculates all the input positions to the filter or Inverse Kin
 		CoMotionFilterOutput coMotionFilterOutput = coordinatedMotion.filterInput(
-				dDis, coMotionOutput.Tseg, coMotionOutput.Tcnt, taughtPositionsConverted, numPaths);
+				deltaDis, coMotionOutput.tSeg, coMotionOutput.tCnt, taughtPositionsConverted, numPaths);
 
 		// This portion calculates Inverse Kinematics for a linear move.
 		// Modified by PDC on 12/5/00
 		if (profileMode == ProfileMode.CartesianInputLinearMotion) { 
-			iKINOutput = kinematics.iKIN(coMotionFilterOutput.PosFilter, coMotionFilterOutput.NumITPs, armLengths, dHLengths, isElbowUp, isFront);
+			iKINOutput = kinematics.inverseKinematics(coMotionFilterOutput.posFilter, coMotionFilterOutput.numITPs, armLengths, dHLengths, isElbowUp, isFront);
 
-			if (iKINOutput.errorFlag == true) { 
+			if (iKINOutput.errorFlag) { 
 				System.out.println("Point Unreachable. Reteach!");
 				return false;
 			}
 		}
 		else {
-			iKINOutput = kinematics.getInstanceIKINOutput(coMotionFilterOutput.NumITPs);
-			iKINOutput.userAngles = coMotionFilterOutput.PosFilter;
+			iKINOutput = kinematics.getInstanceIKINOutput(coMotionFilterOutput.numITPs);
+			iKINOutput.userAngles = coMotionFilterOutput.posFilter;
 		}
 
 		// Runs the RJ-3 joint filter
-		double[][] Out2 = Filter.filter(profileMode, jointAccels1, jointAccels2, cartesianAccel1, cartesianAccel2, 
-				coMotionFilterOutput.NumITPs, iKINOutput.userAngles);
+		double[][] Out2 = Filter.filter(profileMode, jointAccels, jointDecels, cartesianAccels, cartesianDecels, 
+				coMotionFilterOutput.numITPs, iKINOutput.userAngles);
 
 		// Input code to call the Servo filters
 		Filter filter = new Filter();
-		ServoFilterOutput serverFilterOutput = filter.servoFilter(controllerAndServoFilterOutputMs/1000.0, controllerUpdateRateSec, servoExponentialFilterDecayTime, Out2, coMotionFilterOutput.NumITPs, isServerExponentialFilterEnable);
+		ServoFilterOutput serverFilterOutput = filter.servoFilter(controllerAndServoFilterOutputMs/1000.0, controllerUpdateRateSec, servoExponentialFilterDecayTime, Out2, coMotionFilterOutput.numITPs, isServerExponentialFilterEnable);
 
 		// Servo position [ServoOut()] is actually deltaPos, so we take the
 		// joint position of the 1st taught point [PosFilterIn(0,J)] to
@@ -219,12 +225,12 @@ public class MotionProfile
 		for (int i = 0; i < serverFilterOutput.pointCount + 1; i++) {
 			if (i == 0) {
 				for (int j = 0; j < 4; j++) {
-					serverFilterOutput.ServoOut[i][j] = iKINOutput.userAngles[i][j];
+					serverFilterOutput.servoOut[i][j] = iKINOutput.userAngles[i][j];
 				}
 			}                
 			else {
 				for (int j = 0; j < 4; j++) {
-					serverFilterOutput.ServoOut[i][j] = serverFilterOutput.ServoOut[i-1][j] + serverFilterOutput.ServoOut[i][j];
+					serverFilterOutput.servoOut[i][j] = serverFilterOutput.servoOut[i-1][j] + serverFilterOutput.servoOut[i][j];
 				}
 			}
 		}
@@ -234,14 +240,14 @@ public class MotionProfile
 		if (calcVelocitiesAccels) {
 			// CALL Kinematic routine to calculate X,Y,Z position
 			// The Filter only outputs DeltaPosition in Joint Space.
-			double[][] CartPos = Kinematics.fKIN(serverFilterOutput.ServoOut, serverFilterOutput.pointCount, armLengths, dHLengths);
+			double[][] CartPos = Kinematics.forwardKinematics(serverFilterOutput.servoOut, serverFilterOutput.pointCount, armLengths, dHLengths);
 
 			// Call procedure to calculate velocity and acceleration
-			profileOutput = Physics.VelAccPos(serverFilterOutput.pointCount, serverFilterOutput.ServoOut, CartPos, controllerAndServoFilterOutputMs/1000.0);
+			profileOutput = Physics.velAccPos(serverFilterOutput.pointCount, serverFilterOutput.servoOut, CartPos, controllerAndServoFilterOutputMs/1000.0);
 		}
 		else {
 			profileOutput = new ProfileOutput(serverFilterOutput.pointCount, false);
-			profileOutput.setJointAngles(serverFilterOutput.ServoOut);
+			profileOutput.setJointAngles(serverFilterOutput.servoOut);
 		}
 
 		return true;
@@ -284,7 +290,7 @@ public class MotionProfile
 	public double[] calcInverseKinematicsRad(double[] xyzToolPointRad) {
 		double[][] inputPoints = { xyzToolPointRad };
 		Kinematics kinematics = new Kinematics();
-		IKINOutput iKINOutput = kinematics.iKIN(inputPoints, inputPoints.length - 1, armLengths, dHLengths, isElbowUp, isFront);
+		IKinematicsOutput iKINOutput = kinematics.inverseKinematics(inputPoints, inputPoints.length - 1, armLengths, dHLengths, isElbowUp, isFront);
 		return iKINOutput.userAngles[0];
 	}
 
@@ -303,7 +309,7 @@ public class MotionProfile
 
 	public double[] calcForwardKinematicsRad(double[] jointAnglesRad) {
 		double[][] inputPoints = { jointAnglesRad };
-		double[][] output = Kinematics.fKIN(inputPoints, inputPoints.length - 1, armLengths, dHLengths);
+		double[][] output = Kinematics.forwardKinematics(inputPoints, inputPoints.length - 1, armLengths, dHLengths);
 		return output[0];
 	}
 
@@ -381,20 +387,20 @@ public class MotionProfile
 		}
 	}
 
-	public double[] getJointAccels1() {
-		return jointAccels1;
+	public double[] getJointAccels() {
+		return jointAccels;
 	}
 
-	public void setJointAccels1(double[] jointAccels1) {
-		this.jointAccels1 = jointAccels1;
+	public void setJointAccels(double[] jointAccels) {
+		this.jointAccels = jointAccels;
 	}
 
-	public double[] getJointAccels2() {
-		return jointAccels2;
+	public double[] getJointDecels() {
+		return jointDecels;
 	}
 
-	public void setJointAccels2(double[] jointAccels2) {
-		this.jointAccels2 = jointAccels2;
+	public void setJointDecels(double[] jointDecels) {
+		this.jointDecels = jointDecels;
 	}
 
 	public double[] getPathVelocities() {
@@ -405,36 +411,35 @@ public class MotionProfile
 		this.pathVelocities = pathVelocities;
 	}
 
-	public double getCartesianAccel1() {
-		return cartesianAccel1;
+	public double getCartesianAccels() {
+		return cartesianAccels;
 	}
 
-	public void setCartesianAccel1(double cartesianAccel1) {
-		this.cartesianAccel1 = cartesianAccel1;
+	public void setCartesianAccels(double cartesianAccels) {
+		this.cartesianAccels = cartesianAccels;
 	}
 
-	public double getCartesianAccel2() {
-		return cartesianAccel2;
+	public double getCartesianDecels() {
+		return cartesianDecels;
 	}
 
-	public void setCartesianAccel2(double cartesianAccel2) {
-		this.cartesianAccel2 = cartesianAccel2;
+	public void setCartesianDecels(double cartesianDecels) {
+		this.cartesianDecels = cartesianDecels;
 	}
 
-	public double[] getEndTypeCNT() {
-		return endTypeCNT;
+	public double[] getEndTypeCont() {
+		return endTypeContinuity;
 	}
 
-	public void setEndTypeCNT(double[] endTypeCNT) {
-		this.endTypeCNT = endTypeCNT;
+	public void setEndTypeCont(double[] endTypeCont) {
+		this.endTypeContinuity = endTypeCont;
 	}
 
 	public boolean isServerExponentialFilterEnable() {
 		return isServerExponentialFilterEnable;
 	}
 
-	public void setServerExponentialFilterEnable(
-			boolean isServerExponentialFilterEnable) {
+	public void setServerExponentialFilterEnable(boolean isServerExponentialFilterEnable) {
 		this.isServerExponentialFilterEnable = isServerExponentialFilterEnable;
 	}
 
