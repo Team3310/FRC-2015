@@ -2,7 +2,7 @@ package edu.rhhs.frc.subsystems;
 
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
-import edu.rhhs.frc.commands.RobotArmWithJoystick;
+import edu.rhhs.frc.commands.RobotArmMoveWithJoystick;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommand;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.utility.CANTalonAnalogPID;
@@ -190,9 +190,12 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	}
 
 	public void initDefaultCommand() {
-		setDefaultCommand(new RobotArmWithJoystick());
+		setDefaultCommand(new RobotArmMoveWithJoystick());
 	}
 	
+	/**
+	 * A method built to prevent the Talons from hibernating.
+	 */
 	public void keepAlive() {
 		m_j1Motor.enableBrakeMode(true);
 		m_j2Motor.enableBrakeMode(true);
@@ -202,10 +205,17 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	//	m_robotArmInitialized.set(true);
 	}
 	
+	/**
+	 * Locks the RobotArm's x-axis position.
+	 * @param isXLock - If true, locks movement of the RobotArm along the Robot's x-axis.
+	 */
 	public void setXLock(boolean isXLock) {
 		m_isXLock = isXLock;
 	}
 	
+	/**
+	 * Disables Robot's automated command loop.
+	 */
 	public void teleopInit() {
 		disableControlLoop();
 	}
@@ -216,6 +226,12 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		m_j3Motor.initializeSensorPosition();
 	}
 
+	/**
+	 * Sets the RobotArm subsystem's Control Mode.
+	 * <br></br>
+	 * If given "mode" is position, gives the subsystem a PID position command of its current position.
+	 * Otherwise, calls {@link CANTalonEncoderPID#set(double)} on all motors.
+	 */
 	public void setControlMode(CANTalonEncoderPID.ControlMode mode) {
 		m_robotArmControlMode = mode;
 		m_j1Motor.setControlMode(mode);
@@ -271,6 +287,11 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		this.m_waitForNext = waitForNext;
 	}
 
+	/**
+	 * Allows teleop joystick control via XBoxController interface.
+	 * <br></br>
+	 * Adds soft limits to prevent destruction of robot, and adds velocity limits.
+	 */
 	public void controlWithJoystick() {
 		if (!m_controlLoop.isEnabled()) {
 			double throttleRightX = OI.getInstance().getRobotArmController().getRightXAxis();
@@ -501,10 +522,17 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		}
 	}
 	
+	/**
+	 * Moves the RobotArm's joints to the given joint angles using {@link #setPIDPosition(double, double, double, double)}
+	 * @param jointAngles - A double array of joint angles to go to.
+	 */
 	public synchronized void setJointAngles(double[] jointAngles) {
 		setPIDPosition(jointAngles[0], jointAngles[1], jointAngles[2], jointAngles[3]);
 	}
 	
+	/**
+	 * Moves the RobotArm's joints to the given joint angles.
+	 */
 	public synchronized void setPIDPosition(double j1PositionDeg, double j2PositionDeg, double j3PositionDeg, double j4PositionDeg) {
 		
 		// We need to check the limits now so we can save the limited angle in the position command.  If you let the Talon limit
@@ -537,6 +565,9 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 //		m_j3Motor.setPIDPositiveNegativePositionDeg(m_positionCommandJ3, j3PositionPidParamsNegative, j3PositionPidParamsPositive);
 	}
 	
+	/**
+	 * @return A double array of the current joint angles.
+	 */
 	public synchronized double[] getJointAngles() {
 		return new double[] {
 				m_j1Motor.getPositionDeg(),
@@ -546,6 +577,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		};
 	}
 	
+	/**
+	 * Takes min and max joint angles and returns a angle within them.
+	 * @return A valid angle within the limits of the given joint.
+	 */
 	private double limitAngle(double jointAngle, double minJointAngle, double maxJointAngle) {
 		double outputAngle = jointAngle;
 		if (outputAngle > maxJointAngle) {
@@ -558,8 +593,13 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		return outputAngle;
 	}
 	
+	/**
+	 * Adds soft limits for J3, as it is relative to J2.
+	 * @param j2AngleDeg - J2 Angle at the given point in time
+	 * @param j3AngleDeg - J3 Angle at the given point in time
+	 * @return The angle J3 should be given the two angles.
+	 */
 	private double limitJ3(double j2AngleDeg, double j3AngleDeg) {
-		
 		// Interference checks
 		if ((j2AngleDeg + j3AngleDeg) > J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG) {
 			j3AngleDeg = J3_INTERFERENCE_J2_PLUS_J3_MAX_ANGLE_DEG - j2AngleDeg;

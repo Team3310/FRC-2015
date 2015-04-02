@@ -47,11 +47,12 @@ public class RobotMain extends IterativeRobot
 	private Integer numStacks = null;
 	private Integer numTotesPerStack = null;
 	private StackPriority stackPriority;
-
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
+	@Override
 	public void robotInit() {
 		try {
 			m_loopTime = System.nanoTime();
@@ -113,6 +114,10 @@ public class RobotMain extends IterativeRobot
 		updateStatus();
 	}
 
+	/**
+	 * This function is called periodically while the robot is disabled.
+	 */
+	@Override
 	public void disabledPeriodic() {
 		// Calibrate the IMU
 		driveTrain.calibrateIMU();
@@ -134,6 +139,10 @@ public class RobotMain extends IterativeRobot
 		updateStatus();
 	}
 
+	/**
+	 * This function is called at the beginning of autonomous.
+	 */
+	@Override
 	public void autonomousInit() {
 		robotArm.resetMasterPosition();
 		robotArm.setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
@@ -146,10 +155,15 @@ public class RobotMain extends IterativeRobot
 	/**
 	 * This function is called periodically during autonomous
 	 */
+	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
 	}
 
+	/**
+	 * This function is called at the beginning of the teleop period.
+	 */
+	@Override
 	public void teleopInit() {
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
@@ -170,25 +184,31 @@ public class RobotMain extends IterativeRobot
 	 * This function is called when the disabled button is hit.
 	 * You can use it to reset subsystems before shutting down.
 	 */
+	@Override
 	public void disabledInit(){
 		updateStatus();
 	}
 
 	/**
-	 * This function is called periodically during operator control
+	 * This function is called periodically during operator control.
 	 */
+	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		updateStatus();
 	}
 
 	/**
-	 * This function is called periodically during test mode
+	 * This function is called periodically during test mode.
 	 */
+	@Override
 	public void testPeriodic() {
 		updateStatus();
 	}
 
+	/**
+	 * Updates the SmartDashboard values on a global scale.
+	 */
 	public void updateStatus() {
 		try {
 			long currentTime = System.nanoTime();

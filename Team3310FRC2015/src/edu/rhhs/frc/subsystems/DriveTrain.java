@@ -184,10 +184,16 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		setDefaultCommand(new DriveWithJoystick()); 
 	}
 	
+	/**
+	 * Stops PID control.
+	 */
 	public void teleopInit() {
 		stopPID();
 	}
 	
+	/**
+	 * Zeroes the IMU in the NavX.
+	 */
 	public void calibrateIMU() {
 		// Set up the IMU
         boolean isCalibrating = m_imu.isCalibrating();
@@ -210,6 +216,9 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     	m_imu.zeroYaw();
     }
     
+    /**
+	 * A method built to prevent the Talons from hibernating.
+	 */
 	public void keepAlive() {
 		m_frontLeftMotor.enableBrakeMode(false);
 		m_frontRightMotor.enableBrakeMode(false);
@@ -231,7 +240,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		m_frontRightMotor.setControlMode(controlMode);
 		m_controlMode = controlMode;
 	}
-		
+	
+	/**
+	 * Gives the motors a velocity command in degrees per second (deg/sec).
+	 */
 	public void startPIDVelocity(double leftTargetDegPerSec, double rightTargetDegPerSec, double errorDegPerSec) {
 		setControlMode(CANTalonEncoderPID.ControlMode.VELOCITY);
 		m_frontLeftMotor.setPIDVelocityDegPerSecNoLimits(leftTargetDegPerSec);
@@ -240,6 +252,9 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		isHoldOn = false;
 	}
 	
+	/**
+	 * Also known as "Drive Train Hold", tells the DriveTrain subsystem to not move an inch on either wheel.
+	 */
 	public void startPIDPositionHold() {
 		m_frontLeftMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
 		m_frontRightMotor.setPIDParams(positionHoldPidParams, CANTalonEncoderPID.POSITION_PROFILE);
@@ -247,6 +262,9 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		isHoldOn = true;
 	}
 	
+	/**
+	 * Sets the motor's stored position in inches (in.). (?? - Look over.)
+	 */
 	public void startPIDPosition(double leftTargetInches, double rightTargetInches, double errorInches) {
 		setControlMode(CANTalonEncoderPID.ControlMode.POSITION);
 		m_frontLeftMotor.setPosition(0);

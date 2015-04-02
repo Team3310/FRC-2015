@@ -42,6 +42,11 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 	private double[] homePosition = DEFAULT_HOME_COORD;
 	private double[] worldToRobotOffsetInches = {0, 0, 0};
 	
+	/**
+	 * Adds a set of pre-taught and figured-out points, regardless of stacking choices.
+	 * <br></br>
+	 * If SmartDashboard is set to 3 stacks, the points added first will be used as a sequence. Continued trend for 2 stacks, 1 stack.
+	 */
 	public HumanLoadCommandListGenerator() {	
 		stackStartPositions.add(new double[] {-44, 17, 9, 0});
 		stackPreReleaseOffsetPositions.add(new double[] {-24, 24,  0, 0});
@@ -228,7 +233,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 	}
 
 	public void setNumTotesPerStack(int numTotesPerStack) {
-		this.numTotesPerStack = numTotesPerStack / 2; //TODO: Verify
+		this.numTotesPerStack = numTotesPerStack / 2;
 	}
 	
     public static void main(String[] args) {

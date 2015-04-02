@@ -3,9 +3,9 @@ package edu.rhhs.frc.commands;
 import edu.rhhs.frc.RobotMain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class RobotArmWithJoystick extends Command 
+public class RobotArmMoveWithJoystick extends Command 
 {
-	public RobotArmWithJoystick() {
+	public RobotArmMoveWithJoystick() {
 		requires(RobotMain.robotArm);
 	}
 	

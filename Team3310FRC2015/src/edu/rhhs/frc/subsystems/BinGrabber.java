@@ -76,6 +76,9 @@ public class BinGrabber extends Subsystem
 //		setDefaultCommand(new BinGrabberWithJoystick());
 	}
 	
+	/**
+	 * A method built to prevent the Talons from hibernating.
+	 */
 	public void keepAlive() {
 		m_leftMotor.enableBrakeMode(true);
 		m_rightMotor.enableBrakeMode(true);
@@ -87,6 +90,9 @@ public class BinGrabber extends Subsystem
 		m_rightMotor.set(0);
 	}
 	
+	/**
+	 * Opens or closes the claws on the end of the BinGrabbers, depending on the position parameter.
+	 */
 	public void setClawPosition(BinGrabberState position) {
 		if (position == BinGrabberState.EXTENDED) {
 			m_clawPositionSolenoid.set(DoubleSolenoid.Value.kForward);
@@ -96,6 +102,9 @@ public class BinGrabber extends Subsystem
 		}
 	}
 
+	/**
+	 * Locks or unlocks the pivot lockers on the bottom of the BinGrabbers, depending on the position parameter.
+	 */
 	public void setPivotLockPosition(BinGrabberState position) {
 		if (position == BinGrabberState.EXTENDED) {
     		m_pivotLockSolenoid.set(DoubleSolenoid.Value.kForward);
@@ -114,7 +123,10 @@ public class BinGrabber extends Subsystem
 		m_leftMotor.setProfile(profile);
 		m_rightMotor.setProfile(profile);
 	}*/
-		
+	
+	/**
+	 * Sets the speed for each BinGrabber motor respectively.
+	 */
 	public void setSpeed(double leftSpeed, double rightSpeed) {
 		setLeftSpeed(leftSpeed);
 		setRightSpeed(rightSpeed);
