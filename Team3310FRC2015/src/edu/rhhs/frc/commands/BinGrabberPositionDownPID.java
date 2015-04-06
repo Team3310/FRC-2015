@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class BinGrabberPositionDownPID extends Command 
 {
-	private double leftTargetDeg;
+	private double leftTargetDeg; 
 	private double rightTargetDeg;
 
     public BinGrabberPositionDownPID(double leftPositionDeg, double rightPositionDeg) {
