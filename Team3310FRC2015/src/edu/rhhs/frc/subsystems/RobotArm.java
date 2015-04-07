@@ -202,7 +202,10 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		m_j3Motor.enableBrakeMode(true);
 		m_j4Motor.enableBrakeMode(true);
 		
-	//	m_robotArmInitialized.set(true);
+	}
+	
+	public void setLEDStatus(boolean status) {
+		m_robotArmInitialized.set(status);
 	}
 	
 	/**

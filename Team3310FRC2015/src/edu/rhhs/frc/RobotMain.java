@@ -12,10 +12,11 @@ import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
+import edu.rhhs.frc.utility.BHRIterativeRobot;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.CANTalon.StatusFrameRate;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -28,7 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class RobotMain extends IterativeRobot 
+public class RobotMain extends BHRIterativeRobot 
 {
 	public static final BinGrabber binGrabber = new BinGrabber();
 	public static final DriveTrain driveTrain = new DriveTrain();
@@ -36,6 +37,9 @@ public class RobotMain extends IterativeRobot
 	public static final HumanLoadCommandListGenerator commandListGenerator = new HumanLoadCommandListGenerator();
 
 	private Command m_autonomousCommand;
+	private Command m_binGrabberDeployAndGoPID = new BinGrabberDeployAndGoPID();
+	private Command m_binGrabberDeployAndGoPIDLong = new BinGrabberDeployAndGoPIDLong();
+	private Command m_autonomousCommandPrevious;
 	private SendableChooser m_autonomousChooser;
 //	private SendableChooser m_driveModeChooser;
 	private SendableChooser m_robotArmControlModeChooser;
@@ -99,8 +103,8 @@ public class RobotMain extends IterativeRobot
 			commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 
 			m_autonomousChooser = new SendableChooser();
-			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", 	new BinGrabberDeployAndGoPID());
-			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Long", 	new BinGrabberDeployAndGoPIDLong());
+			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", m_binGrabberDeployAndGoPID);
+			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Long", 	m_binGrabberDeployAndGoPIDLong);
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
 			m_autonomousChooser.addObject ("Do nothing", null);
 			m_autonomousChooser.addObject ("Drive forward 24", new DriveTrainPositionControl(36, 36, true, 36));
@@ -129,12 +133,24 @@ public class RobotMain extends IterativeRobot
 
 		// Get the command used for the autonomous period
 		m_autonomousCommand = (Command)m_autonomousChooser.getSelected();
+		if (m_autonomousCommand != m_autonomousCommandPrevious) {
+			if (m_autonomousCommand == m_binGrabberDeployAndGoPID ||
+				m_autonomousCommand == m_binGrabberDeployAndGoPIDLong) {
+				RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
+		    	RobotMain.binGrabber.startPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 0);
+			}
+			else {
+				RobotMain.binGrabber.stopPID();
+			}
+			m_autonomousCommandPrevious = m_autonomousCommand;
+		}
 
 		// This is for an issue when the robotRIO boots up sometimes Talons don't get enabled
 		driveTrain.keepAlive();
 		binGrabber.keepAlive();
 		robotArm.keepAlive();
 
+ 		
 		Scheduler.getInstance().run();
 		updateStatus();
 	}
@@ -144,6 +160,7 @@ public class RobotMain extends IterativeRobot
 	 */
 	@Override
 	public void autonomousInit() {
+		robotArm.setLEDStatus(true);
 		robotArm.resetMasterPosition();
 		robotArm.setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 		if (m_autonomousCommand != null) {
@@ -165,6 +182,7 @@ public class RobotMain extends IterativeRobot
 	 */
 	@Override
 	public void teleopInit() {
+		robotArm.setLEDStatus(true);
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
 		}
@@ -186,6 +204,7 @@ public class RobotMain extends IterativeRobot
 	 */
 	@Override
 	public void disabledInit(){
+		robotArm.setLEDStatus(false);
 		updateStatus();
 	}
 

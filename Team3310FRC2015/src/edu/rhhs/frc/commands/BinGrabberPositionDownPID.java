@@ -19,8 +19,9 @@ public class BinGrabberPositionDownPID extends Command
 
     // Called just before this Command runs the first time
     protected void initialize() {
-		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
-    	RobotMain.binGrabber.startPositionDownPID(leftTargetDeg, rightTargetDeg, 0);
+//		RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
+//    	RobotMain.binGrabber.startPositionDownPID(leftTargetDeg, rightTargetDeg, 0);
+    	RobotMain.robotArm.setLEDStatus(false);
     }
 
     // Called repeatedly when this Command is scheduled to run

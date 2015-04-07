@@ -53,5 +53,5 @@ public class RobotMap
 
 	// roboRIO DIO ports
 	public static final int TOTE_GRABBER_SWITCH_DIO_ID = 0;
-	public static final int ROBOT_ARM_INITIALIZED_DIO_ID = 1;
+	public static final int ROBOT_ARM_INITIALIZED_DIO_ID = 2;
 }
