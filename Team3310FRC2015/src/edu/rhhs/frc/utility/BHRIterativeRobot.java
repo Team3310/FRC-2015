@@ -101,6 +101,7 @@ public class BHRIterativeRobot extends RobotBase {
                 }
                 FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
                 disabledPeriodic();
+                m_ds.waitForData(1);
             } else if (isAutonomous()) {
                 // call Autonomous_Init() if this is the first time
                 // we've entered autonomous_mode
@@ -116,6 +117,7 @@ public class BHRIterativeRobot extends RobotBase {
                 }
                 FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
                 autonomousPeriodic();
+                m_ds.waitForData(10);
             } else {
                 // call Teleop_Init() if this is the first time
                 // we've entered teleop_mode
@@ -128,8 +130,8 @@ public class BHRIterativeRobot extends RobotBase {
                 }
                 FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
                 teleopPeriodic();
+                m_ds.waitForData(10);
             }
-            m_ds.waitForData(10);
        }
     }
 
