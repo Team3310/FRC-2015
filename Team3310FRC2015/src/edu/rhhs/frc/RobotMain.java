@@ -3,6 +3,7 @@ package edu.rhhs.frc;
 import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPIDLong;
+import edu.rhhs.frc.commands.BinGrabberNoDeployAndGoPID;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
@@ -103,6 +104,7 @@ public class RobotMain extends BHRIterativeRobot
 			commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 
 			m_autonomousChooser = new SendableChooser();
+			m_autonomousChooser.addObject("BinGrabberNoDeployAndGoPID", new BinGrabberNoDeployAndGoPID());
 			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", m_binGrabberDeployAndGoPID);
 			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Long", 	m_binGrabberDeployAndGoPIDLong);
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
@@ -166,6 +168,7 @@ public class RobotMain extends BHRIterativeRobot
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
 			Scheduler.getInstance().run();
+			updateStatus();
 		}
 	}
 
@@ -175,6 +178,7 @@ public class RobotMain extends BHRIterativeRobot
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+		updateStatus();
 	}
 
 	/**
@@ -182,6 +186,7 @@ public class RobotMain extends BHRIterativeRobot
 	 */
 	@Override
 	public void teleopInit() {
+		driveTrain.getIMU().resetDisplacement();
 		robotArm.setLEDStatus(true);
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
@@ -235,6 +240,8 @@ public class RobotMain extends BHRIterativeRobot
 			SmartDashboard.putNumber("Num Stacks Verify", numStacks);
 			SmartDashboard.putNumber("Num Totes Per Stack Verify", numTotesPerStack);
 			SmartDashboard.putString("Stack Priority Verify", stackPriority == StackPriority.HORIZONTAL ? "Horizontal" : "Vertical");
+			SmartDashboard.putNumber("NavX X Distance", driveTrain.getIMU().getDisplacementX());
+			SmartDashboard.putNumber("NavX Y Distance", driveTrain.getIMU().getDisplacementY());
 			m_loopTime = currentTime;
 			driveTrain.updateStatus();
 			binGrabber.updateStatus();

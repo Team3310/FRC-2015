@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends Subsystem implements ControlLoopable
 {	
-	public static enum PIDMode {SOFTWARE_TURN, TALON_MOTION_PROFILE, TALON_MOTION_PROFILE_WITH_GYRO};
+	public static enum PIDMode {SOFTWARE_TURN, SOFTWARE_STRAIGHT, TALON_MOTION_PROFILE, TALON_MOTION_PROFILE_WITH_GYRO};
 	public static enum ToteSledPosition {UP, DOWN};
 
 	public static final long OUTER_LOOP_UPDATE_RATE_MS = 10;
@@ -374,6 +374,24 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		enableControlLoop();
 	}
 
+	public void startStraightSoftwarePID(double distanceInches, double toleranceInches, double maxThrottle) {
+		if (isControlLoopEnabled()) {
+			disableControlLoop();
+		}
+		m_pidMode = PIDMode.SOFTWARE_STRAIGHT;
+		m_setpoint = distanceInches;
+		m_tolerance = toleranceInches;
+		m_maximumOutput = maxThrottle;
+		m_frontLeftMotor.setPosition(0);
+		m_frontRightMotor.setPosition(0);
+		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+		m_frontLeftMotor.set(0);
+		m_frontRightMotor.set(0);
+		m_error = m_setpoint - (getLeftDistanceInches() + getRightDistanceInches()) / 2.0;
+		isHoldOn = false;
+		enableControlLoop();
+	}
+
 	public double getGyroTurnError() {
 		return m_error;
 	}
@@ -400,8 +418,13 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 			}
 		}
 
-		else if (m_pidMode == PIDMode.SOFTWARE_TURN) {
-			m_error = m_setpoint - getYawAngleDeg();
+		else if (m_pidMode == PIDMode.SOFTWARE_TURN || m_pidMode == PIDMode.SOFTWARE_STRAIGHT ) {
+			if (m_pidMode == PIDMode.SOFTWARE_TURN) {
+				m_error = m_setpoint - getYawAngleDeg();
+			}
+			else {
+				m_error = m_setpoint - (getLeftDistanceInches() + getRightDistanceInches()) / 2.0;
+			}
 	        if (m_I != 0) {
 	            double potentialIGain = (m_totalError + m_error) * m_I;
 	            if (potentialIGain < m_maximumOutput) {
@@ -424,7 +447,12 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	            m_result = m_minimumOutput;
 	        }
 	        
-	        m_frontLeftMotor.set(-m_result);
+			if (m_pidMode == PIDMode.SOFTWARE_TURN) {
+				m_frontLeftMotor.set(-m_result);
+			}
+			else {
+				m_frontLeftMotor.set(m_result);
+			}
 	        m_frontRightMotor.set(-m_result);
 		}
 	}

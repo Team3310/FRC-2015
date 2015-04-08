@@ -18,6 +18,7 @@ import edu.rhhs.frc.commands.DriveTrainMotionProfileTurn;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.DriveTrainPositionHoldOn;
 import edu.rhhs.frc.commands.DriveTrainStopPID;
+import edu.rhhs.frc.commands.DriveTrainStraightSoftwarePID;
 import edu.rhhs.frc.commands.DriveTrainToteSledPosition;
 import edu.rhhs.frc.commands.RobotArmMotionProfileCurrentToPosition;
 import edu.rhhs.frc.commands.RobotArmMotionProfileNext;
@@ -191,9 +192,9 @@ public class OI
 //        binGrabberDeployPIDTest.whenReleased(new BinGrabberPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG));
 //		SmartDashboard.putData("Bin Grabber Deploy Position PID", binGrabberDeployPIDTest);
 //		
-		InternalButton binGrabberStowedPIDTest = new InternalButton();
-        binGrabberStowedPIDTest.whenReleased(new BinGrabberPositionStowedPID());
-		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPIDTest);
+		InternalButton drivetrainStraightPIDTest = new InternalButton();
+		drivetrainStraightPIDTest.whenReleased(new DriveTrainStraightSoftwarePID(40, 2, 0.5));
+		SmartDashboard.putData("Drivetrain Straight Software PID", drivetrainStraightPIDTest);
 		
 		InternalButton binGrabberStopPIDTest = new InternalButton();
 		binGrabberStopPIDTest.whenReleased(new BinGrabberStopPID());
@@ -363,7 +364,6 @@ public class OI
 //		commandListJ3A.add(new RobotArmMotionProfilePath(waypointsJ3A));
 //
 //		InternalButton motionProfileJ3A = new InternalButton();
-//		motionProfileJ3A.whenPressed(new RobotArmMotionProfileStart(commandListJ3A));
 //		SmartDashboard.putData("Motion Profile Start J3 A", motionProfileJ3A);
 //		
 //    	WaypointList waypointsJ3B = new WaypointList(MotionProfile.ProfileMode.JointInputJointMotion);
