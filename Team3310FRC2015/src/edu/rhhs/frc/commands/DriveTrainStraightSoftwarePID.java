@@ -28,7 +28,7 @@ public class DriveTrainStraightSoftwarePID extends Command
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	return Math.abs((RobotMain.driveTrain.getLeftDistanceInches() + RobotMain.driveTrain.getRightDistanceInches()) / 2.0 - distanceInches) < toleranceInches; 
+    	return Math.abs(RobotMain.driveTrain.getSoftwarePIDError()) < toleranceInches; 
     }
 
     // Called once after isFinished returns true

@@ -86,6 +86,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     private double m_I = 0.00003; // 0.00015;     
     private double m_D = 0.0;     
     private double m_F = 0.0;                 
+    private double m_T = 0.05;                 
     private double m_maximumOutput = 1.0; // |maximum output|
     private double m_minimumOutput = -1.0;  // |minimum output|
     private double m_prevError = 0.0; // the prior sensor input (used to compute velocity)
@@ -384,6 +385,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		m_maximumOutput = maxThrottle;
 		m_frontLeftMotor.setPosition(0);
 		m_frontRightMotor.setPosition(0);
+		setYawAngleZero();
 		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
 		m_frontLeftMotor.set(0);
 		m_frontRightMotor.set(0);
@@ -392,7 +394,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		enableControlLoop();
 	}
 
-	public double getGyroTurnError() {
+	public double getSoftwarePIDError() {
 		return m_error;
 	}
 
@@ -418,6 +420,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 			}
 		}
 
+		// TODO Hack for now, need to factor this into sources and outputs!
 		else if (m_pidMode == PIDMode.SOFTWARE_TURN || m_pidMode == PIDMode.SOFTWARE_STRAIGHT ) {
 			if (m_pidMode == PIDMode.SOFTWARE_TURN) {
 				m_error = m_setpoint - getYawAngleDeg();
@@ -439,7 +442,8 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	        }
 	
 	        m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
-	        m_prevError = m_error;
+	        
+			m_prevError = m_error;
 	
 	        if (m_result > m_maximumOutput) {
 	            m_result = m_maximumOutput;
@@ -449,11 +453,13 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	        
 			if (m_pidMode == PIDMode.SOFTWARE_TURN) {
 				m_frontLeftMotor.set(-m_result);
+		        m_frontRightMotor.set(-m_result);
 			}
 			else {
-				m_frontLeftMotor.set(m_result);
+				double turnCorrection = getYawAngleDeg() * m_T;
+				m_frontLeftMotor.set(m_result + turnCorrection);
+		        m_frontRightMotor.set(-m_result - turnCorrection);
 			}
-	        m_frontRightMotor.set(-m_result);
 		}
 	}
 

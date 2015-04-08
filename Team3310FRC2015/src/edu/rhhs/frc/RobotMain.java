@@ -152,7 +152,6 @@ public class RobotMain extends BHRIterativeRobot
 		binGrabber.keepAlive();
 		robotArm.keepAlive();
 
- 		
 		Scheduler.getInstance().run();
 		updateStatus();
 	}
@@ -209,6 +208,7 @@ public class RobotMain extends BHRIterativeRobot
 	 */
 	@Override
 	public void disabledInit(){
+		m_autonomousCommand = null;
 		robotArm.setLEDStatus(false);
 		updateStatus();
 	}

@@ -28,7 +28,7 @@ public class DriveTrainGyroTurn extends Command
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	return Math.abs(RobotMain.driveTrain.getGyroTurnError()) < toleranceDeg; 
+    	return Math.abs(RobotMain.driveTrain.getSoftwarePIDError()) < toleranceDeg; 
     }
 
     // Called once after isFinished returns true
