@@ -24,6 +24,7 @@ public class BinGrabber extends Subsystem
 	public static final double DEPLOYED_POSITION_DEG = 80;
 	public static final double DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG = 50;   //  10
 	public static final double STOWED_POSITION_DEG = 0;
+	public static final double HALF_STOWED_POSITION_DEG = 20;
 	public static final double DRAG_BIN_POSITION_DEG = 60;
 			
 	private DoubleSolenoid m_clawPositionSolenoid;
@@ -33,7 +34,7 @@ public class BinGrabber extends Subsystem
 	private CANTalonAnalogPID m_leftMotor;
 
     private PIDParams downPositionPidParams = new PIDParams(10, 0.004, 0.0, 0.0, 50, 0);
-    private PIDParams upPositionPidParams = new PIDParams(1.5, 0.004, 0.0, 0.0, 50, 0);
+    private PIDParams upPositionPidParams = new PIDParams(2.0, 0.004, 0.0, 0.0, 50, 0);
 
 	private double m_error;
 

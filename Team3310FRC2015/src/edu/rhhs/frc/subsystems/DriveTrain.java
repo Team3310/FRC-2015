@@ -458,7 +458,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 			else {
 				double turnCorrection = getYawAngleDeg() * m_T;
 				m_frontLeftMotor.set(m_result + turnCorrection);
-		        m_frontRightMotor.set(-m_result - turnCorrection);
+		        m_frontRightMotor.set(-m_result + turnCorrection);
 			}
 		}
 	}
