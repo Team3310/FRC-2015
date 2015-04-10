@@ -173,11 +173,11 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 			
 			byte updateRateHz = 50;
 			m_imu = new AHRS(m_imuSerialPort, updateRateHz);
+			m_imuFirstIteration = true;
         } 
 		catch (Exception e) {
             System.out.println("Unknown error initializing drivetrain.  Message = " + e.getMessage());
         }
-		m_imuFirstIteration = true;
 	}
 	
 	@Override
@@ -197,11 +197,22 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	 */
 	public void calibrateIMU() {
 		// Set up the IMU
-        boolean isCalibrating = m_imu.isCalibrating();
-        if ( m_imuFirstIteration && !isCalibrating ) {
-            Timer.delay( 0.3 );
-            m_imu.zeroYaw();
-            m_imuFirstIteration = false; 
+        if (m_imuFirstIteration) {
+        	for (int i = 0; i < 500; i++) {
+        		try {
+		            boolean isCalibrating = m_imu.isCalibrating();
+		        	if (!isCalibrating ) {
+			            Timer.delay( 0.3 );
+			            m_imu.zeroYaw();
+			            m_imuFirstIteration = false; 
+			            break;
+		        	}
+		        	m_imu.wait(10);
+        		}
+        		catch (Exception e) {
+        			
+        		}
+        	}
         }
 	}
 

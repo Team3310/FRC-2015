@@ -43,10 +43,13 @@ public class RobotMain extends BHRIterativeRobot
 	private Command m_autonomousCommandPrevious;
 	private SendableChooser m_autonomousChooser;
 //	private SendableChooser m_driveModeChooser;
-	private SendableChooser m_robotArmControlModeChooser;
+//	private SendableChooser m_robotArmControlModeChooser;
 	private SendableChooser m_numStacksChooser;
 	private SendableChooser m_numTotesPerStackChooser;
-	private SendableChooser m_stackPriorityChooser;
+//	private SendableChooser m_stackPriorityChooser;
+
+	private boolean m_isRobotArmInitialized = false;
+	private boolean m_isBinGrabberActive = false;
 
 	private long m_loopTime;
 	private Integer numStacks = null;
@@ -73,10 +76,10 @@ public class RobotMain extends BHRIterativeRobot
 //			m_driveModeChooser.addObject ("Joystick Tank",   	new Integer(DriveTrain.CONTROLLER_JOYSTICK_TANK));
 //			SmartDashboard.putData("Drive Mode", m_driveModeChooser);            
 
-			m_stackPriorityChooser = new SendableChooser();
-			m_stackPriorityChooser.addDefault("Vertical Priority", StackPriority.VERTICAL);
-			m_stackPriorityChooser.addObject ("Horizontal Priority", StackPriority.HORIZONTAL);
-			SmartDashboard.putData("Stack Priority Chooser", m_stackPriorityChooser);
+//			m_stackPriorityChooser = new SendableChooser();
+//			m_stackPriorityChooser.addDefault("Vertical Priority", StackPriority.VERTICAL);
+//			m_stackPriorityChooser.addObject ("Horizontal Priority", StackPriority.HORIZONTAL);
+//			SmartDashboard.putData("Stack Priority Chooser", m_stackPriorityChooser);
 
 			m_numStacksChooser = new SendableChooser();
 			m_numStacksChooser.addObject ("1 Stack", 	new Integer(1));
@@ -90,13 +93,13 @@ public class RobotMain extends BHRIterativeRobot
 			m_numTotesPerStackChooser.addDefault("6 Totes", new Integer(6));
 			SmartDashboard.putData("Num Totes Per Stack Chooser", m_numTotesPerStackChooser);
 
-			m_robotArmControlModeChooser = new SendableChooser();
-			m_robotArmControlModeChooser.addObject ("VBus Only", 				CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
-			m_robotArmControlModeChooser.addObject ("VBus Position Hold", 		CANTalonEncoderPID.ControlMode.VBUS_POSITION_HOLD);
-			m_robotArmControlModeChooser.addObject ("Position Absolute", 		CANTalonEncoderPID.ControlMode.POSITION);
-			m_robotArmControlModeChooser.addDefault("Position Incremental", 	CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);
-			m_robotArmControlModeChooser.addObject ("Velocity Position Hold", 	CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD);
-			SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
+//			m_robotArmControlModeChooser = new SendableChooser();
+//			m_robotArmControlModeChooser.addObject ("VBus Only", 				CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+//			m_robotArmControlModeChooser.addObject ("VBus Position Hold", 		CANTalonEncoderPID.ControlMode.VBUS_POSITION_HOLD);
+//			m_robotArmControlModeChooser.addObject ("Position Absolute", 		CANTalonEncoderPID.ControlMode.POSITION);
+//			m_robotArmControlModeChooser.addDefault("Position Incremental", 	CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);
+//			m_robotArmControlModeChooser.addObject ("Velocity Position Hold", 	CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD);
+//			SmartDashboard.putData("Robot Arm Mode", m_robotArmControlModeChooser);
 
 			WaypointList waypointsCurrentToHome = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 			waypointsCurrentToHome.addWaypoint(HumanLoadCommandListGenerator.DEFAULT_HOME_COORD);
@@ -113,6 +116,10 @@ public class RobotMain extends BHRIterativeRobot
 //			m_autonomousChooser.addObject ("3 tote stack knock bins over", new AutonGet3TotesTip3BinsNew());
 			m_autonomousChooser.addDefault("Back up from Human Position", new AutonTurnToHumanPosition());
 			SmartDashboard.putData("Autonomous Mode", m_autonomousChooser);
+			
+			// Calibrate the IMU
+			driveTrain.calibrateIMU();
+
 		} catch( Exception ex ) {
 
 		}
@@ -125,13 +132,10 @@ public class RobotMain extends BHRIterativeRobot
 	 */
 	@Override
 	public void disabledPeriodic() {
-		// Calibrate the IMU
-		driveTrain.calibrateIMU();
-
 		// Update the command list generator
 		numStacks = (Integer)m_numStacksChooser.getSelected();
 		numTotesPerStack = (Integer)m_numTotesPerStackChooser.getSelected();
-		stackPriority = (StackPriority)m_stackPriorityChooser.getSelected();
+//		stackPriority = (StackPriority)m_stackPriorityChooser.getSelected();
 
 		// Get the command used for the autonomous period
 		m_autonomousCommand = (Command)m_autonomousChooser.getSelected();
@@ -140,9 +144,11 @@ public class RobotMain extends BHRIterativeRobot
 				m_autonomousCommand == m_binGrabberDeployAndGoPIDLong) {
 				RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 		    	RobotMain.binGrabber.startPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 0);
+		    	m_isBinGrabberActive = true;
 			}
 			else {
 				RobotMain.binGrabber.stopPID();
+				m_isBinGrabberActive = false;
 			}
 			m_autonomousCommandPrevious = m_autonomousCommand;
 		}
@@ -151,8 +157,14 @@ public class RobotMain extends BHRIterativeRobot
 		driveTrain.keepAlive();
 		binGrabber.keepAlive();
 		robotArm.keepAlive();
+		
+		if (!m_isRobotArmInitialized) {
+			robotArm.resetMasterPosition();
+			robotArm.setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
+			driveTrain.setJoystickControllerMode(DriveTrain.CONTROLLER_JOYSTICK_CHEESY);
+			m_isRobotArmInitialized = true;
+		}
 
-		Scheduler.getInstance().run();
 		updateStatus();
 	}
 
@@ -162,12 +174,11 @@ public class RobotMain extends BHRIterativeRobot
 	@Override
 	public void autonomousInit() {
 		robotArm.setLEDStatus(true);
-		robotArm.resetMasterPosition();
-		robotArm.setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.start();
-			Scheduler.getInstance().run();
-			updateStatus();
+		if (!m_isBinGrabberActive) {
+			if (m_autonomousCommand != null) {
+				m_autonomousCommand.start();
+				Scheduler.getInstance().run();
+			}			
 		}
 	}
 
@@ -176,8 +187,17 @@ public class RobotMain extends BHRIterativeRobot
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
-		updateStatus();
+		if (m_isBinGrabberActive) {			
+			// do action 1
+			
+			// do action 2
+			
+			// finally when done...
+			if (m_autonomousCommand != null) {
+				m_autonomousCommand.start();
+				Scheduler.getInstance().run();
+			}
+		}
 	}
 
 	/**
@@ -185,20 +205,20 @@ public class RobotMain extends BHRIterativeRobot
 	 */
 	@Override
 	public void teleopInit() {
-		driveTrain.getIMU().resetDisplacement();
 		robotArm.setLEDStatus(true);
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
+			m_autonomousCommand = null;
 		}
 		binGrabber.teleopInit();
 		driveTrain.teleopInit();
 		robotArm.teleopInit();
+
 //		driveTrain.setJoystickControllerMode(((Integer)m_driveModeChooser.getSelected()).intValue());
-		driveTrain.setJoystickControllerMode(DriveTrain.CONTROLLER_JOYSTICK_CHEESY);
-		robotArm.setControlMode((CANTalonEncoderPID.ControlMode)m_robotArmControlModeChooser.getSelected());
 		commandListGenerator.setNumStacks(numStacks);
 		commandListGenerator.setNumTotesPerStack(numTotesPerStack);
 		commandListGenerator.calculate();
+		
 		updateStatus();
 	}
 
