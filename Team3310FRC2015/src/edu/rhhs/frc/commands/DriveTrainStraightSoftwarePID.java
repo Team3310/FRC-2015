@@ -28,6 +28,7 @@ public class DriveTrainStraightSoftwarePID extends Command
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
+    	System.out.println("straight error " + distanceInches + " = " + RobotMain.driveTrain.getSoftwarePIDError());
     	return Math.abs(RobotMain.driveTrain.getSoftwarePIDError()) < toleranceInches; 
     }
 
