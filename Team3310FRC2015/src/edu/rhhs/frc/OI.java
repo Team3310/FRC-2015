@@ -8,6 +8,7 @@ import edu.rhhs.frc.commands.BinGrabberClawPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberPivotLockPosition;
 import edu.rhhs.frc.commands.BinGrabberPositionDownPID;
+import edu.rhhs.frc.commands.BinGrabberPositionHalfStowedPID;
 import edu.rhhs.frc.commands.BinGrabberPositionStowedPID;
 import edu.rhhs.frc.commands.BinGrabberSetLeftSpeed;
 import edu.rhhs.frc.commands.BinGrabberSetRightSpeed;
@@ -28,6 +29,7 @@ import edu.rhhs.frc.commands.RobotArmMotionProfileResume;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.RobotArmSetHome;
 import edu.rhhs.frc.commands.RobotArmSetXLock;
+import edu.rhhs.frc.commands.SecondaryToteGrabberPosition;
 import edu.rhhs.frc.commands.ToteGrabberPosition;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
@@ -126,11 +128,11 @@ public class OI
         XBoxDPadTriggerButton binGrabberClawClose = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.DOWN);
         binGrabberClawClose.whenPressed(new BinGrabberClawPosition(BinGrabber.BinGrabberState.RETRACTED));    
         
-        XBoxDPadTriggerButton driveTrainHoldOn = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT);
-        driveTrainHoldOn.whenPressed(new DriveTrainPositionHoldOn());
+        XBoxDPadTriggerButton binGrabberStowUp = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.RIGHT);
+        binGrabberStowUp.whenPressed(new BinGrabberPositionStowedPID());
 
-        XBoxDPadTriggerButton driveTrainHoldOff = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT);
-        driveTrainHoldOff.whenPressed(new DriveTrainStopPID());
+        XBoxDPadTriggerButton binGrabberStowHalf = new XBoxDPadTriggerButton(m_drivetrainController, XBoxDPadTriggerButton.LEFT);
+        binGrabberStowHalf.whenPressed(new BinGrabberPositionHalfStowedPID());
         
         // Robot arm controller
         JoystickButton motionProfilePause = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.Y_BUTTON);
@@ -179,9 +181,19 @@ public class OI
         XBoxDPadTriggerButton cancelXLock = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.LEFT);
         cancelXLock.whenPressed(new RobotArmSetXLock(false));
 
+        XBoxDPadTriggerButton secondaryToteGrabberOpen = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+        secondaryToteGrabberOpen.whenPressed(new SecondaryToteGrabberPosition(RobotArm.ToteGrabberPosition.OPEN));
+       
+        XBoxDPadTriggerButton secondaryToteGrabberClose = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
+        secondaryToteGrabberClose.whenPressed(new SecondaryToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
+       
 		InternalButton binGrabberStowedPID = new InternalButton();
 		binGrabberStowedPID.whenReleased(new BinGrabberPositionStowedPID());
 		SmartDashboard.putData("Bin Grabber Stowed Position PID", binGrabberStowedPID);
+       
+		InternalButton binGrabberStowedHalfPID = new InternalButton();
+		binGrabberStowedHalfPID.whenReleased(new BinGrabberPositionStowedPID());
+		SmartDashboard.putData("Bin Grabber Stow Half Position PID", binGrabberStowedHalfPID);
 
 		// Testing
         boolean test = true;

@@ -48,8 +48,8 @@ public class RobotMap
 	public static final int BIN_GRABBER_PIVOT_LOCK_RETRACT_PNEUMATIC_MODULE_ID = 3;
 	public static final int BIN_GRABBER_CLAW_RETRACT_PNEUMATIC_MODULE_ID = 4;
 	public static final int BIN_GRABBER_CLAW_EXTEND_PNEUMATIC_MODULE_ID = 5;
-	public static final int TOTE_SLED_RETRACT_PNEUMATIC_MODULE_ID = 6;
-	public static final int TOTE_SLED_EXTEND_PNEUMATIC_MODULE_ID = 7;
+	public static final int TOTE_SLED_PNEUMATIC_MODULE_ID = 6;
+	public static final int SECONDARY_GRIPPER_PNEUMATIC_MODULE_ID = 7;
 
 	// roboRIO DIO ports
 	public static final int TOTE_GRABBER_SWITCH_DIO_ID = 0;

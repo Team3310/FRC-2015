@@ -1,6 +1,7 @@
 package edu.rhhs.frc.subsystems;
 
 import com.kauailabs.navx_mxp.AHRS;
+
 import edu.rhhs.frc.OI;
 import edu.rhhs.frc.RobotMap;
 import edu.rhhs.frc.commands.DriveWithJoystick;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,7 +48,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	 
     private RobotDrive m_drive;
     
-	private DoubleSolenoid m_toteSledSolenoid;
+	private Solenoid m_toteSledSolenoid;
     
     // Controllers
     public static final int CONTROLLER_JOYSTICK_ARCADE = 0;
@@ -105,7 +107,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     
     public DriveTrain() {
 		try {
-			m_toteSledSolenoid = new DoubleSolenoid(RobotMap.TOTE_SLED_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_SLED_RETRACT_PNEUMATIC_MODULE_ID);
+			m_toteSledSolenoid = new Solenoid(RobotMap.TOTE_SLED_PNEUMATIC_MODULE_ID);
 
 			m_frontLeftMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
 			m_frontRightMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
@@ -240,10 +242,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 
 	public void setToteSledPosition(ToteSledPosition position) {
 		if (position == ToteSledPosition.DOWN) {
-			m_toteSledSolenoid.set(DoubleSolenoid.Value.kForward);
+			m_toteSledSolenoid.set(true);
     	}
 		else {
-			m_toteSledSolenoid.set(DoubleSolenoid.Value.kReverse);
+			m_toteSledSolenoid.set(false);
 		}
 	}
 

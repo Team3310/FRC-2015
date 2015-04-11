@@ -14,6 +14,8 @@ public abstract class RobotArmCommand
     private double m_timeout = -1;
     /** Whether or not this command has been initialized */
     private boolean m_initialized = false;
+    protected RobotArmCommand m_parallelCommand;
+    protected int m_parallelCommandStartIndex;
 
     public RobotArmCommand() {
     	m_commandType = RobotArmCommandType.NULL;
@@ -104,4 +106,9 @@ public abstract class RobotArmCommand
     protected abstract boolean isFinished();
 
     protected abstract void end();
+    
+    protected void setParallelCommand(RobotArmCommand command, int startIndex) {
+    	m_parallelCommand = command;
+    	m_parallelCommandStartIndex = startIndex;
+    }
 }

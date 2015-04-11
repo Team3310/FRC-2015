@@ -143,6 +143,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		    	addMotionProfileCommand(waypointsGetTote, new double[] {160, 120, 120, 120}, new double[] {100, 100, 100, 100, 100}, new double[] {25, 100, 100, 100, 100});
 
 				addToteGrabberCloseCommand();
+				addSecondaryToteGrabberCloseCommand();
 
 				// Pull away from human load station
 				WaypointList waypointsHumanToStack = new WaypointList(ProfileMode.CartesianInputJointMotion);	
@@ -168,6 +169,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 				addWaitForNextCommand();
 				
 				// Release tote
+				addSecondaryToteGrabberOpenCommand();
 				addToteGrabberOpenCommand();
 				
 				// Joint motion back to human load station

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -112,6 +113,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	private DigitalInput m_toteGrabberSwitch;
 	private DoubleSolenoid m_toteGrabberSolenoid;
+	private Solenoid m_secondaryToteGrabberSolenoid;
 
 	private CANTalonEncoderPID.ControlMode m_robotArmControlMode = CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD;
 
@@ -178,8 +180,12 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 //			setControlMode(CANTalonEncoderPID.ControlMode.POSITION_INCREMENTAL);	
 
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH_DIO_ID);	
+
 			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
 			setToteGrabberPosition(ToteGrabberPosition.OPEN);		
+
+			m_secondaryToteGrabberSolenoid = new Solenoid(RobotMap.SECONDARY_GRIPPER_PNEUMATIC_MODULE_ID);
+			setSecondaryToteGrabberPosition(ToteGrabberPosition.OPEN);		
 
 			m_controlLoop = new ControlLooper(this, OUTER_LOOP_UPDATE_RATE_MS);
 			m_controlLoop.start();
@@ -272,6 +278,15 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 		}
 		else {
 			m_toteGrabberSolenoid.set(DoubleSolenoid.Value.kReverse);
+		}
+	}
+
+	public synchronized void setSecondaryToteGrabberPosition(ToteGrabberPosition position) {
+		if (position == ToteGrabberPosition.OPEN) {
+			m_secondaryToteGrabberSolenoid.set(true);
+		}
+		else {
+			m_secondaryToteGrabberSolenoid.set(false);
 		}
 	}
 

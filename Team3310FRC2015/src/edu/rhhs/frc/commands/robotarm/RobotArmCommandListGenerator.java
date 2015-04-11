@@ -55,6 +55,14 @@ public abstract class RobotArmCommandListGenerator
 		commandList.add(new RobotArmToteGrabberSetPosition(ToteGrabberPosition.OPEN));
 	}
 
+	protected void addSecondaryToteGrabberCloseCommand() {
+		commandList.add(new RobotArmSecondaryToteGrabberSetPosition(ToteGrabberPosition.CLOSE));
+	}
+
+	protected void addSecondaryToteGrabberOpenCommand() {
+		commandList.add(new RobotArmSecondaryToteGrabberSetPosition(ToteGrabberPosition.OPEN));
+	}
+
 	public static double[] addPositionOffset(double[] waypoint, double deltaX, double deltaY, double deltaZ, double deltaToolAngle) {
 		double[] position = new double[4];
 		position[0] = waypoint[0] + deltaX;

@@ -18,17 +18,20 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 	
     public RobotArmMotionProfilePath(WaypointList waypoints) {
     	this.waypoints = waypoints;
-    }
+       	calculatePath();
+   }
 
     public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointVelocities) {
        	this.waypoints = waypoints;
        	this.jointVelocities = jointVelocities;
+       	calculatePath();
     }
     
     public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointVelocities, double[] jointPercentVelocities) {
        	this.waypoints = waypoints;
        	this.jointVelocities = jointVelocities;
        	this.jointPercentVelocities = jointPercentVelocities;
+       	calculatePath();
     }
     
     public RobotArmMotionProfilePath(WaypointList waypoints, double[] jointVelocities, double[] jointPercentVelocities, double[] endTypeCnt) {
@@ -36,9 +39,10 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
        	this.jointVelocities = jointVelocities;
        	this.jointPercentVelocities = jointPercentVelocities;
        	this.endTypeCnt = endTypeCnt;
+       	calculatePath();
     }
     
-    protected void initialize() {    	
+    private void calculatePath() {
     	if (waypoints != null) {
 	    	MotionProfile motionProfile = new MotionProfile(waypoints);
 	    	if (jointVelocities != null) {
@@ -53,7 +57,9 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 			motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, RobotMain.commandListGenerator.getWorldToRobotOffsetInches());
 			profileOutput = motionProfile.getProfile();
     	}
-    	
+    }
+    
+    protected void initialize() {    	 	
     	if (profileOutput == null) {
     		System.out.println("Error calculating path for RobotArmMotionProfilePath");
     		isFinished = true;
@@ -84,6 +90,11 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 
 //		currentProfileIndex += RobotArm.OUTER_LOOP_UPDATE_RATE_MS;
 		// We now only output the points at the controller rate (used to be every ms)
+		
+		if (m_parallelCommand != null && m_parallelCommandStartIndex <= currentProfileIndex) {
+			m_parallelCommand.run();
+		}
+			
 		currentProfileIndex++;
     }
 
