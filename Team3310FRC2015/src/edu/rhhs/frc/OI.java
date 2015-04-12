@@ -1,3 +1,4 @@
+
 package edu.rhhs.frc;
 
 import edu.rhhs.frc.buttons.XBoxDPadTriggerButton;
@@ -164,11 +165,11 @@ public class OI
         JoystickButton toteGrabberClose = new JoystickButton(m_robotArmController.getJoyStick(), XboxController.RIGHT_BUMPER_BUTTON);
         toteGrabberClose.whenPressed(new ToteGrabberPosition(RobotArm.ToteGrabberPosition.CLOSE));
 
-        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
-        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 78, MotionProfile.ProfileMode.CartesianInputJointMotion));
-        
-        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
-        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 6, MotionProfile.ProfileMode.CartesianInputJointMotion));
+//        XBoxDPadTriggerButton moveToSixStackLoadHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.UP);
+//        moveToSixStackLoadHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 78, MotionProfile.ProfileMode.CartesianInputJointMotion));
+//        
+//        XBoxDPadTriggerButton moveToSixStackReleaseHeight = new XBoxDPadTriggerButton(m_robotArmController, XBoxDPadTriggerButton.DOWN);
+//        moveToSixStackReleaseHeight.whenPressed(new RobotArmMotionProfileCurrentToPosition(36, 0, 6, MotionProfile.ProfileMode.CartesianInputJointMotion));
         
     	RobotArmCommandList commandListJ1ToZero = new RobotArmCommandList();
     	commandListJ1ToZero.add(new RobotArmToteGrabberSetPosition(RobotArm.ToteGrabberPosition.OPEN));
@@ -344,12 +345,12 @@ public class OI
 
 			InternalButton driveGyroTurnLeftTest = new InternalButton();
 			driveGyroTurnLeftTest
-					.whenPressed(new DriveTrainGyroTurn(20, 1, 0.6));
+					.whenPressed(new DriveTrainGyroTurn(40, 5, 0.6));
 			SmartDashboard.putData("Drive Gyro Turn  45 Test",
 					driveGyroTurnLeftTest);
 
 			InternalButton driveGyroTurnRightTest = new InternalButton();
-			driveGyroTurnRightTest.whenPressed(new DriveTrainGyroTurn(-20, 1,
+			driveGyroTurnRightTest.whenPressed(new DriveTrainGyroTurn(-40, 5,
 					0.6));
 			SmartDashboard.putData("Drive Gyro Turn -45 Test",
 					driveGyroTurnRightTest);

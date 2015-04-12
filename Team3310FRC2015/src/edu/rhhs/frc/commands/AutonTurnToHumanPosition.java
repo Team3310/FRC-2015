@@ -31,6 +31,6 @@ public class AutonTurnToHumanPosition extends CommandGroup
 		armDownCommandList.add(new RobotArmMotionProfilePath(armDown, new double[] {120, 120, 120, 120}, new double[] {100, 100, 100}, new double[] {100, 100, 100})); 	
 		addSequential(new RobotArmMotionProfileStart(armDownCommandList));
 
-		addSequential(new DriveTrainStopPID());
+		//addSequential(new DriveTrainStopPID());
 	}
 }

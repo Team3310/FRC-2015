@@ -1,5 +1,7 @@
 package edu.rhhs.frc.commands.robotarm;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -14,8 +16,9 @@ public abstract class RobotArmCommand
     private double m_timeout = -1;
     /** Whether or not this command has been initialized */
     private boolean m_initialized = false;
-    protected RobotArmCommand m_parallelCommand;
+    protected ArrayList<RobotArmCommand> m_parallelCommandList = new ArrayList<RobotArmCommand>();
     protected int m_parallelCommandStartIndex;
+    protected int m_parallelCommandEndIndex;
 
     public RobotArmCommand() {
     	m_commandType = RobotArmCommandType.NULL;
@@ -98,6 +101,10 @@ public abstract class RobotArmCommand
     protected synchronized boolean isTimedOut() {
         return m_timeout != -1 && timeSinceInitialized() >= m_timeout;
     }
+    
+    public boolean isInitialized() {
+    	return m_initialized;
+    }
 
     protected abstract void initialize();
 
@@ -107,8 +114,31 @@ public abstract class RobotArmCommand
 
     protected abstract void end();
     
-    protected void setParallelCommand(RobotArmCommand command, int startIndex) {
-    	m_parallelCommand = command;
-    	m_parallelCommandStartIndex = startIndex;
+    protected void setParallelCommandIndexStart(int index) {
+    	m_parallelCommandStartIndex = index;
+    	m_parallelCommandEndIndex = -1;
+    }
+    
+    protected int getParallelCommandIndexStart() {
+    	return m_parallelCommandStartIndex;
+    }
+    
+    protected void setParallelCommandIndexEnd(int index) {
+    	m_parallelCommandStartIndex = -1;
+    	m_parallelCommandEndIndex = index;
+    }
+    
+    protected int getParallelCommandIndexEnd() {
+    	return m_parallelCommandEndIndex;
+    }
+    
+    protected void addParallelStartCommand(RobotArmCommand command, int startIndex) {
+    	m_parallelCommandList.add(command);
+    	command.setParallelCommandIndexStart(startIndex);
+    }
+    
+    protected void addParallelEndCommand(RobotArmCommand command, int endIndex) {
+    	m_parallelCommandList.add(command);
+    	command.setParallelCommandIndexEnd(endIndex);
     }
 }

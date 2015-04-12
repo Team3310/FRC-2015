@@ -16,16 +16,17 @@ public class RobotArmSecondaryToteGrabberSetPosition extends RobotArmCommand
     }
 
     protected void initialize() {
-//    	setTimeout(0.5);
+    	setTimeout(0.15);
     	RobotMain.robotArm.setSecondaryToteGrabberPosition(m_position);
     }
 
+    
     protected void execute() {
     }
 
     protected boolean isFinished() {
-//        return isTimedOut();
-    	return true;
+        return isTimedOut();
+//    	return true;
     }
 
     protected void end() {

@@ -1,20 +1,19 @@
 package edu.rhhs.frc.commands;
 
 import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
+import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import edu.wpi.first.wpilibj.command.WaitForChildren;
 
 public class BinGrabberNoDeployAndGoPID extends CommandGroup 
 {
     public BinGrabberNoDeployAndGoPID() {
-        addSequential(new BinGrabberPivotLockPosition(BinGrabberState.RETRACTED)); 
-        addSequential(new DriveTrainPositionControl(108, 108, true, 108));
+     	addSequential(new BinGrabberPositionStowedPID());
+    	addSequential(new BinGrabberPivotLockPosition(BinGrabberState.RETRACTED)); 
         addSequential(new BinGrabberClawPosition(BinGrabberState.RETRACTED));  
-        addParallel(new DriveTrainStraightSoftwarePID(40, 2, 0.5));
-//       addParallel(new DriveTrainMotionProfileStraight(40, 30));
-    //    addParallel(new DriveTrainSpeedTimeout(0.4, 1.5));
-    	addSequential(new BinGrabberPositionStowedPID());
-        addSequential(new WaitForChildren());
+    	addSequential(new DriveTrainStraightSoftwarePID(181, 4, 0.5));
+        addSequential(new DriveTrainGyroTurn(33, 4, 0.6));
         addSequential(new DriveTrainStopPID());
+     	addSequential(new BinGrabberPositionHalfStowedPID());
+        addSequential(new DriveTrainToteSledPosition(ToteSledPosition.DOWN));
     }
 }

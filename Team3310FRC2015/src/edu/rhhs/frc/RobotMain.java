@@ -13,6 +13,8 @@ import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
+import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
+import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.BHRIterativeRobot;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
@@ -65,6 +67,8 @@ public class RobotMain extends BHRIterativeRobot
 		try {
 			m_loopTime = System.nanoTime();
 
+			robotArm.setToteGrabberPosition(ToteGrabberPosition.OPEN);
+			robotArm.setSecondaryToteGrabberPosition(ToteGrabberPosition.OPEN);
 			commandListGenerator.setStackPriority(StackPriority.VERTICAL);
 
 //			m_driveModeChooser = new SendableChooser();
@@ -174,7 +178,13 @@ public class RobotMain extends BHRIterativeRobot
 	@Override
 	public void autonomousInit() {
 		robotArm.setLEDStatus(true);
-		if (!m_isBinGrabberActive) {
+		if (m_isBinGrabberActive) {
+			if (m_autonomousCommand != null) {
+				m_autonomousCommand.start();
+				Scheduler.getInstance().run();
+			}			
+		}
+		else {
 			if (m_autonomousCommand != null) {
 				m_autonomousCommand.start();
 				Scheduler.getInstance().run();
@@ -193,10 +203,13 @@ public class RobotMain extends BHRIterativeRobot
 			// do action 2
 			
 			// finally when done...
-			if (m_autonomousCommand != null) {
-				m_autonomousCommand.start();
-				Scheduler.getInstance().run();
-			}
+//			if (m_autonomousCommand != null) {
+//				m_autonomousCommand.start();
+//			}
+			Scheduler.getInstance().run();
+		}
+		else {
+			Scheduler.getInstance().run();			
 		}
 	}
 

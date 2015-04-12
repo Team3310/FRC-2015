@@ -30,8 +30,12 @@ public class BinGrabberPositionDownPID extends Command
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-		return RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG && 
+		boolean angleTest =  RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG && 
 				RobotMain.binGrabber.getRightPositionDeg() >  BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG;
+		if (angleTest) {
+			System.out.println("Right = " + RobotMain.binGrabber.getRightPositionDeg() + ", left = " + RobotMain.binGrabber.getLeftPositionDeg());
+		}
+		return angleTest;
     }
 
     // Called once after isFinished returns true

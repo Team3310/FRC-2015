@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,7 +47,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	 
     private RobotDrive m_drive;
     
-	private Solenoid m_toteSledSolenoid;
+	private DoubleSolenoid m_toteSledSolenoid;
     
     // Controllers
     public static final int CONTROLLER_JOYSTICK_ARCADE = 0;
@@ -107,7 +106,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     
     public DriveTrain() {
 		try {
-			m_toteSledSolenoid = new Solenoid(RobotMap.TOTE_SLED_PNEUMATIC_MODULE_ID);
+			m_toteSledSolenoid = new DoubleSolenoid(RobotMap.TOTE_SLED_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_SLED_RETRACT_PNEUMATIC_MODULE_ID);
 
 			m_frontLeftMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_LEFT_CAN_ID);
 			m_frontRightMotor = new CANTalonEncoderPID(RobotMap.DRIVETRAIN_FRONT_RIGHT_CAN_ID);
@@ -242,10 +241,10 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 
 	public void setToteSledPosition(ToteSledPosition position) {
 		if (position == ToteSledPosition.DOWN) {
-			m_toteSledSolenoid.set(true);
+			m_toteSledSolenoid.set(DoubleSolenoid.Value.kForward);
     	}
 		else {
-			m_toteSledSolenoid.set(false);
+			m_toteSledSolenoid.set(DoubleSolenoid.Value.kReverse);
 		}
 	}
 
@@ -383,7 +382,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
 		m_frontLeftMotor.set(0);
 		m_frontRightMotor.set(0);
-		m_error = m_setpoint - getYawAngleDeg();
+		m_error = m_setpoint;
 		isHoldOn = false;
 		enableControlLoop();
 	}
@@ -402,7 +401,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
 		m_frontLeftMotor.set(0);
 		m_frontRightMotor.set(0);
-		m_error = m_setpoint - (getLeftDistanceInches() + getRightDistanceInches()) / 2.0;
+		m_error = m_setpoint;
 		isHoldOn = false;
 		enableControlLoop();
 	}
@@ -412,6 +411,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	}
 
 	public void controlLoopUpdate() {
+		if (!isControlLoopEnabled()) return;
 		if (m_pidMode == PIDMode.TALON_MOTION_PROFILE || m_pidMode == PIDMode.TALON_MOTION_PROFILE_WITH_GYRO) {
 			if (m_motionProfileIndex < m_motionProfile.numPoints) {
 				double distanceLeft = m_motionProfile.jointPos[m_motionProfileIndex][0];    // hack, use J1
@@ -460,18 +460,21 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 	
 	        if (m_result > m_maximumOutput) {
 	            m_result = m_maximumOutput;
-	        } else if (m_result < m_minimumOutput) {
+	        } 
+	        else if (m_result < m_minimumOutput) {
 	            m_result = m_minimumOutput;
 	        }
 	        
 			if (m_pidMode == PIDMode.SOFTWARE_TURN) {
 				m_frontLeftMotor.set(-m_result);
 		        m_frontRightMotor.set(-m_result);
+//		        System.out.println("Turn result = " + m_result);
 			}
 			else {
 				double turnCorrection = getYawAngleDeg() * m_T;
 				m_frontLeftMotor.set(m_result + turnCorrection);
 		        m_frontRightMotor.set(-m_result + turnCorrection);
+//		        System.out.println("Straight result = " + m_result + ", turnCorrection = " + turnCorrection);
 			}
 		}
 	}

@@ -112,7 +112,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	private PIDParams j4VelocityPidParams = new PIDParams(1.0, 0.027, 0.0, 0.0, 0, 0);
 
 	private DigitalInput m_toteGrabberSwitch;
-	private DoubleSolenoid m_toteGrabberSolenoid;
+	private Solenoid m_toteGrabberSolenoid;
 	private Solenoid m_secondaryToteGrabberSolenoid;
 
 	private CANTalonEncoderPID.ControlMode m_robotArmControlMode = CANTalonEncoderPID.ControlMode.VELOCITY_POSITION_HOLD;
@@ -181,7 +181,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 			m_toteGrabberSwitch = new DigitalInput(RobotMap.TOTE_GRABBER_SWITCH_DIO_ID);	
 
-			m_toteGrabberSolenoid = new DoubleSolenoid(RobotMap.TOTE_GRABBER_EXTEND_PNEUMATIC_MODULE_ID, RobotMap.TOTE_GRABBER_RETRACT_PNEUMATIC_MODULE_ID);
+			m_toteGrabberSolenoid = new Solenoid(RobotMap.TOTE_GRABBER_PNEUMATIC_MODULE_ID);
 			setToteGrabberPosition(ToteGrabberPosition.OPEN);		
 
 			m_secondaryToteGrabberSolenoid = new Solenoid(RobotMap.SECONDARY_GRIPPER_PNEUMATIC_MODULE_ID);
@@ -274,24 +274,24 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 
 	public synchronized void setToteGrabberPosition(ToteGrabberPosition position) {
 		if (position == ToteGrabberPosition.OPEN) {
-			m_toteGrabberSolenoid.set(DoubleSolenoid.Value.kForward);
+			m_toteGrabberSolenoid.set(false);
 		}
 		else {
-			m_toteGrabberSolenoid.set(DoubleSolenoid.Value.kReverse);
+			m_toteGrabberSolenoid.set(true);
 		}
 	}
 
 	public synchronized void setSecondaryToteGrabberPosition(ToteGrabberPosition position) {
 		if (position == ToteGrabberPosition.OPEN) {
-			m_secondaryToteGrabberSolenoid.set(true);
+			m_secondaryToteGrabberSolenoid.set(false);
 		}
 		else {
-			m_secondaryToteGrabberSolenoid.set(false);
+			m_secondaryToteGrabberSolenoid.set(true);
 		}
 	}
 
 	public synchronized ToteGrabberPosition getToteGrabberPosition() {
-		if (m_toteGrabberSolenoid.get() == DoubleSolenoid.Value.kForward) {
+		if (m_toteGrabberSolenoid.get() == false) {
 			return ToteGrabberPosition.OPEN;
 		}
 		return ToteGrabberPosition.CLOSE;

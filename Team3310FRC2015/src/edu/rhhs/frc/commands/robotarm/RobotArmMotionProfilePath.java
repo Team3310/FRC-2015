@@ -67,6 +67,9 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
     	}
     	currentProfileIndex = 0;
     	isFinished = false;
+		for (RobotArmCommand command : m_parallelCommandList) {
+			command.reset();
+		}
     }
 
     protected void execute() {
@@ -91,8 +94,16 @@ public class RobotArmMotionProfilePath extends RobotArmCommand
 //		currentProfileIndex += RobotArm.OUTER_LOOP_UPDATE_RATE_MS;
 		// We now only output the points at the controller rate (used to be every ms)
 		
-		if (m_parallelCommand != null && m_parallelCommandStartIndex <= currentProfileIndex) {
-			m_parallelCommand.run();
+		if (m_parallelCommandList.size() > 0) {
+			for (RobotArmCommand command : m_parallelCommandList) {
+//				System.out.println("Index=" + currentProfileIndex + ", size=" + m_parallelCommandList.size() + ", start" + command.getParallelCommandIndexStart() + ", end" + command.getParallelCommandIndexEnd());
+				if (!command.isInitialized() && command.getParallelCommandIndexStart() > 0 && command.getParallelCommandIndexStart() <= currentProfileIndex) {
+					command.run();		// Will only run once.. but ok for pneumatics		
+				}
+				if (!command.isInitialized() && command.getParallelCommandIndexEnd() > 0 && command.getParallelCommandIndexEnd() >= (profileOutput.jointPos.length - currentProfileIndex)) {
+					command.run();		// Will only run once.. but ok for pneumatics		
+				}
+			}
 		}
 			
 		currentProfileIndex++;
