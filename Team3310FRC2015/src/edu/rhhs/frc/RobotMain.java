@@ -13,6 +13,7 @@ import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
+import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
 import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.BHRIterativeRobot;
@@ -40,6 +41,7 @@ public class RobotMain extends BHRIterativeRobot
 	public static final HumanLoadCommandListGenerator commandListGenerator = new HumanLoadCommandListGenerator();
 
 	private Command m_autonomousCommand;
+	private int m_autonomousIndex;
 	private Command m_binGrabberDeployAndGoPID = new BinGrabberDeployAndGoPID();
 	private Command m_binGrabberDeployAndGoPIDLong = new BinGrabberDeployAndGoPIDLong();
 	private Command m_autonomousCommandPrevious;
@@ -148,6 +150,7 @@ public class RobotMain extends BHRIterativeRobot
 				m_autonomousCommand == m_binGrabberDeployAndGoPIDLong) {
 				RobotMain.binGrabber.setStatusFrameRate(StatusFrameRate.AnalogTempVbat, 10);
 		    	RobotMain.binGrabber.startPositionDownPID(BinGrabber.DEPLOYED_POSITION_DEG, BinGrabber.DEPLOYED_POSITION_DEG, 0);
+		    	RobotMain.driveTrain.initAutonStraightSoftwarePID();
 		    	m_isBinGrabberActive = true;
 			}
 			else {
@@ -178,13 +181,8 @@ public class RobotMain extends BHRIterativeRobot
 	@Override
 	public void autonomousInit() {
 		robotArm.setLEDStatus(true);
-		if (m_isBinGrabberActive) {
-			if (m_autonomousCommand != null) {
-				m_autonomousCommand.start();
-				Scheduler.getInstance().run();
-			}			
-		}
-		else {
+		m_autonomousIndex = 0;
+		if (!m_isBinGrabberActive) {
 			if (m_autonomousCommand != null) {
 				m_autonomousCommand.start();
 				Scheduler.getInstance().run();
@@ -197,17 +195,43 @@ public class RobotMain extends BHRIterativeRobot
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		
+		// Bin grabber auton because command based architecture is too slow...
 		if (m_isBinGrabberActive) {			
-			// do action 1
+			// Check for bin grabber angle
+			if (m_autonomousIndex == 0) {
+				boolean angleTest =  RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG && 
+						RobotMain.binGrabber.getRightPositionDeg() >  BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG;
+				System.out.println("AngleTest = " + angleTest + ", BinGrabberPos = " + RobotMain.binGrabber.getLeftPositionDeg());
+				if (angleTest) {
+					System.out.println("AngleTest = true");
+					// Start drivetrain
+					RobotMain.driveTrain.startAutonStraightSoftwarePID(102, 4, 1.0);
+					RobotMain.binGrabber.setPivotLockPosition(BinGrabberState.RETRACTED);
+					m_autonomousIndex++;
+				}
+			}
 			
-			// do action 2
-			
-			// finally when done...
-//			if (m_autonomousCommand != null) {
-//				m_autonomousCommand.start();
-//			}
-			Scheduler.getInstance().run();
+			// Check for drivetrain distance
+			else if (m_autonomousIndex == 1) {
+		    	boolean distanceTest = Math.abs(RobotMain.driveTrain.getSoftwarePIDError()) < 4; 
+		    	System.out.println("DistanceTest = " + distanceTest + ", PIDError = " + RobotMain.driveTrain.getSoftwarePIDError());
+				if (distanceTest) {
+					System.out.println("DistanceTest = true");
+					RobotMain.driveTrain.disableControlLoop();
+					if (m_autonomousCommand != null) {
+						m_autonomousCommand.start();
+					}
+					Scheduler.getInstance().run();
+					m_autonomousIndex++;
+				}
+			}
+			else if (m_autonomousIndex == 2) {
+				Scheduler.getInstance().run();
+			}
 		}
+		
+		// Normal auton
 		else {
 			Scheduler.getInstance().run();			
 		}

@@ -117,7 +117,7 @@ public class BHRIterativeRobot extends RobotBase {
                 }
                 FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
                 autonomousPeriodic();
-                m_ds.waitForData(10);
+                m_ds.waitForData(5);
             } else {
                 // call Teleop_Init() if this is the first time
                 // we've entered teleop_mode

@@ -387,6 +387,28 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 		enableControlLoop();
 	}
 
+	public void initAutonStraightSoftwarePID() {
+		if (isControlLoopEnabled()) {
+			disableControlLoop();
+		}
+		m_pidMode = PIDMode.SOFTWARE_STRAIGHT;
+		m_frontLeftMotor.setPosition(0);
+		m_frontRightMotor.setPosition(0);
+		setYawAngleZero();
+		setControlMode(CANTalonEncoderPID.ControlMode.PERCENT_VBUS);
+		m_frontLeftMotor.set(0);
+		m_frontRightMotor.set(0);
+		isHoldOn = false;
+	}
+
+	public void startAutonStraightSoftwarePID(double distanceInches, double toleranceInches, double maxThrottle) {
+		m_setpoint = distanceInches;
+		m_tolerance = toleranceInches;
+		m_maximumOutput = maxThrottle;
+		m_error = m_setpoint;
+		enableControlLoop();
+	}
+
 	public void startStraightSoftwarePID(double distanceInches, double toleranceInches, double maxThrottle) {
 		if (isControlLoopEnabled()) {
 			disableControlLoop();
@@ -439,6 +461,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 				m_error = m_setpoint - getYawAngleDeg();
 			}
 			else {
+				System.out.println("Left inches: " + getLeftDistanceInches() + ", Right inches: " + getRightDistanceInches());
 				m_error = m_setpoint - (getLeftDistanceInches() + getRightDistanceInches()) / 2.0;
 			}
 	        if (m_I != 0) {

@@ -22,9 +22,9 @@ public class BinGrabber extends Subsystem
 	private static final int RIGHT_ANALOG_ZERO_PRACTICE = -580;
 	
 	public static final double DEPLOYED_POSITION_DEG = 85;
-	public static final double DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG = 10;   //  10
+	public static final double DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG = 20;   //  10
 	public static final double STOWED_POSITION_DEG = 0;
-	public static final double HALF_STOWED_POSITION_DEG = 30;
+	public static final double HALF_STOWED_POSITION_DEG = 40;
 	public static final double DRAG_BIN_POSITION_DEG = 60;
 			
 	private DoubleSolenoid m_clawPositionSolenoid;

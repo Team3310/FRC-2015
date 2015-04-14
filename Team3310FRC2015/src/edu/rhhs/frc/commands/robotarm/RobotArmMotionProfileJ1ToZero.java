@@ -27,7 +27,7 @@ public class RobotArmMotionProfileJ1ToZero extends RobotArmMotionProfilePath
     	else {
 	    	waypoints.addWaypoint(new double[] { -2, 24, 50, 0});  // last stack
     	}
-    	waypoints.addWaypoint(RobotArm.X_MIN_INCHES, 0, 40, 0);
+    	waypoints.addWaypoint(RobotArm.X_MIN_INCHES, 0, 45, 0);
     	
     	motionProfile = new MotionProfile(waypoints);
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, MotionProfile.ZERO_OFFSET);

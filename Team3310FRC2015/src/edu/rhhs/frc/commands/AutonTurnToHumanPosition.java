@@ -3,6 +3,7 @@ package edu.rhhs.frc.commands;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfilePath;
+import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
@@ -20,8 +21,11 @@ public class AutonTurnToHumanPosition extends CommandGroup
 
 		// Start position clamp tote
 		addSequential(new DriveTrainToteSledPosition(ToteSledPosition.DOWN));
-		addSequential(new WaitCommand(4));
-
+		addSequential(new WaitCommand(2));
+		addSequential(new DriveTrainSpeedTimeout(.2, 1));
+		
+		addSequential(new BinGrabberPositionHalfStowedPID());
+		addSequential(new WaitCommand(2));
 		// Move arm up, over and knock over first bin
 		WaypointList armDown = new WaypointList(MotionProfile.ProfileMode.CartesianInputJointMotion);
 		armDown.addWaypoint(0,   15, 47, 0);
@@ -30,7 +34,7 @@ public class AutonTurnToHumanPosition extends CommandGroup
 		RobotArmCommandList armDownCommandList = new RobotArmCommandList();
 		armDownCommandList.add(new RobotArmMotionProfilePath(armDown, new double[] {120, 120, 120, 120}, new double[] {100, 100, 100}, new double[] {100, 100, 100})); 	
 		addSequential(new RobotArmMotionProfileStart(armDownCommandList));
-
+		addSequential(new BinGrabberPivotLockPosition(BinGrabberState.RETRACTED));
 		//addSequential(new DriveTrainStopPID());
 	}
 }
