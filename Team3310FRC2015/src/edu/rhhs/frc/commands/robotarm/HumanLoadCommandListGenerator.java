@@ -51,23 +51,62 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 	 * If SmartDashboard is set to 3 stacks, the points added first will be used as a sequence. Continued trend for 2 stacks, 1 stack.
 	 */
 	public HumanLoadCommandListGenerator() {	
-		stackStartPositions.add(new double[] {-44, 17, 9, 0});
-		stackPreReleaseOffsetPositions.add(new double[] {-24, 24,  0, 0});
-		stackExtractOffsetPositions.add(new double[] {-30, 30,  0, 0});
-		stackPostReleaseOffsetPositions.add(new double[] {-41, 16, 0, 0});
-		stackPullBackOffsetPositions.add(new double[] { -22, 9,  0, 0});
+		// Orig stack rotated and tightened
+		stackStartPositions.add(new double[] {-33, 26.7, 9, 0});
+		stackPreReleaseOffsetPositions.add(new double[] {-13, 29,  0, 0});
+		stackExtractOffsetPositions.add(new double[] {-17.5, 39,  0, 0});
+		stackPostReleaseOffsetPositions.add(new double[] {-30.7, 24.8, 0, 0});
+		stackPullBackOffsetPositions.add(new double[] { -15, 12,  0, 0});
 
-		stackStartPositions.add(new double[] {-25, 34, 8, 0});
-		stackPreReleaseOffsetPositions.add(new double[] {-5, 29,  0, 0});
-		stackExtractOffsetPositions.add(new double[] {-7, 42,  0, 0});
-		stackPostReleaseOffsetPositions.add(new double[] {-23, 31, 0, 0});
-		stackPullBackOffsetPositions.add(new double[] { -11, 15,  0, 0});
+		stackStartPositions.add(new double[] {-17.2, 40.5, 8, 0});
+		stackPreReleaseOffsetPositions.add(new double[] {1.5, 30.3,  0, 0});
+		stackExtractOffsetPositions.add(new double[] { 2, 44,  0, 0});
+		stackPostReleaseOffsetPositions.add(new double[] {-16, 37.7, 0, 0});
+		stackPullBackOffsetPositions.add(new double[] { -8, 19,  0, 0});
 
-		stackStartPositions.add(new double[] { -4, 47, 8, 0});
-		stackPreReleaseOffsetPositions.add(new double[] { 9, 26,  0, 0});
-		stackExtractOffsetPositions.add(new double[] { 16, 44,  0, 0});
-		stackPostReleaseOffsetPositions.add(new double[] {-4, 44, 0, 0});
-		stackPullBackOffsetPositions.add(new double[] { -2, 24,  0, 0});
+		stackStartPositions.add(new double[] { 0, 50.5, 8, 0});
+		stackPreReleaseOffsetPositions.add(new double[] { 10.3, 24.8,  0, 0});
+		stackExtractOffsetPositions.add(new double[] { 19, 46.6,  0, 0});
+		stackPostReleaseOffsetPositions.add(new double[] {0, 47.5, 0, 0});
+		stackPullBackOffsetPositions.add(new double[] { 0, 27.5,  0, 0});
+
+		// Orig stack a little tighter
+//		stackStartPositions.add(new double[] {-42.4, 20.2, 9, 0});
+//		stackPreReleaseOffsetPositions.add(new double[] {-22.5, 25.7,  0, 0});
+//		stackExtractOffsetPositions.add(new double[] {-27.7, 31.7,  0, 0});
+//		stackPostReleaseOffsetPositions.add(new double[] {-39.7, 18.9, 0, 0});
+//		stackPullBackOffsetPositions.add(new double[] { -21.6, 10.3,  0, 0});
+//
+//		stackStartPositions.add(new double[] {-25, 34, 9, 0});
+//		stackPreReleaseOffsetPositions.add(new double[] {-5, 29.8,  0, 0});
+//		stackExtractOffsetPositions.add(new double[] {-7, 41.5,  0, 0});
+//		stackPostReleaseOffsetPositions.add(new double[] {-23.2, 31.4, 0, 0});
+//		stackPullBackOffsetPositions.add(new double[] { -11.4, 15.4,  0, 0});
+//
+//		stackStartPositions.add(new double[] { -6.9, 46.5, 9, 0});
+//		stackPreReleaseOffsetPositions.add(new double[] { 7.4, 26.3,  0, 0});
+//		stackExtractOffsetPositions.add(new double[] { 12.7, 45.2,  0, 0});
+//		stackPostReleaseOffsetPositions.add(new double[] {-6.5, 43.5, 0, 0});
+//		stackPullBackOffsetPositions.add(new double[] { -3.5, 23.7,  0, 0});
+
+		// Save working 2 stack
+//		stackStartPositions.add(new double[] {-44, 17, 9, 0});
+//		stackPreReleaseOffsetPositions.add(new double[] {-24, 24,  0, 0});
+//		stackExtractOffsetPositions.add(new double[] {-30, 30,  0, 0});
+//		stackPostReleaseOffsetPositions.add(new double[] {-41, 16, 0, 0});
+//		stackPullBackOffsetPositions.add(new double[] { -22, 9,  0, 0});
+//
+//		stackStartPositions.add(new double[] {-25, 34, 8, 0});
+//		stackPreReleaseOffsetPositions.add(new double[] {-5, 29,  0, 0});
+//		stackExtractOffsetPositions.add(new double[] {-7, 42,  0, 0});
+//		stackPostReleaseOffsetPositions.add(new double[] {-23, 31, 0, 0});
+//		stackPullBackOffsetPositions.add(new double[] { -11, 15,  0, 0});
+//
+//		stackStartPositions.add(new double[] { -4, 47, 8, 0});
+//		stackPreReleaseOffsetPositions.add(new double[] { 9, 26,  0, 0});
+//		stackExtractOffsetPositions.add(new double[] { 16, 44,  0, 0});
+//		stackPostReleaseOffsetPositions.add(new double[] {-4, 44, 0, 0});
+//		stackPullBackOffsetPositions.add(new double[] { -2, 24,  0, 0});
 	
 		maxStacks = 3;
 	}
