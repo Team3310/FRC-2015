@@ -11,10 +11,9 @@ import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator.StackPriorit
 import edu.rhhs.frc.commands.robotarm.RobotArmCommandList;
 import edu.rhhs.frc.commands.robotarm.RobotArmMotionProfileCurrentToPath;
 import edu.rhhs.frc.subsystems.BinGrabber;
+import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.rhhs.frc.subsystems.DriveTrain;
 import edu.rhhs.frc.subsystems.RobotArm;
-import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
-import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
 import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.BHRIterativeRobot;
 import edu.rhhs.frc.utility.CANTalonEncoderPID;
