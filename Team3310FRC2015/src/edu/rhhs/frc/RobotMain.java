@@ -4,6 +4,7 @@ import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPIDLong;
 import edu.rhhs.frc.commands.BinGrabberNoDeployAndGoPID;
+import edu.rhhs.frc.commands.BinGrabberNoDeployAndGoPIDLong;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
@@ -113,6 +114,7 @@ public class RobotMain extends BHRIterativeRobot
 
 			m_autonomousChooser = new SendableChooser();
 			m_autonomousChooser.addObject("BinGrabberNoDeployAndGoPID", new BinGrabberNoDeployAndGoPID());
+			m_autonomousChooser.addObject("BinGrabberNoDeployAndGoPID Long", new BinGrabberNoDeployAndGoPIDLong());
 			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", m_binGrabberDeployAndGoPID);
 			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Long", 	m_binGrabberDeployAndGoPIDLong);
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));

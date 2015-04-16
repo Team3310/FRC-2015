@@ -65,7 +65,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
     private int m_steerNonLinear = 0;
     
     private double m_moveScaleSlow = 0.35;
-    private double m_steerScaleSlow = 0.35;
+    private double m_steerScaleSlow = 0.50;
     private double m_moveScale = 0.75;
     private double m_steerScale = 0.75;
     private double m_moveScaleTurbo = 1.0;
