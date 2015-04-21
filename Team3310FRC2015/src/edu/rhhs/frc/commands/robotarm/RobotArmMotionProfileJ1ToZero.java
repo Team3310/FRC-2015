@@ -2,6 +2,7 @@ package edu.rhhs.frc.commands.robotarm;
 
 import edu.rhhs.frc.RobotMain;
 import edu.rhhs.frc.subsystems.RobotArm;
+import edu.rhhs.frc.subsystems.RobotArm.ToteGrabberPosition;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile;
 import edu.rhhs.frc.utility.motionprofile.MotionProfile.ProfileMode;
 import edu.rhhs.frc.utility.motionprofile.WaypointList;
@@ -27,7 +28,7 @@ public class RobotArmMotionProfileJ1ToZero extends RobotArmMotionProfilePath
     	else {
 	    	waypoints.addWaypoint(new double[] { -2, 24, 50, 0});  // last stack
     	}
-    	waypoints.addWaypoint(RobotArm.X_MIN_INCHES, 0, 45, 0);
+    	waypoints.addWaypoint(RobotArm.X_MIN_INCHES, 0, 48, 0);
     	
     	motionProfile = new MotionProfile(waypoints);
 		motionProfile.calculatePath(false, RobotArm.OUTER_LOOP_UPDATE_RATE_MS, 0, MotionProfile.ZERO_OFFSET);
@@ -40,6 +41,8 @@ public class RobotArmMotionProfileJ1ToZero extends RobotArmMotionProfilePath
     	}
     	currentProfileIndex = 0;
     	isFinished = false;
+    	
+    	RobotMain.robotArm.setSecondaryToteGrabberPosition(ToteGrabberPosition.OPEN);
     }
     
     protected void end() {

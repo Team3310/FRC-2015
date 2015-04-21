@@ -59,7 +59,7 @@ public class RobotArmCommandList extends ArrayList<RobotArmCommand>
 		RobotArmMotionProfilePath arm = new RobotArmMotionProfilePath(wpl);
 		arm.setCommandType(RobotArmCommandType.BEGIN_CYCLE);
 		list.add(arm);
-		System.out.println(list.getCurrent().getClass().getSimpleName());
-		System.out.println(list.getNext(RobotArmCommandType.BEGIN_CYCLE).getClass().getSimpleName());
+		//System.out.println(list.getCurrent().getClass().getSimpleName());
+		//System.out.println(list.getNext(RobotArmCommandType.BEGIN_CYCLE).getClass().getSimpleName());
 	}
 }

@@ -15,7 +15,7 @@ public class BinGrabberClawPosition extends Command
 
 	@Override
 	protected void initialize() {
-		System.out.println("Setting claw pos to " + m_position.name());
+		//System.out.println("Setting claw pos to " + m_position.name());
 		RobotMain.binGrabber.setClawPosition(m_position);
 	}
 

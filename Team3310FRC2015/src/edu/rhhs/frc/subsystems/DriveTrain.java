@@ -461,7 +461,7 @@ public class DriveTrain extends Subsystem implements ControlLoopable
 				m_error = m_setpoint - getYawAngleDeg();
 			}
 			else {
-				System.out.println("Left inches: " + getLeftDistanceInches() + ", Right inches: " + getRightDistanceInches());
+				//System.out.println("Left inches: " + getLeftDistanceInches() + ", Right inches: " + getRightDistanceInches());
 				m_error = m_setpoint - (getLeftDistanceInches() + getRightDistanceInches()) / 2.0;
 			}
 	        if (m_I != 0) {

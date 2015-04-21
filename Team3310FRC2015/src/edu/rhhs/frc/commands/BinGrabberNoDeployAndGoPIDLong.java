@@ -1,6 +1,5 @@
 package edu.rhhs.frc.commands;
 
-import edu.rhhs.frc.subsystems.BinGrabber.BinGrabberState;
 import edu.rhhs.frc.subsystems.DriveTrain.ToteSledPosition;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;

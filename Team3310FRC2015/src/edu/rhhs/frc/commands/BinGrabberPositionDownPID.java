@@ -33,7 +33,7 @@ public class BinGrabberPositionDownPID extends Command
 		boolean angleTest =  RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG && 
 				RobotMain.binGrabber.getRightPositionDeg() >  BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG;
 		if (angleTest) {
-			System.out.println("Right = " + RobotMain.binGrabber.getRightPositionDeg() + ", left = " + RobotMain.binGrabber.getLeftPositionDeg());
+			//System.out.println("Right = " + RobotMain.binGrabber.getRightPositionDeg() + ", left = " + RobotMain.binGrabber.getLeftPositionDeg());
 		}
 		return angleTest;
     }

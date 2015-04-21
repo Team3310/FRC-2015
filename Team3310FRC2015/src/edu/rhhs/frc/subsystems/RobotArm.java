@@ -71,7 +71,7 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	
 	public static final double X_MIN_INCHES = 33.0;
 	
-	private static final double Z_MAX_INCHES = 73.0;
+	private static final double Z_MAX_INCHES = 75.0;
 	private static final double Z_MIN_INCHES = 4.0;
 	
 	private static final double J3_INTERFERENCE_J2_PLUS_J3_MIN_ANGLE_DEG = -65.0;
@@ -226,6 +226,13 @@ public class RobotArm extends Subsystem implements ControlLoopable {
 	 */
 	public void teleopInit() {
 		disableControlLoop();
+	}
+	
+	/**
+	 * Methods to call when the RobotArm gets disabled.
+	 */
+	public void disabledInit() {
+		setLEDStatus(false);
 	}
 	
 	public void resetMasterPosition() {

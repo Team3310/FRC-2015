@@ -92,42 +92,42 @@ public class RobotUtility
 	
     public static void main(String[] args) {
     	double value = convertAnalogPositionToDeg(1024, 0);
-    	System.out.println("convertAnalogPositionToDeg(1024, 0) = " + value + " deg");
+    	//System.out.println("convertAnalogPositionToDeg(1024, 0) = " + value + " deg");
  
     	value = convertDegToAnalogPosition(360, 0);
-    	System.out.println("convertDegToAnalogPosition(360, 0) = " + value + " encoder counts");
+    	//System.out.println("convertDegToAnalogPosition(360, 0) = " + value + " encoder counts");
 
     	value = convertAnalogPositionToDeg(1024, 512);
-    	System.out.println("convertAnalogPositionToDeg(1024, 512) = " + value + " deg");
+    	//System.out.println("convertAnalogPositionToDeg(1024, 512) = " + value + " deg");
  
     	value = convertDegToAnalogPosition(180, 512);
-    	System.out.println("convertDegToAnalogPosition(180, 512) = " + value + " encoder counts");
+    	//System.out.println("convertDegToAnalogPosition(180, 512) = " + value + " encoder counts");
  
-    	System.out.println(" ");
+    	//System.out.println(" ");
 
     	value = convertEncoderPositionToDeg(1024);
-    	System.out.println("convertEncoderPositionToDeg(1024) = " + value + " deg");
+    	//System.out.println("convertEncoderPositionToDeg(1024) = " + value + " deg");
  
     	value = convertDegToEncoderPosition(360);
-    	System.out.println("convertDegToEncoderPosition(360) = " + value + " encoder counts");
+    	//System.out.println("convertDegToEncoderPosition(360) = " + value + " encoder counts");
    
-    	System.out.println(" ");
+    	//System.out.println(" ");
 
     	double wheelCircum = RobotMap.WHEEL_DIAMETER_IN * Math.PI;
-    	System.out.println("wheelCircum = " + wheelCircum + " inches");
+    	//System.out.println("wheelCircum = " + wheelCircum + " inches");
 
     	value = convertEncoderPositionToInches(1024);
-    	System.out.println("convertEncoderPositionToInches(1024) = " + value + " inches");
+    	//System.out.println("convertEncoderPositionToInches(1024) = " + value + " inches");
  
     	value = convertInchesToEncoderPosition(wheelCircum);
-    	System.out.println("convertInchesToEncoderPosition(" + wheelCircum + ") = " + value + " encoder counts");
+    	//System.out.println("convertInchesToEncoderPosition(" + wheelCircum + ") = " + value + " encoder counts");
     	 
-    	System.out.println(" ");
+    	//System.out.println(" ");
 
     	value = convertDegToEncoderPosition(360, -1);
-    	System.out.println("convertDegToEncoderPosition(360) (-1 gear ratio) = " + value + " encoder counts");
+    	//System.out.println("convertDegToEncoderPosition(360) (-1 gear ratio) = " + value + " encoder counts");
 
     	value = convertEncoderPositionToDeg(value, -1);
-    	System.out.println("convertEncoderPositionToDeg(value) (-1 gear ratio) = " + value + " deg");
+    	//System.out.println("convertEncoderPositionToDeg(value) (-1 gear ratio) = " + value + " deg");
    }
 }

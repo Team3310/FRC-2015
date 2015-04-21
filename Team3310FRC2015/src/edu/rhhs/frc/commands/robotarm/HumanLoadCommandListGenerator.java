@@ -13,7 +13,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 {
 	public enum StackPriority {VERTICAL, HORIZONTAL};
 	
-	public static final double[] DEFAULT_HOME_COORD =     {20, 0.0, 10, 0};  // Gripper position for bottom tote in stacker tray
+	public static final double[] DEFAULT_HOME_COORD =     {21, 0.0, 14, 0};  // Gripper position for bottom tote in stacker tray
 	public static final double[] HOME_LOAD_COORD =        {20, 0.0, 22, 0};  // Gripper position for second tote to seat it in bottom tote
 	public static final double[] HOME_STACK_EXIT_COORD =  {16, 0.0, 26, 0};  // Gripper position to clear stacker tray when gripped on bottom tote
 	public static final double[] HOME_STACK_CLEAR_COORD = {13, 0.0, 36, 0};  // Gripper position to clear top tote in stacker tray on return to home gripper open
@@ -52,7 +52,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 	 */
 	public HumanLoadCommandListGenerator() {	
 		// Orig stack rotated and tightened
-		stackStartPositions.add(new double[] {-33, 26.7, 9, 0});
+		/*stackStartPositions.add(new double[] {-33, 26.7, 9, 0});
 		stackPreReleaseOffsetPositions.add(new double[] {-13, 29,  0, 0});
 		stackExtractOffsetPositions.add(new double[] {-17.5, 39,  0, 0});
 		stackPostReleaseOffsetPositions.add(new double[] {-30.7, 24.8, 0, 0});
@@ -68,7 +68,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		stackPreReleaseOffsetPositions.add(new double[] { 10.3, 24.8,  0, 0});
 		stackExtractOffsetPositions.add(new double[] { 19, 46.6,  0, 0});
 		stackPostReleaseOffsetPositions.add(new double[] {0, 47.5, 0, 0});
-		stackPullBackOffsetPositions.add(new double[] { 0, 27.5,  0, 0});
+		stackPullBackOffsetPositions.add(new double[] { 0, 27.5,  0, 0});*/
 
 		// Orig stack a little tighter
 		/*stackStartPositions.add(new double[] {-42.4, 20.2, 9, 0});
@@ -90,7 +90,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		stackPullBackOffsetPositions.add(new double[] { -3.5, 23.7,  0, 0});*/
 
 		// Save working 2 stack
-		/*stackStartPositions.add(new double[] {-44, 17, 9, 0});
+		stackStartPositions.add(new double[] {-44, 17, 9, 0});
 		stackPreReleaseOffsetPositions.add(new double[] {-24, 24,  0, 0});
 		stackExtractOffsetPositions.add(new double[] {-30, 30,  0, 0});
 		stackPostReleaseOffsetPositions.add(new double[] {-41, 16, 0, 0});
@@ -106,7 +106,7 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		stackPreReleaseOffsetPositions.add(new double[] { 9, 26,  0, 0});
 		stackExtractOffsetPositions.add(new double[] { 16, 44,  0, 0});
 		stackPostReleaseOffsetPositions.add(new double[] {-4, 44, 0, 0});
-		stackPullBackOffsetPositions.add(new double[] { -2, 24,  0, 0});*/
+		stackPullBackOffsetPositions.add(new double[] { -2, 24,  0, 0});
 	
 		maxStacks = 3;
 	}
@@ -205,11 +205,11 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
 		    	waypointsHumanToStack.addWaypoint(totePreUnloadPosition);
 		    	waypointsHumanToStack.addWaypoint(toteReleasePosition);
 
-		    	double j1Speed = /*(i == 1) ? 110 : 140*/120;
+		    	double j1Speed = 120; /*(i == 1) ? 110 : 140*/
 		    	// Build command with parallel close
 		    	RobotArmMotionProfilePath motionProfile = new RobotArmMotionProfilePath(waypointsHumanToStack, new double[] {j1Speed, 70, 70, 90}, new double[] {100, 100, 100, 100, 100, 100}, new double[] {100, 100, 100, 100, 100, 100});
 		    	motionProfile.addParallelStartCommand(new RobotArmSecondaryToteGrabberSetPosition(ToteGrabberPosition.CLOSE), 50);
-		    	motionProfile.addParallelEndCommand(new RobotArmSecondaryToteGrabberSetPosition(ToteGrabberPosition.OPEN), 50);
+		    	motionProfile.addParallelEndCommand(new RobotArmSecondaryToteGrabberSetPosition(ToteGrabberPosition.OPEN), 38);
 		    	commandList.add(motionProfile);
 
 		    	// Wait for release ok
@@ -296,8 +296,8 @@ public class HumanLoadCommandListGenerator extends RobotArmCommandListGenerator
     	RobotArmCommandList commandList = humanLoad.getCommandList();
     	for (RobotArmCommand command : commandList) {
     		if (command instanceof  RobotArmMotionProfilePath) {
-    			System.out.println(" ");
-    			System.out.println("Motion Profile Output");
+    			//System.out.println(" ");
+    			//System.out.println("Motion Profile Output");
     			WaypointList waypoints = ((RobotArmMotionProfilePath) command).getWaypoints();
     	    	if (waypoints != null) {
     		    	MotionProfile motionProfile = new MotionProfile(waypoints);

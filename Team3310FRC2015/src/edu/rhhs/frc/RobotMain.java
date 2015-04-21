@@ -4,7 +4,6 @@ import edu.rhhs.frc.commands.AutonTurnToHumanPosition;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPID;
 import edu.rhhs.frc.commands.BinGrabberDeployAndGoPIDLong;
 import edu.rhhs.frc.commands.BinGrabberNoDeployAndGoPID;
-import edu.rhhs.frc.commands.BinGrabberNoDeployAndGoPIDLong;
 import edu.rhhs.frc.commands.DriveTrainPositionControl;
 import edu.rhhs.frc.commands.RobotArmMotionProfileStart;
 import edu.rhhs.frc.commands.robotarm.HumanLoadCommandListGenerator;
@@ -113,9 +112,8 @@ public class RobotMain extends BHRIterativeRobot
 			commandListCurrentToHome.add(new RobotArmMotionProfileCurrentToPath(waypointsCurrentToHome));
 
 			m_autonomousChooser = new SendableChooser();
-			m_autonomousChooser.addObject("BinGrabberNoDeployAndGoPID", new BinGrabberNoDeployAndGoPID());
-			m_autonomousChooser.addObject("BinGrabberNoDeployAndGoPID Long", new BinGrabberNoDeployAndGoPIDLong());
-			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID", m_binGrabberDeployAndGoPID);
+			m_autonomousChooser.addObject("BinGrabberNoDeployAndGoPID Long", new BinGrabberNoDeployAndGoPID());
+			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Short", m_binGrabberDeployAndGoPID);
 			m_autonomousChooser.addObject("BinGrabberDeployAndGoPID Long", 	m_binGrabberDeployAndGoPIDLong);
 			m_autonomousChooser.addObject ("Move Arm To Home", 	new RobotArmMotionProfileStart(commandListCurrentToHome));
 			m_autonomousChooser.addObject ("Do nothing", null);
@@ -203,11 +201,12 @@ public class RobotMain extends BHRIterativeRobot
 			if (m_autonomousIndex == 0) {
 				boolean angleTest =  RobotMain.binGrabber.getLeftPositionDeg() > BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG && 
 						RobotMain.binGrabber.getRightPositionDeg() >  BinGrabber.DEPLOYED_POSITION_DRIVETRAIN_ENGAGE_DEG;
-				System.out.println("AngleTest = " + angleTest + ", BinGrabberPos = " + RobotMain.binGrabber.getLeftPositionDeg());
+//				System.out.println("AngleTest = " + angleTest + ", BinGrabberPos = " + RobotMain.binGrabber.getLeftPositionDeg());
 				if (angleTest) {
-					System.out.println("AngleTest = true");
+//					System.out.println("AngleTest = true");
 					// Start drivetrain
-					RobotMain.driveTrain.startAutonStraightSoftwarePID(102, 4, 1.0);
+					double distance = m_autonomousCommand == m_binGrabberDeployAndGoPIDLong ? 102.0 : 24.0;
+					RobotMain.driveTrain.startAutonStraightSoftwarePID(distance, 4, 1.0);
 					RobotMain.binGrabber.setPivotLockPosition(BinGrabberState.RETRACTED);
 					m_autonomousIndex++;
 				}
@@ -267,7 +266,7 @@ public class RobotMain extends BHRIterativeRobot
 	@Override
 	public void disabledInit(){
 		m_autonomousCommand = null;
-		robotArm.setLEDStatus(false);
+		robotArm.disabledInit();
 		updateStatus();
 	}
 
